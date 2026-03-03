@@ -7,6 +7,7 @@ import {
     TouchableOpacity,
     Image,
     Pressable,
+    FlatList,
 } from "react-native";
 import {
     SafeAreaProvider,
@@ -18,6 +19,69 @@ import { StatusBar } from "expo-status-bar";
 import BottomNav from "../components/BottomNav";
 import { useNavigation } from "@react-navigation/native"; //NAVEGACION
 
+const DATA = [
+    {
+        id: '1',
+        title: 'Alineación y balanceo',
+        status: 'Finalizado'
+    },
+    {
+        id: '2',
+        title: 'Cambio filtro aire acondicionado',
+        status: 'Pendiente'
+    },
+    {
+        id: '3',
+        title: 'Lavado de motor',
+        status: 'En Proceso'
+    },
+    {
+        id: '4',
+        title: 'Cambio de aceite',
+        status: 'En Proceso'
+    },
+    {
+        id: '5',
+        title: 'Cambio de filtro de aceite',
+        status: 'En Proceso'
+    },
+    {
+        id: '6',
+        title: 'Inflado de llantas con nitrogeno',
+        status: 'Pendiente'
+    },
+]
+
+
+const Item = ({ title, status }) => {
+  const renderIcon = () => {
+    switch (status) {
+      case "Finalizado":
+        return <Feather name="check-circle" size={18} color="#22C55E" />;
+      case "En Proceso":
+        return <Feather name="clock" size={18} color="#FFD43B" />;
+      case "Pendiente":
+        return <Feather name="x-circle" size={18} color="#EF4444" />;
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <View style={{
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      marginTop: 15,
+    }}>
+      <Text style={{ color: "#fff", fontWeight: "bold" }}>
+        {title}
+      </Text>
+
+      {renderIcon()}
+    </View>
+  );
+};
 
 
 export default function OrderDetailsScreen() {
@@ -38,7 +102,7 @@ export default function OrderDetailsScreen() {
                     backgroundColor: "#0B0F14",
                 }}>
                     <Pressable 
-                        onPress={() => navigation.goBack()}
+                        onPress={() => navigation.navigate("Orders")}
                         hitSlop={12}
                         style={{ padding: 1}}
                         >
@@ -57,7 +121,7 @@ export default function OrderDetailsScreen() {
 
                     }}                  //PONER EL NUMERO DE ORDEM               
                     >
-                        Orden #
+                        Orden #341
 
                     </Text>                    
                 </View>
@@ -67,7 +131,8 @@ export default function OrderDetailsScreen() {
                         style={[
                             styles.card,
                             { borderColor: "#FFD43B" },
-                            { borderWidth: 1}
+                            { borderWidth: 1},
+                            { marginTop: 15}
                         ]}
                     >
                         <View style={styles.rowBetween}>
@@ -77,8 +142,9 @@ export default function OrderDetailsScreen() {
                                     flexDirection: "row"}}>                                    
                                     <Text style={styles.subText}>SJD739A</Text>
                                     <Text style={styles.subText}>   Gris</Text>
+                                    <Text style={styles.subText}> 122,000Km</Text>
                                 </View>
-                                
+                                                                
                             </View>
                             <View style={{
                                 alignItems: "flex-end"
@@ -95,12 +161,57 @@ export default function OrderDetailsScreen() {
                                 }}>
                                     28/02/26</Text>
                             </View>
-
                         </View>
+                    </View>
+                    <View 
+                        style={[
+                            styles.card,
+                            {borderColor: "#ffffffa8"},
+                            {borderWidth: 1}
+                        ]}
+                    >
+                        <Text style={styles.carTitle}>Servicios</Text>   
+                            <FlatList
+                                data={DATA}
+                                keyExtractor={(item) => item.id}
+                                renderItem={({ item }) => (
+                                    <Item title={item.title} status={item.status} />
+                            )}
+                        />        
+                    </View>
+                    <View style={[
+                        styles.card,
+                        {borderColor: "#ffffffa8"},
+                        {borderWidth: 1}
+                        ]}>
+                        <Text style={styles.carTitle}>Notas</Text>
+                        <Text style={[
+                            { fontSize: 15 },
+                            { marginTop: 15},
+                            { color: "#969494ff"}                          
+
+                        ]}>Cliente reporta movimiento inusual del volante</Text>
 
                     </View>
-                    
+                    <View style={{
+                            flexDirection: "row",
+                            gap: 15
+                         }}>
+                        <TouchableOpacity style={[styles.productButton, styles.half]}>
+                            <Text style={styles.secondaryButtonText}>Agregar Producto</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={[styles.serviceButton, styles.half]}>
+                            <Text style={styles.secondaryButtonText}>Agregar Servicio</Text>
+                        </TouchableOpacity>
+                    </View>
 
+                    <TouchableOpacity style={[styles.primaryButton]}>
+                            <Text style={styles.primaryButtonText}>
+                                Finalizar
+                            </Text>
+                    </TouchableOpacity>
+
+                    
                 </ScrollView>
 
 
@@ -168,6 +279,10 @@ const styles = StyleSheet.create({
     },
     primaryButtonText: {
         color: "#000",
+        fontWeight: "700",
+    },
+    secondaryButtonText: {
+        color: "#ffff",
         fontWeight: "700",
     },
     assignmentCard: {
@@ -270,4 +385,31 @@ const styles = StyleSheet.create({
         alignItems: "center",
         elevation: 8,
     },
+    half: {
+        flex: 1
+    },
+    productButton: {
+        backgroundColor: "#111827",
+        paddingVertical: 14,
+        borderRadius: 15,
+        borderColor: "#FACC15",
+        borderWidth: 1.5,
+        alignItems: "center",
+        marginTop: 20,
+        flexDirection: "row",
+        justifyContent: "center",
+        gap: 8,
+    },
+    serviceButton: {
+        backgroundColor: "#111827",
+        paddingVertical: 14,
+        borderRadius: 15,
+        borderColor: "#FACC15",
+        borderWidth: 1.5,
+        alignItems: "center",
+        marginTop: 20,
+        flexDirection: "row",
+        justifyContent: "center",
+        gap: 8,
+    }
 });
