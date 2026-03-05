@@ -7,6 +7,7 @@ import LoginScreen from "./screens/LoginScreen";
 import HomeScreen from "./screens/HomeScreen";
 import OrdersScreen from "./screens/OrdersScreen";
 import AgendaScreen from "./screens/AgendaScreen";
+import AddServiceScreen from "./screens/AddServiceScreen";
 
 import PastRepairsScreen from "./screens/PastRepairsScreen";
 import OrderDetailsScreen from "./screens/OrderDetailsScreen";
@@ -58,13 +59,17 @@ export default function App() {
                      name="PastRepairs"
                      component={PastRepairsScreen}
                      options={{ headerShown: false }}
-/>
+                />
                 <Stack.Screen
                     name="OrderDetails"
                     component={OrderDetailsScreen}
                     options={{ headerShown: false}}
                 />
-
+                <Stack.Screen
+                    name="AddService"
+                    component={AddServiceScreen}
+                    options={{ headerShown: false}}
+                />
             </Stack.Navigator>
         </NavigationContainer>
     );

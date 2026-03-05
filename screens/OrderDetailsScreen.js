@@ -91,7 +91,7 @@ export default function OrderDetailsScreen() {
         <SafeAreaProvider>
             <StatusBar style="light" />
             <SafeAreaView
-                style={[styles.container, { paddingBottom: insets.bottom }]}
+                style={[styles.container, { }]}
                 edges={["top", "bottom"]}
             >
                 <View style={{
@@ -200,7 +200,7 @@ export default function OrderDetailsScreen() {
                         <TouchableOpacity style={[styles.productButton, styles.half]}>
                             <Text style={styles.secondaryButtonText}>Agregar Producto</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={[styles.serviceButton, styles.half]}>
+                        <TouchableOpacity style={[styles.serviceButton, styles.half]} onPress={() => navigation.navigate("AddService")}>
                             <Text style={styles.secondaryButtonText}>Agregar Servicio</Text>
                         </TouchableOpacity>
                     </View>
