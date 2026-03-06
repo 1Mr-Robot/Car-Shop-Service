@@ -20,50 +20,110 @@ import BottomNav from "../components/BottomNav";
 
 const HomeScreen = ({ navigation }) => {
     const [expandedId, setExpandedId] = useState(null);
+    const insets = useSafeAreaInsets();
     
     return (
         <SafeAreaProvider>
-            <ScreenContent navigation={navigation} expandedId={expandedId} setExpandedId={setExpandedId} />
+            <StatusBar style="light" />
+            <SafeAreaView
+                style={[styles.container, { paddingBottom: insets.bottom }]}
+                edges={["top", "bottom"]}
+            >
+                <ScrollView showsVerticalScrollIndicator={false}>
+                    <View style={styles.header}>
+                        <View style={styles.profileRow}>
+                            <View style={styles.avatar}>
+                                <Feather name="user" size={30} color="black" />
+                            </View>
+                            <View>
+                                <Text style={styles.greeting}>
+                                    BUENOS DÍAS,
+                                </Text>
+                                <Text style={styles.name}>Chalino Sánchez</Text>
+                            </View>
+                        </View>
+                    </View>
+
+                    <Text style={styles.sectionTitle}>Ordenes activas</Text>
+
+                    <OrderCard
+                        type="active"
+                        vehicleYear={ACTIVE_ORDER.vehicleYear}
+                        vehicleBrand={ACTIVE_ORDER.vehicleBrand}
+                        vehicleModel={ACTIVE_ORDER.vehicleModel}
+                        vehiclePlate={ACTIVE_ORDER.vehiclePlate}
+                        services={ACTIVE_ORDER.services}
+                        notes={ACTIVE_ORDER.notes}
+                        time={ACTIVE_ORDER.since}
+                        mileage={ACTIVE_ORDER.vehicleMileage}
+                        navigation={navigation}
+                        expandedId={expandedId}
+                        setExpandedId={setExpandedId}
+                    />
+
+                    <View style={styles.sectionRow}>
+                        <Text style={styles.sectionTitle}>
+                            Próximas ordenes
+                        </Text>
+                        <TouchableOpacity onPress={() => navigation.navigate('Agenda')}>
+                            <Text style={styles.link}>Ver Calendario</Text>
+                        </TouchableOpacity>
+                    </View>
+
+                    {UPCOMING_ORDERS.map((order) => (
+                        <OrderCard
+                            key={order.id}
+                            type="upcoming"
+                            vehicleYear={order.vehicleYear}
+                            vehicleBrand={order.vehicleBrand}
+                            vehicleModel={order.vehicleModel}
+                            vehiclePlate={order.vehiclePlate}
+                            services={order.services}
+                            notes={order.notes}
+                            time={order.time}
+                            mileage={order.vehicleMileage}
+                            navigation={navigation}
+                            expandedId={expandedId}
+                            setExpandedId={setExpandedId}
+                        />
+                    ))}
+
+                    <View style={styles.sectionRow}>
+                        <Text style={styles.sectionTitle}>
+                            Ordenes Completadas
+                        </Text>
+                        <Text style={styles.subtle}>Ultimas 24h</Text>
+                    </View>
+
+                    {COMPLETED_ORDERS.map((order) => (
+                        <OrderCard
+                            key={order.id}
+                            type="completed"
+                            vehicleYear={order.vehicleYear}
+                            vehicleBrand={order.vehicleBrand}
+                            vehicleModel={order.vehicleModel}
+                            vehiclePlate={order.vehiclePlate}
+                            services={order.services}
+                            time={order.time}
+                            mileage={order.vehicleMileage}
+                            navigation={navigation}
+                            expandedId={expandedId}
+                            setExpandedId={setExpandedId}
+                        />
+                    ))}
+
+                    <View style={{ height: 120 }} />
+                </ScrollView>
+
+                <BottomNav active="Home" />
+            </SafeAreaView>
         </SafeAreaProvider>
     );
 };
 
-const Service = ({ title, status }) => {
-    const renderIcon = () => {
-        switch (status) {
-            case "Finalizado":
-                return (
-                    <Feather name="check-circle" size={18} color="#22C55E" />
-                );
-            case "En Proceso":
-                return <Feather name="clock" size={18} color="#FFD43B" />;
-            case "Pendiente":
-                return <Feather name="x-circle" size={18} color="#EF4444" />;
-            default:
-                return null;
-        }
-    };
-
-    return (
-        <View style={styles.servicesRow}>
-            <Text style={styles.servicesText}>•  {title}</Text>
-            {renderIcon()}
-        </View>
-    );
-};
-
-const OrderCard = ({ type, vehicleYear, vehicleBrand, vehicleModel, vehiclePlate, services, notes, time, navigation, expandedId, setExpandedId }) => {
+const OrderCard = ({ type, vehicleYear, vehicleBrand, vehicleModel, vehiclePlate, services, notes, time, mileage, navigation, expandedId, setExpandedId }) => {
     const isExpanded = expandedId === `${type}-${vehiclePlate}`;
     
-    const getMileage = () => {
-        if (vehicleBrand === 'Ferrari') return '32,500 km';
-        if (vehicleBrand === 'Ford') return '78,900 km';
-        if (vehicleBrand === 'Toyota' && vehicleModel === 'RAV4') return '42,000 km';
-        if (vehicleBrand === 'BMW') return '28,300 km';
-        if (vehicleBrand === 'Audi') return '55,200 km';
-        return '50,000 km';
-    };
-
     const handlePress = () => {
         setExpandedId(isExpanded ? null : `${type}-${vehiclePlate}`);
     };
@@ -75,7 +135,7 @@ const OrderCard = ({ type, vehicleYear, vehicleBrand, vehicleModel, vehiclePlate
             case 'upcoming':
                 return { iconFamily: 'Ionicons', icon: 'time-outline', bgColor: '#FFD43B', stripColor: null };
             case 'completed':
-                return { iconFamily: 'Ionicons', icon: 'checkmark', bgColor: '#1E7D32', stripColor: null };
+                return { iconFamily: 'Ionicons', icon: 'checkmark', bgColor: '#1E7D32', stripColor: null, color: '#fff' };
             default:
                 return { iconFamily: 'Feather', icon: 'tool', bgColor: '#FFD43B', stripColor: '#FFD43B' };
         }
@@ -84,7 +144,7 @@ const OrderCard = ({ type, vehicleYear, vehicleBrand, vehicleModel, vehiclePlate
     const iconConfig = getIconConfig();
 
     const renderIcon = () => {
-        const iconProps = { size: 20, color: "#000" };
+        const iconProps = { size: 20, color: iconConfig.color || "#000" };
         if (iconConfig.iconFamily === 'Ionicons') {
             return <Ionicons name={iconConfig.icon} {...iconProps} />;
         }
@@ -166,7 +226,7 @@ const OrderCard = ({ type, vehicleYear, vehicleBrand, vehicleModel, vehiclePlate
                                         vehicle: `${vehicleYear} ${vehicleBrand} ${vehicleModel}`,
                                         plate: vehiclePlate,
                                         service: serviceInfo,
-                                        mileage: getMileage(),
+                                        mileage: mileage,
                                         notes: notes || ''
                                     });
                                 } else {
@@ -174,7 +234,7 @@ const OrderCard = ({ type, vehicleYear, vehicleBrand, vehicleModel, vehiclePlate
                                         vehicle: `${vehicleYear} ${vehicleBrand} ${vehicleModel}`,
                                         plate: vehiclePlate,
                                         service: serviceInfo,
-                                        mileage: getMileage(),
+                                        mileage: mileage,
                                         notes: notes || ''
                                     });
                                 }
@@ -190,12 +250,39 @@ const OrderCard = ({ type, vehicleYear, vehicleBrand, vehicleModel, vehiclePlate
     );
 };
 
+const Service = ({ title, status }) => {
+    const renderIcon = () => {
+        switch (status) {
+            case "Finalizado":
+                return (
+                    <Feather name="check-circle" size={18} color="#22C55E" />
+                );
+            case "En Proceso":
+                return <Feather name="clock" size={18} color="#FFD43B" />;
+            case "Pendiente":
+                return <Feather name="x-circle" size={18} color="#EF4444" />;
+            default:
+                return null;
+        }
+    };
+
+    return (
+        <View style={styles.servicesRow}>
+            <Text style={styles.servicesText}>•  {title}</Text>
+            {renderIcon()}
+        </View>
+    );
+};
+
+export default HomeScreen;
+
 const ACTIVE_ORDER = {
     id: '1',
     vehicleYear: '2026',
     vehicleBrand: 'Ferrari',
     vehicleModel: 'SF-26',
     vehiclePlate: '62SBG2',
+    vehicleMileage: '50,000 km',
     status: 'EN PROGRESO',
     since: '09:00 AM',
     notes: 'El cliente reporta ruido extraño al abrir el DRS. También pidió que se revisara el sistema de escape por posibles fugas.',
@@ -216,6 +303,7 @@ const UPCOMING_ORDERS = [
         vehicleBrand: 'Ford',
         vehicleModel: 'F-150',
         vehiclePlate: '57SBG3',
+        vehicleMileage: '60,000 km',
         time: 'Hoy, 02:30 PM',
         notes: 'El cliente pidió que se revisara la presión de las llantas.',
         services: [
@@ -228,6 +316,7 @@ const UPCOMING_ORDERS = [
         vehicleBrand: 'Toyota',
         vehicleModel: 'RAV4',
         vehiclePlate: '29HJK1',
+        vehicleMileage: '70,000 km',
         time: 'Mañana, 09:00 AM',
         notes: 'El cliente solicita que se revise el sistema de aire acondicionado.',
         services: [
@@ -243,6 +332,7 @@ const COMPLETED_ORDERS = [
         vehicleBrand: 'BMW',
         vehicleModel: 'X5',
         vehiclePlate: '45JLM2',
+        vehicleMileage: '80,000 km',
         time: '08:15 AM',
         notes: 'El cliente pidió que se revisara la alarma.',
         services: [
@@ -255,6 +345,7 @@ const COMPLETED_ORDERS = [
         vehicleBrand: 'Audi',
         vehicleModel: 'A4',
         vehiclePlate: '78NPQ5',
+        vehicleMileage: '90,000 km',
         time: 'Ayer',
         notes: 'El cliente solicitó cambio de luces LED.',
         services: [
@@ -262,112 +353,6 @@ const COMPLETED_ORDERS = [
         ]
     }
 ]
-
-const ScreenContent = ({ navigation, expandedId, setExpandedId }) => {
-    const insets = useSafeAreaInsets();
-
-    return (
-        <>
-            <StatusBar style="light" />
-            <SafeAreaView
-                style={[styles.container, { paddingBottom: insets.bottom }]}
-                edges={["top", "bottom"]}
-            >
-                <ScrollView showsVerticalScrollIndicator={false}>
-                    {/* HEADER */}
-                    <View style={styles.header}>
-                        <View style={styles.profileRow}>
-                            <View style={styles.avatar}>
-                                <Feather name="user" size={30} color="black" />
-                            </View>
-                            <View>
-                                <Text style={styles.greeting}>
-                                    BUENOS DÍAS,
-                                </Text>
-                                <Text style={styles.name}>Chalino Sánchez</Text>
-                            </View>
-                        </View>
-                    </View>
-
-                    {/* ACTIVE REPAIR */}
-                    <Text style={styles.sectionTitle}>Ordenes activas</Text>
-
-                    <OrderCard
-                        type="active"
-                        vehicleYear={ACTIVE_ORDER.vehicleYear}
-                        vehicleBrand={ACTIVE_ORDER.vehicleBrand}
-                        vehicleModel={ACTIVE_ORDER.vehicleModel}
-                        vehiclePlate={ACTIVE_ORDER.vehiclePlate}
-                        services={ACTIVE_ORDER.services}
-                        notes={ACTIVE_ORDER.notes}
-                        time={ACTIVE_ORDER.since}
-                        navigation={navigation}
-                        expandedId={expandedId}
-                        setExpandedId={setExpandedId}
-                    />
-
-                    {/* UPCOMING TASKS */}
-                    <View style={styles.sectionRow}>
-                        <Text style={styles.sectionTitle}>
-                            Próximas ordenes
-                        </Text>
-                        <TouchableOpacity onPress={() => navigation.navigate('Agenda')}>
-                            <Text style={styles.link}>Ver Calendario</Text>
-                        </TouchableOpacity>
-                    </View>
-
-                    {UPCOMING_ORDERS.map((order) => (
-                        <OrderCard
-                            key={order.id}
-                            type="upcoming"
-                            vehicleYear={order.vehicleYear}
-                            vehicleBrand={order.vehicleBrand}
-                            vehicleModel={order.vehicleModel}
-                            vehiclePlate={order.vehiclePlate}
-                            services={order.services}
-                            notes={order.notes}
-                            time={order.time}
-                            navigation={navigation}
-                            expandedId={expandedId}
-                            setExpandedId={setExpandedId}
-                        />
-                    ))}
-
-                    {/* COMPLETED TASKS */}
-                    <View style={styles.sectionRow}>
-                        <Text style={styles.sectionTitle}>
-                            Ordenes Completadas
-                        </Text>
-                        <Text style={styles.subtle}>Ultimas 24h</Text>
-                    </View>
-
-                    {COMPLETED_ORDERS.map((order) => (
-                        <OrderCard
-                            key={order.id}
-                            type="completed"
-                            vehicleYear={order.vehicleYear}
-                            vehicleBrand={order.vehicleBrand}
-                            vehicleModel={order.vehicleModel}
-                            vehiclePlate={order.vehiclePlate}
-                            services={order.services}
-                            time={order.time}
-                            navigation={navigation}
-                            expandedId={expandedId}
-                            setExpandedId={setExpandedId}
-                        />
-                    ))}
-
-                    <View style={{ height: 120 }} />
-                </ScrollView>
-
-                {/* BOTTOM NAV */}
-                <BottomNav active="Home" />
-            </SafeAreaView>
-        </>
-    );
-};
-
-export default HomeScreen;
 
 const styles = StyleSheet.create({
     container: {
@@ -459,6 +444,7 @@ const styles = StyleSheet.create({
         fontSize: 13,
         flex: 1,
         flexWrap: "wrap",
+        lineHeight: 20,
     },
 
     orderCard: {
