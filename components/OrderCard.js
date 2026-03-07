@@ -117,22 +117,33 @@ const OrderCard = ({ type, vehicleYear, vehicleBrand, vehicleModel, vehiclePlate
                             style={getDetailsButtonStyle()} 
                             onPress={() => {
                                 const serviceInfo = services.map(s => s.title).join(', ') || 'Servicio general';
-                                if (type === 'completed') {
-                                    navigation.navigate('LastService', { 
+                                switch(type){
+                                    case 'completed':
+                                        navigation.navigate('LastService', { 
                                         vehicle: `${vehicleYear} ${vehicleBrand} ${vehicleModel}`,
                                         plate: vehiclePlate,
                                         service: serviceInfo,
                                         mileage: mileage,
                                         notes: notes || ''
-                                    });
-                                } else {
-                                    navigation.navigate('NextService', { 
+                                        });
+                                        break;
+                                    case 'upcoming':
+                                        navigation.navigate('NextService', { 
                                         vehicle: `${vehicleYear} ${vehicleBrand} ${vehicleModel}`,
                                         plate: vehiclePlate,
                                         service: serviceInfo,
                                         mileage: mileage,
                                         notes: notes || ''
-                                    });
+                                        });
+                                        break;
+                                    case 'active':
+                                            navigation.navigate('OrderDetails', { 
+                                            vehicle: `${vehicleYear} ${vehicleBrand} ${vehicleModel}`,
+                                            plate: vehiclePlate,
+                                            service: serviceInfo,
+                                            mileage: mileage,
+                                            notes: notes || ''
+                                        });
                                 }
                             }}
                         >
