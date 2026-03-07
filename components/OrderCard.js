@@ -53,6 +53,20 @@ const OrderCard = ({ type, vehicleYear, vehicleBrand, vehicleModel, vehiclePlate
         }
     };
 
+    const getDetailsButtonStyle = () => {
+        if (type === 'active') {
+            return styles.detailsButtonActive;
+        }
+        return styles.detailsButton;
+    };
+
+    const getDetailsButtonTextStyle = () => {
+        if (type === 'active') {
+            return styles.detailsButtonTextActive;
+        }
+        return styles.detailsButtonText;
+    };
+
     return (
         <View style={styles.orderCard}>
             {type === 'active' && <View style={[styles.yellowStrip, { backgroundColor: iconConfig.stripColor }]} />}
@@ -100,7 +114,7 @@ const OrderCard = ({ type, vehicleYear, vehicleBrand, vehicleModel, vehiclePlate
                         )}
 
                         <TouchableOpacity 
-                            style={styles.detailsButton} 
+                            style={getDetailsButtonStyle()} 
                             onPress={() => {
                                 const serviceInfo = services.map(s => s.title).join(', ') || 'Servicio general';
                                 if (type === 'completed') {
@@ -122,8 +136,8 @@ const OrderCard = ({ type, vehicleYear, vehicleBrand, vehicleModel, vehiclePlate
                                 }
                             }}
                         >
-                            <Text style={styles.detailsButtonText}>Detalles</Text>
-                            <Feather name="chevron-right" size={14} color="#FFD43B" />
+                            <Text style={getDetailsButtonTextStyle()}>Detalles</Text>
+                            <Feather name="chevron-right" size={14} color={type === 'active' ? "#000" : "#FFD43B"} />
                         </TouchableOpacity>
                     </View>
                 )}
@@ -131,6 +145,8 @@ const OrderCard = ({ type, vehicleYear, vehicleBrand, vehicleModel, vehiclePlate
         </View>
     );
 };
+
+export default OrderCard;
 
 const styles = {
     orderCard: {
@@ -239,12 +255,28 @@ const styles = {
         borderColor: "#FFD43B",
     },
 
+    detailsButtonActive: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+        marginTop: 12,
+        paddingVertical: 14,
+        paddingHorizontal: 24,
+        borderRadius: 15,
+        backgroundColor: "#FFD43B",
+    },
+
     detailsButtonText: {
         color: "#FFD43B",
         fontSize: 13,
         fontWeight: "600",
         marginRight: 4,
     },
-};
 
-export default OrderCard;
+    detailsButtonTextActive: {
+        color: "#000",
+        fontSize: 14,
+        fontWeight: "700",
+        marginRight: 4,
+    },
+};

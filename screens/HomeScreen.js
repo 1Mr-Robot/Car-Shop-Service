@@ -61,7 +61,7 @@ const HomeScreen = ({ navigation }) => {
 
                     <View style={styles.sectionRow}>
                         <Text style={styles.sectionTitle}>
-                            Próximas ordenes
+                            Ordenes de hoy
                         </Text>
                         <TouchableOpacity onPress={() => navigation.navigate('Agenda')}>
                             <Text style={styles.link}>Ver Calendario</Text>

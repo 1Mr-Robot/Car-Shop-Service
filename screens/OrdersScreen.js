@@ -1,20 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import {
     View,
     Text,
     StyleSheet,
     ScrollView,
-    TouchableOpacity,
-    Image,
-    Pressable,
-    Button,
 } from "react-native";
-import {
-    Ionicons,
-    MaterialCommunityIcons,
-    Feather,
-    Octicons,
-} from "@expo/vector-icons";
+import { Octicons } from "@expo/vector-icons";
 import {
     SafeAreaProvider,
     SafeAreaView,
@@ -22,9 +13,12 @@ import {
 } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import BottomNav from "../components/BottomNav";
+import OrderCard from "../components/OrderCard";
 
 export default function OrdersScreen({ navigation }) {
+    const [expandedId, setExpandedId] = useState(`active-${ACTIVE_ORDER.vehiclePlate}`);
     const insets = useSafeAreaInsets();
+    const groupedOrders = groupOrdersByDay(UPCOMING_ORDERS);
     return (
         <SafeAreaProvider>
             <StatusBar style="light" />
@@ -32,7 +26,7 @@ export default function OrdersScreen({ navigation }) {
                 style={[styles.container, { paddingBottom: insets.bottom }]}
                 edges={["top", "bottom"]}
             >
-                <ScrollView showsVerticalScrollIndicator={false}>
+                <ScrollView showsVerticalScrollIndicator={false} style={{ marginBottom: 20 }}>
                     <Text
                         style={{
                             fontSize: 24,
@@ -41,7 +35,7 @@ export default function OrdersScreen({ navigation }) {
                             color: "#fff",
                         }}
                     >
-                        Gestor de Ordenes
+                        Próximas Ordenes
                     </Text>
                     <View
                         style={{
@@ -59,73 +53,51 @@ export default function OrdersScreen({ navigation }) {
                                 fontWeight: "bold",
                             }}
                         >
-                            Orden actual
+                            Ordenes actuales
                         </Text>
                     </View>
-                    <View style={styles.card}>
-                        <View style={styles.rowBetween}>
-                            <View>
-                                <Text style={styles.carTitle}>Honda Civic</Text>
-                                <Text style={styles.subText}>
-                                    Placas: AB123D • Gris • 2027
-                                </Text>
-                            </View>
-                            <View style={styles.badge}>
-                                <Text style={styles.badgeText}>EN PROCESO</Text>
-                            </View>
-                        </View>
-
-                        <TouchableOpacity style={styles.primaryButton} onPress={() => navigation.navigate("OrderDetails")} >
-                            <Text style={styles.primaryButtonText}>
-                                Ver detalles
-                            </Text>
-                            <MaterialCommunityIcons
-                                name="arrow-right"
-                                size={20}
-                                color="black"
-                            />
-                        </TouchableOpacity>
-                    </View>
+                    <OrderCard
+                        type="active"
+                        vehicleYear={ACTIVE_ORDER.vehicleYear}
+                        vehicleBrand={ACTIVE_ORDER.vehicleBrand}
+                        vehicleModel={ACTIVE_ORDER.vehicleModel}
+                        vehiclePlate={ACTIVE_ORDER.vehiclePlate}
+                        services={ACTIVE_ORDER.services}
+                        notes={ACTIVE_ORDER.notes}
+                        time={ACTIVE_ORDER.time}
+                        mileage={ACTIVE_ORDER.vehicleMileage}
+                        navigation={navigation}
+                        expandedId={expandedId}
+                        setExpandedId={setExpandedId}
+                    />
 
                     {/* UPCOMING */}
-                    <Text style={styles.sectionLabel}>PRÓXIMAS ORDENES</Text>
+                    {dayOrder.map((day) => (
+                        groupedOrders[day] && (
+                            <View key={day}>
+                                <Text style={styles.sectionLabel}>{day.toUpperCase()}</Text>
+                                {groupedOrders[day].map((order) => (
+                                    <OrderCard
+                                        key={order.id}
+                                        type="upcoming"
+                                        vehicleYear={order.vehicleYear}
+                                        vehicleBrand={order.vehicleBrand}
+                                        vehicleModel={order.vehicleModel}
+                                        vehiclePlate={order.vehiclePlate}
+                                        services={order.services}
+                                        notes={order.notes}
+                                        time={order.time}
+                                        mileage={order.vehicleMileage}
+                                        navigation={navigation}
+                                        expandedId={expandedId}
+                                        setExpandedId={setExpandedId}
+                                    />
+                                ))}
+                            </View>
+                        )
+                    ))}
 
-                    {renderUpcoming(
-                        "Ford F-150",
-                        "Diagnostico de motor • PL-9988",
-                        "HOY, 02:30 PM",
-                        "PENDIENTE"
-                    )}
-                    {renderUpcoming(
-                        "Toyota RAV4",
-                        "Servicio de mantenimiento • TX-5544",
-                        "MAÑANA, 09:00 AM",
-                        "PROGRAMADO"
-                    )}
-                    {renderUpcoming(
-                        "BMW X5",
-                        "Cambio de aceite • BM-2233",
-                        "MAÑANA, 11:00 AM",
-                        "PROGRAMADO"
-                    )}
-                    {renderUpcoming(
-                        "Nissan Sentra",
-                        "Revisión de frenos • NS-8877",
-                        "20/03/2026, 10:00 AM",
-                        "PROGRAMADO"
-                    )}
-                    {renderUpcoming(
-                        "Chevrolet Malibu",
-                        "Diagnóstico eléctrico • CH-4455",
-                        "21/03/2026, 02:00 PM",
-                        "PROGRAMADO"
-                    )}
-                    {renderUpcoming(
-                        "Mazda CX-5",
-                        "Alineación y balanceo • MZ-1122",
-                        "22/03/2026, 09:30 AM",
-                        "PROGRAMADO"
-                    )}
+                    <View style={{ height: 120 }} />
                 </ScrollView>
                 <BottomNav active="Orders" />
             </SafeAreaView>
@@ -133,27 +105,121 @@ export default function OrdersScreen({ navigation }) {
     );
 }
 
-function renderUpcoming(title, subtitle, time, status) {
-    return (
-        <View style={styles.taskCard}>
-            <View style={styles.iconCircleDark}>
-                <Feather name="clock" size={16} color="#FFD43B" />
-            </View>
+const groupOrdersByDay = (orders) => {
+    const groups = {};
+    orders.forEach((order) => {
+        const day = order.dayKey;
+        if (!groups[day]) {
+            groups[day] = [];
+        }
+        groups[day].push(order);
+    });
+    return groups;
+};
 
-            <View style={{ flex: 1 }}>
-                <Text style={styles.carTitle}>{title}</Text>
-                <Text style={styles.subText}>{subtitle}</Text>
-            </View>
+const dayOrder = ['HOY', 'MAÑANA', '20/03/2026', '21/03/2026', '22/03/2026'];
 
-            <View style={{ alignItems: "flex-end" }}>
-                <Text style={styles.timeText}>{time}</Text>
-                <View style={styles.statusBadge}>
-                    <Text style={styles.statusText}>{status}</Text>
-                </View>
-            </View>
-        </View>
-    );
-}
+const ACTIVE_ORDER = {
+    id: 'active',
+    vehicleYear: '2027',
+    vehicleBrand: 'Honda',
+    vehicleModel: 'Civic',
+    vehiclePlate: 'AB123D',
+    vehicleMileage: '10,000 km',
+    time: '09:00 AM',
+    notes: 'Cambio de aceite y revisión general',
+    services: [
+        { id: '1', title: 'Cambio de aceite', status: 'En Proceso' },
+        { id: '2', title: 'Revisión de frenos', status: 'Pendiente' },
+    ]
+};
+
+const UPCOMING_ORDERS = [
+    {
+        id: '1',
+        vehicleYear: '2019',
+        vehicleBrand: 'Ford',
+        vehicleModel: 'F-150',
+        vehiclePlate: 'PL-9988',
+        vehicleMileage: '60,000 km',
+        time: 'HOY, 02:30 PM',
+        dayKey: 'HOY',
+        notes: 'Diagnostico de motor',
+        services: [
+            { id: '1', title: 'Diagnostico de motor', status: 'Pendiente' },
+        ]
+    },
+    {
+        id: '2',
+        vehicleYear: '2022',
+        vehicleBrand: 'Toyota',
+        vehicleModel: 'RAV4',
+        vehiclePlate: 'TX-5544',
+        vehicleMileage: '70,000 km',
+        time: 'MAÑANA, 09:00 AM',
+        dayKey: 'MAÑANA',
+        notes: 'Servicio de mantenimiento',
+        services: [
+            { id: '1', title: 'Servicio de mantenimiento', status: 'Pendiente' },
+        ]
+    },
+    {
+        id: '3',
+        vehicleYear: '2023',
+        vehicleBrand: 'BMW',
+        vehicleModel: 'X5',
+        vehiclePlate: 'BM-2233',
+        vehicleMileage: '80,000 km',
+        time: 'MAÑANA, 11:00 AM',
+        dayKey: 'MAÑANA',
+        notes: 'Cambio de aceite',
+        services: [
+            { id: '1', title: 'Cambio de aceite', status: 'Pendiente' },
+        ]
+    },
+    {
+        id: '4',
+        vehicleYear: '2021',
+        vehicleBrand: 'Nissan',
+        vehicleModel: 'Sentra',
+        vehiclePlate: 'NS-8877',
+        vehicleMileage: '50,000 km',
+        time: '20/03/2026, 10:00 AM',
+        dayKey: '20/03/2026',
+        notes: 'Revisión de frenos',
+        services: [
+            { id: '1', title: 'Revisión de frenos', status: 'Pendiente' },
+        ]
+    },
+    {
+        id: '5',
+        vehicleYear: '2020',
+        vehicleBrand: 'Chevrolet',
+        vehicleModel: 'Malibu',
+        vehiclePlate: 'CH-4455',
+        vehicleMileage: '65,000 km',
+        time: '21/03/2026, 02:00 PM',
+        dayKey: '21/03/2026',
+        notes: 'Diagnóstico eléctrico',
+        services: [
+            { id: '1', title: 'Diagnóstico eléctrico', status: 'Pendiente' },
+        ]
+    },
+    {
+        id: '6',
+        vehicleYear: '2022',
+        vehicleBrand: 'Mazda',
+        vehicleModel: 'CX-5',
+        vehiclePlate: 'MZ-1122',
+        vehicleMileage: '45,000 km',
+        time: '22/03/2026, 09:30 AM',
+        dayKey: '22/03/2026',
+        notes: 'Alineación y balanceo',
+        services: [
+            { id: '1', title: 'Alineación y balanceo', status: 'Pendiente' },
+        ]
+    },
+];
 
 const styles = StyleSheet.create({
     container: {
@@ -167,139 +233,5 @@ const styles = StyleSheet.create({
         letterSpacing: 1,
         marginBottom: 15,
         marginTop: 10,
-    },
-    card: {
-        backgroundColor: "#1A1D24",
-        borderRadius: 20,
-        padding: 20,
-        marginBottom: 25,
-    },
-    rowBetween: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
-    },
-    carTitle: {
-        color: "#fff",
-        fontSize: 16,
-        fontWeight: "600",
-    },
-    subText: {
-        color: "#8B90A0",
-        fontSize: 13,
-        marginTop: 4,
-    },
-    badge: {
-        backgroundColor: "rgba(255,212,59,0.15)",
-        paddingHorizontal: 12,
-        paddingVertical: 6,
-        borderRadius: 20,
-    },
-    badgeText: {
-        color: "#FFD43B",
-        fontSize: 12,
-        fontWeight: "600",
-    },
-    primaryButton: {
-        backgroundColor: "#FFD43B",
-        paddingVertical: 14,
-        borderRadius: 15,
-        alignItems: "center",
-        marginTop: 20,
-        flexDirection: "row",
-        justifyContent: "center",
-        gap: 8,
-    },
-    primaryButtonText: {
-        color: "#000",
-        fontWeight: "700",
-    },
-    assignmentCard: {
-        backgroundColor: "#14161C",
-        borderRadius: 18,
-        padding: 16,
-        flexDirection: "row",
-        alignItems: "center",
-        marginBottom: 25,
-        borderWidth: 1,
-        borderColor: "#2A2E38",
-    },
-    iconCircle: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        backgroundColor: "#1F222B",
-        justifyContent: "center",
-        alignItems: "center",
-        marginRight: 12,
-    },
-    smallButton: {
-        backgroundColor: "#FFD43B",
-        paddingHorizontal: 16,
-        paddingVertical: 8,
-        borderRadius: 12,
-    },
-    smallButtonText: {
-        color: "#000",
-        fontWeight: "600",
-        fontSize: 12,
-    },
-    taskCard: {
-        backgroundColor: "#1A1D24",
-        borderRadius: 18,
-        padding: 16,
-        flexDirection: "row",
-        alignItems: "center",
-        marginBottom: 15,
-    },
-    iconCircleDark: {
-        width: 36,
-        height: 36,
-        borderRadius: 18,
-        backgroundColor: "#14161C",
-        justifyContent: "center",
-        alignItems: "center",
-        marginRight: 12,
-    },
-    completedCircle: {
-        width: 36,
-        height: 36,
-        borderRadius: 18,
-        backgroundColor: "#2ECC71",
-        justifyContent: "center",
-        alignItems: "center",
-        marginRight: 12,
-    },
-    timeText: {
-        color: "#8B90A0",
-        fontSize: 11,
-        marginBottom: 6,
-        textAlign: "right",
-    },
-    statusBadge: {
-        borderWidth: 1,
-        borderColor: "#FFD43B",
-        borderRadius: 10,
-        paddingHorizontal: 8,
-        paddingVertical: 2,
-    },
-    statusText: {
-        color: "#FFD43B",
-        fontSize: 10,
-    },
-    price: {
-        color: "#FFD43B",
-        fontWeight: "700",
-        fontSize: 16,
-    },
-    priorityBadge: {
-        backgroundColor: "#402225",
-        paddingHorizontal: 10,
-        paddingVertical: 4,
-        borderRadius: 10,
-    },
-    priorityText: {
-        color: "#FF4D4F",
-        fontSize: 11,
     },
 });

@@ -26,6 +26,8 @@ const Service = ({ title, status }) => {
     );
 };
 
+export default Service;
+
 const styles = {
     servicesRow: {
         flexDirection: "row",
@@ -43,5 +45,3 @@ const styles = {
         lineHeight: 20,
     },
 };
-
-export default Service;
