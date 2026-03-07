@@ -5,6 +5,7 @@ import {
     StyleSheet,
     ScrollView,
     TouchableOpacity,
+    Modal,
 } from "react-native";
 import {
     SafeAreaProvider,
@@ -18,6 +19,7 @@ import OrderCard from "../components/OrderCard";
 
 const HomeScreen = ({ navigation }) => {
     const [expandedId, setExpandedId] = useState(null);
+    const [showLogoutModal, setShowLogoutModal] = useState(false);
     const insets = useSafeAreaInsets();
     
     return (
@@ -40,6 +42,12 @@ const HomeScreen = ({ navigation }) => {
                                 <Text style={styles.name}>Chalino Sánchez</Text>
                             </View>
                         </View>
+                        <TouchableOpacity 
+                            style={styles.logoutButton} 
+                            onPress={() => setShowLogoutModal(true)}
+                        >
+                            <Feather name="log-out" size={22} color="#FF4D4D" />
+                        </TouchableOpacity>
                     </View>
 
                     <Text style={styles.sectionTitle}>Ordenes activas</Text>
@@ -112,6 +120,36 @@ const HomeScreen = ({ navigation }) => {
 
                     <View style={{ height: 120 }} />
                 </ScrollView>
+
+                <Modal
+                    visible={showLogoutModal}
+                    transparent={true}
+                    animationType="fade"
+                    onRequestClose={() => setShowLogoutModal(false)}
+                >
+                    <View style={styles.modalOverlay}>
+                        <View style={styles.modalContent}>
+                            <Text style={styles.modalTitle}>Cerrar Sesión</Text>
+                            <Text style={styles.modalText}>¿Estás seguro de que deseas cerrar sesión?</Text>
+                            <View style={styles.modalButtons}>
+                                <TouchableOpacity 
+                                    style={styles.modalCancelButton}
+                                    onPress={() => setShowLogoutModal(false)}
+                                >
+                                    <Text style={styles.modalCancelText}>Cancelar</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity 
+                                    style={styles.modalAcceptButton}
+                                    onPress={() => {
+                                        setShowLogoutModal(false);
+                                    }}
+                                >
+                                    <Text style={styles.modalAcceptText}>Aceptar</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </View>
+                </Modal>
 
                 <BottomNav active="Home" />
             </SafeAreaView>
@@ -498,5 +536,69 @@ const styles = StyleSheet.create({
         fontSize: 13,
         fontWeight: "600",
         marginRight: 4,
+    },
+
+    logoutButton: {
+        padding: 8,
+    },
+
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: "rgba(0, 0, 0, 0.7)",
+        justifyContent: "center",
+        alignItems: "center",
+    },
+
+    modalContent: {
+        backgroundColor: "#1A1D23",
+        borderRadius: 20,
+        padding: 24,
+        width: "85%",
+        alignItems: "center",
+    },
+
+    modalTitle: {
+        color: "#fff",
+        fontSize: 20,
+        fontWeight: "bold",
+        marginBottom: 12,
+    },
+
+    modalText: {
+        color: "#888",
+        fontSize: 14,
+        textAlign: "center",
+        marginBottom: 24,
+    },
+
+    modalButtons: {
+        flexDirection: "row",
+        gap: 12,
+    },
+
+    modalCancelButton: {
+        backgroundColor: "#333",
+        paddingVertical: 12,
+        paddingHorizontal: 24,
+        borderRadius: 12,
+    },
+
+    modalCancelText: {
+        color: "#fff",
+        fontSize: 14,
+        fontWeight: "600",
+    },
+
+    modalAcceptButton: {
+        backgroundColor: "#FF4D4D",
+        paddingVertical: 12,
+        paddingHorizontal: 24,
+        borderRadius: 12,
+    },
+
+    modalAcceptText: {
+        color: "#fff",
+        fontSize: 14,
+        fontWeight: "600",
     },
 });
