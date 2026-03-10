@@ -11,7 +11,8 @@ import { Feather } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import BottomNav from "../components/BottomNav";
-
+import OrderCard from "../components/OrderCard";
+import { useNavigation } from "@react-navigation/native";
 const months = [
   "Enero","Febrero","Marzo","Abril","Mayo","Junio",
   "Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"
@@ -51,12 +52,12 @@ const mockOrders = {
 };
 
 export default function AgendaScreen() {
-
+const navigation = useNavigation();
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
   const [selectedDay, setSelectedDay] = useState(new Date().getDate());
   const [filterType, setFilterType] = useState("day");
-
+  const [expandedId, setExpandedId] = useState(null);
   const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
   const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
   const startOffset = firstDayOfMonth === 0 ? 6 : firstDayOfMonth - 1;
@@ -205,34 +206,34 @@ export default function AgendaScreen() {
               No hay órdenes para este filtro.
             </Text>
           ) : (
-            filteredOrders.map((order) => (
-              <View key={order.id} style={styles.orderCard}>
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.vehicle}>{order.vehicle}</Text>
-                  <Text style={styles.service}>
-                    {order.service} • {order.plate}
-                  </Text>
-                  <Text style={styles.timeText}>{order.time}</Text>
-                </View>
-
-                <View
-                  style={[
-                    styles.statusBadge,
-                    order.status === "PENDIENTE"
-                      ? styles.pendingBadge
-                      : styles.programmedBadge
-                  ]}
-                >
-                  <Text style={[
-                    styles.statusText,
-                    order.status === "PENDIENTE"
-                      ? styles.pendingText
-                      : styles.programmedText
-                  ]}>
-                    {order.status}
-                  </Text>
-                </View>
-              </View>
+           filteredOrders.map((order) => (
+              <OrderCard
+                key={order.id}
+                type={
+                  order.status === "PENDIENTE"
+                    ? "active"
+                    : order.status === "PROGRAMADO"
+                    ? "upcoming"
+                    : "completed"
+                }
+                vehicleYear="2026"
+                vehicleBrand={order.vehicle.split(" ")[0]}
+                vehicleModel={order.vehicle.split(" ").slice(1).join(" ")}
+                vehiclePlate={order.plate}
+                services={[
+                  {
+                    id: 1,
+                    title: order.service,
+                    status: "pending"
+                  }
+                ]}
+                notes="Sin notas"
+                time={order.time}
+                mileage="15000"
+                navigation={navigation}
+                expandedId={expandedId}
+                setExpandedId={setExpandedId}
+              />
             ))
           )}
 
