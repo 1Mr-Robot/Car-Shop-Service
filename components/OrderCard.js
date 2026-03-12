@@ -4,7 +4,7 @@ import { View, Text, TouchableOpacity } from "react-native";
 import { Ionicons, Feather } from "@expo/vector-icons";
 import Service from "./Service";
 
-const OrderCard = ({ type, vehicleYear, vehicleBrand, vehicleModel, vehiclePlate, services, notes, time, mileage, navigation, expandedId, setExpandedId }) => {
+const OrderCard = ({ id, type, vehicleYear, vehicleBrand, vehicleModel, vehiclePlate, services, notes, time, mileage, navigation, expandedId, setExpandedId }) => {
     const isExpanded = expandedId === `${type}-${vehiclePlate}`;
     
     const handlePress = () => {
@@ -118,22 +118,36 @@ const OrderCard = ({ type, vehicleYear, vehicleBrand, vehicleModel, vehiclePlate
                             style={getDetailsButtonStyle()} 
                             onPress={() => {
                                 const serviceInfo = services.map(s => s.title).join(', ') || 'Servicio general';
-                                if (type === 'completed') {
-                                    navigation.navigate('LastService', { 
+                                switch(type){
+                                    case 'completed':
+                                        navigation.navigate('LastService', {
+                                        orderId: id, 
                                         vehicle: `${vehicleYear} ${vehicleBrand} ${vehicleModel}`,
                                         plate: vehiclePlate,
                                         service: serviceInfo,
                                         mileage: mileage,
                                         notes: notes || ''
-                                    });
-                                } else {
-                                    navigation.navigate('NextService', { 
+                                        });
+                                        break;
+                                    case 'upcoming':
+                                        navigation.navigate('NextService', { 
+                                        orderId: id,
                                         vehicle: `${vehicleYear} ${vehicleBrand} ${vehicleModel}`,
                                         plate: vehiclePlate,
                                         service: serviceInfo,
                                         mileage: mileage,
                                         notes: notes || ''
-                                    });
+                                        });
+                                        break;
+                                    case 'active':
+                                            navigation.navigate('OrderDetails', { 
+                                            orderId: id,
+                                            vehicle: `${vehicleYear} ${vehicleBrand} ${vehicleModel}`,
+                                            plate: vehiclePlate,
+                                            service: serviceInfo,
+                                            mileage: mileage,
+                                            notes: notes || ''
+                                        });
                                 }
                             }}
                         >
@@ -261,12 +275,10 @@ const styles = {
         alignItems: "center",
         justifyContent: "center",
         marginTop: 12,
-        paddingVertical: 8,
-        paddingHorizontal: 16,
-        borderRadius: 10,
-        backgroundColor: "#1A1D23",
-        borderWidth: 1,
-        borderColor: "#FFD43B",
+        paddingVertical: 14,
+        paddingHorizontal: 24,
+        borderRadius: 15,
+        backgroundColor: "#FFD43B",
     },
 
     detailsButtonText: {
@@ -277,9 +289,9 @@ const styles = {
     },
 
     detailsButtonTextActive: {
-        color: "#FFD43B",
-        fontSize: 13,
-        fontWeight: "600",
+        color: "#000",
+        fontSize: 14,
+        fontWeight: "700",
         marginRight: 4,
     },
 };
