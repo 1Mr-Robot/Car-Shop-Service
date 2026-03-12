@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
     View,
     Text,
@@ -19,7 +19,8 @@ import { StatusBar } from "expo-status-bar";
 import BottomNav from "../components/BottomNav";
 import { useNavigation } from "@react-navigation/native"; //NAVEGACION
 
-const DATA = [
+// NO Modificar: Se tomara como punto de partida para implementar la logica de cambio de estado
+const INITIAL_DATA = [
     {
         id: '1',
         title: 'Alineación y balanceo',
@@ -33,17 +34,17 @@ const DATA = [
     {
         id: '3',
         title: 'Lavado de motor',
-        status: 'En Proceso'
+        status: 'En Progreso' // No Modificar -> Cambio: "En Proceso " -> "En progreso"
     },
     {
         id: '4',
         title: 'Cambio de aceite',
-        status: 'En Proceso'
+        status: 'En Progreso' // No Modificar -> Cambio: "En Proceso " -> "En progreso"
     },
     {
         id: '5',
         title: 'Cambio de filtro de aceite',
-        status: 'En Proceso'
+        status: 'En Progreso' // No Modificar -> Cambio: "En Proceso " -> "En progreso"
     },
     {
         id: '6',
@@ -52,13 +53,13 @@ const DATA = [
     },
 ]
 
-
-const Item = ({ title, status }) => {
+// No modificar: id & onToggle()
+const Item = ({ id, title, status, onToggle }) => {
   const renderIcon = () => {
     switch (status) {
       case "Finalizado":
         return <Feather name="check-circle" size={18} color="#22C55E" />;
-      case "En Proceso":
+      case "En Progreso": // No Modificar -> Cambio: "En Proceso " -> "En progreso"
         return <Feather name="clock" size={18} color="#FFD43B" />;
       case "Pendiente":
         return <Feather name="x-circle" size={18} color="#EF4444" />;
@@ -68,25 +69,51 @@ const Item = ({ title, status }) => {
   };
 
   return (
-    <View style={{
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      marginTop: 15,
+    // No modificar: View -> TouchableOpacity
+    <TouchableOpacity
+        activeOpacity={0.7}
+        onPress={() => onToggle(id)}
+        style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+            marginTop: 15,
+            paddingVertical: 5
     }}>
-      <Text style={{ color: "#fff", fontWeight: "bold" }}>
-        {title}
-      </Text>
+        <Text style={{ color: "#fff", fontWeight: "bold" }}>
+            {title}
+        </Text>
 
       {renderIcon()}
-    </View>
+    </TouchableOpacity>
   );
 };
 
 
 const OrderDetailsScreen= ({navigation, route}) => {
-    const { vehicle, plate, service, mileage, notes } = route.params || {};
+    // No Modificar: orderId
+    const { orderId, vehicle, plate, service, mileage, notes } = route.params || {};
     const insets = useSafeAreaInsets();
+
+    // No Modificar: Lista dinamica
+    const [orderServices, setOrderServices] = useState(INITIAL_DATA);
+    // Logica de cambio
+    const toggleServiceStatus = (serviceId) => {
+        setOrderServices(prevServices => 
+            prevServices.map(item => {
+                if (item.id === serviceId) {
+                    let nextStatus;
+                    if (item.status === 'Pendiente') nextStatus = "En Progreso";
+                    else if (item.status === 'En Progreso') nextStatus = "Finalizado";
+                    else nextStatus = 'Pendiente'; 
+
+                    return { ...item, status: nextStatus };
+                }
+                return item; 
+            })
+        );
+    };
+
     
     return (
         <SafeAreaProvider>
@@ -120,9 +147,10 @@ const OrderDetailsScreen= ({navigation, route}) => {
                         fontWeight: "bold",
                         marginLeft: 20,
 
-                    }}                  //PONER EL NUMERO DE ORDEM               
+                    }}                              
                     >
-                        Orden #341
+                        {/* No modificar: Orden Dinamica */}
+                        Orden #{orderId || '---'}
 
                     </Text>                    
                 </View>
@@ -174,10 +202,15 @@ const OrderDetailsScreen= ({navigation, route}) => {
                         <Text style={styles.carTitle}>Servicios</Text>   
                             <FlatList
                                 scrollEnabled={false}
-                                data={DATA}
+                                data={orderServices} // No Modificar: Cambio de variable: DATA -> orderServices
                                 keyExtractor={(item) => item.id}
                                 renderItem={({ item }) => (
-                                    <Item title={item.title} status={item.status} />
+                                    <Item // No modificar id & onToggle
+                                        id={item.id}
+                                        title={item.title} 
+                                        status={item.status} 
+                                        onToggle={toggleServiceStatus}
+                                    />
                             )}
                         />        
                     </View>
@@ -199,10 +232,18 @@ const OrderDetailsScreen= ({navigation, route}) => {
                             flexDirection: "row",
                             gap: 15
                          }}>
-                        <TouchableOpacity style={[styles.productButton, styles.half]}>
+                        {/* No Modificar: Preparación para el envio del orderId a las pantallas: Agregar ../.. */}
+                        <TouchableOpacity 
+                            style={[styles.productButton, styles.half]}
+                            onPress={() => navigation.navigate("AddProduct", { orderId: orderId })}
+                            >
                             <Text style={styles.secondaryButtonText}>Agregar Producto</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={[styles.serviceButton, styles.half]} onPress={() => navigation.navigate("AddService")}>
+
+                        <TouchableOpacity 
+                            style={[styles.serviceButton, styles.half]} 
+                            onPress={() => navigation.navigate("AddService", { orderId: orderId })}
+                            >
                             <Text style={styles.secondaryButtonText}>Agregar Servicio</Text>
                         </TouchableOpacity>
                     </View>
