@@ -84,9 +84,10 @@ const Item = ({ title, status }) => {
 };
 
 
-export default function OrderDetailsScreen() {
-    const navigation = useNavigation();
+const OrderDetailsScreen= ({navigation, route}) => {
+    const { vehicle, plate, service, mileage, notes } = route.params || {};
     const insets = useSafeAreaInsets();
+    
     return (
         <SafeAreaProvider>
             <StatusBar style="light" />
@@ -137,12 +138,12 @@ export default function OrderDetailsScreen() {
                     >
                         <View style={styles.rowBetween}>
                             <View>
-                                <Text style={styles.carTitle}>Honda Civic</Text>
+                                <Text style={styles.carTitle}>{vehicle}</Text>
                                 <View style={{
                                     flexDirection: "row"}}>                                    
-                                    <Text style={styles.subText}>SJD739A</Text>
+                                    <Text style={styles.subText}>{plate}</Text>
                                     <Text style={styles.subText}>   Gris</Text>
-                                    <Text style={styles.subText}> 122,000Km</Text>
+                                    <Text style={styles.subText}> {mileage}</Text>
                                 </View>
                                                                 
                             </View>
@@ -191,7 +192,7 @@ export default function OrderDetailsScreen() {
                             { marginTop: 15},
                             { color: "#969494ff"}                          
 
-                        ]}>Cliente reporta movimiento inusual del volante</Text>
+                        ]}>{notes}</Text>
 
                     </View>
                     <View style={{
@@ -222,6 +223,8 @@ export default function OrderDetailsScreen() {
 
   );
 }
+
+export default OrderDetailsScreen;
 
 const styles = StyleSheet.create({
     container: {
