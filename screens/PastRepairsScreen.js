@@ -65,6 +65,7 @@ export default function PastRepairsScreen({ navigation }) {
                             placeholder="Buscar por placa o cliente..."
                             placeholderTextColor="#8B90A0"
                             style={styles.searchInput}
+                            caretColor="#FFD43B"
                         />
                     </View>
 
@@ -268,12 +269,16 @@ const styles = StyleSheet.create({
         paddingHorizontal: 14,
         paddingVertical: 10,
         marginBottom: 20,
+        borderWidth: 0,
     },
 
     searchInput: {
         flex: 1,
         marginLeft: 10,
         color: "#fff",
+        backgroundColor: "transparent",
+        borderWidth: 0,
+        outlineWidth: 0,
     },
 
     sectionLabel: {

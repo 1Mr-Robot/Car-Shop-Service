@@ -118,33 +118,22 @@ const OrderCard = ({ type, vehicleYear, vehicleBrand, vehicleModel, vehiclePlate
                             style={getDetailsButtonStyle()} 
                             onPress={() => {
                                 const serviceInfo = services.map(s => s.title).join(', ') || 'Servicio general';
-                                switch(type){
-                                    case 'completed':
-                                        navigation.navigate('LastService', { 
+                                if (type === 'completed') {
+                                    navigation.navigate('LastService', { 
                                         vehicle: `${vehicleYear} ${vehicleBrand} ${vehicleModel}`,
                                         plate: vehiclePlate,
                                         service: serviceInfo,
                                         mileage: mileage,
                                         notes: notes || ''
-                                        });
-                                        break;
-                                    case 'upcoming':
-                                        navigation.navigate('NextService', { 
+                                    });
+                                } else {
+                                    navigation.navigate('NextService', { 
                                         vehicle: `${vehicleYear} ${vehicleBrand} ${vehicleModel}`,
                                         plate: vehiclePlate,
                                         service: serviceInfo,
                                         mileage: mileage,
                                         notes: notes || ''
-                                        });
-                                        break;
-                                    case 'active':
-                                            navigation.navigate('OrderDetails', { 
-                                            vehicle: `${vehicleYear} ${vehicleBrand} ${vehicleModel}`,
-                                            plate: vehiclePlate,
-                                            service: serviceInfo,
-                                            mileage: mileage,
-                                            notes: notes || ''
-                                        });
+                                    });
                                 }
                             }}
                         >
@@ -272,10 +261,12 @@ const styles = {
         alignItems: "center",
         justifyContent: "center",
         marginTop: 12,
-        paddingVertical: 14,
-        paddingHorizontal: 24,
-        borderRadius: 15,
-        backgroundColor: "#FFD43B",
+        paddingVertical: 8,
+        paddingHorizontal: 16,
+        borderRadius: 10,
+        backgroundColor: "#1A1D23",
+        borderWidth: 1,
+        borderColor: "#FFD43B",
     },
 
     detailsButtonText: {
@@ -286,9 +277,9 @@ const styles = {
     },
 
     detailsButtonTextActive: {
-        color: "#000",
-        fontSize: 14,
-        fontWeight: "700",
+        color: "#FFD43B",
+        fontSize: 13,
+        fontWeight: "600",
         marginRight: 4,
     },
 };
