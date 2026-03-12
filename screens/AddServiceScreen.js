@@ -158,7 +158,7 @@ export default function AddServiceScreen(){
                     paddingVertical: 10,
                 }}>
                     <Pressable 
-                        onPress={() => navigation.navigate("OrderDetails")}  //IR ATRAS
+                        onPress={() => navigation.goBack()}  //IR ATRAS
                         hitSlop={12}
                         style={{ padding: 1}}
                         >
