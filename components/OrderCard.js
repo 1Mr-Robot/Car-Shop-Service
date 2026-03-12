@@ -4,6 +4,7 @@ import { View, Text, TouchableOpacity } from "react-native";
 import { Ionicons, Feather } from "@expo/vector-icons";
 import Service from "./Service";
 
+// id -> No Modificar
 const OrderCard = ({ id, type, vehicleYear, vehicleBrand, vehicleModel, vehiclePlate, services, notes, time, mileage, navigation, expandedId, setExpandedId }) => {
     const isExpanded = expandedId === `${type}-${vehiclePlate}`;
     
@@ -120,34 +121,35 @@ const OrderCard = ({ id, type, vehicleYear, vehicleBrand, vehicleModel, vehicleP
                                 const serviceInfo = services.map(s => s.title).join(', ') || 'Servicio general';
                                 switch(type){
                                     case 'completed':
-                                        navigation.navigate('LastService', {
-                                        orderId: id, 
-                                        vehicle: `${vehicleYear} ${vehicleBrand} ${vehicleModel}`,
-                                        plate: vehiclePlate,
-                                        service: serviceInfo,
-                                        mileage: mileage,
-                                        notes: notes || ''
-                                        });
-                                        break;
-                                    case 'upcoming':
-                                        navigation.navigate('NextService', { 
-                                        orderId: id,
-                                        vehicle: `${vehicleYear} ${vehicleBrand} ${vehicleModel}`,
-                                        plate: vehiclePlate,
-                                        service: serviceInfo,
-                                        mileage: mileage,
-                                        notes: notes || ''
-                                        });
-                                        break;
-                                    case 'active':
-                                            navigation.navigate('OrderDetails', { 
-                                            orderId: id,
+                                        navigation.navigate('LastService', { 
+                                            orderId: id,  // id -> No Modificar
                                             vehicle: `${vehicleYear} ${vehicleBrand} ${vehicleModel}`,
                                             plate: vehiclePlate,
                                             service: serviceInfo,
                                             mileage: mileage,
                                             notes: notes || ''
                                         });
+                                        break;
+                                    case 'upcoming':
+                                        navigation.navigate('NextService', { 
+                                            orderId: id,  // id -> No Modificar
+                                            vehicle: `${vehicleYear} ${vehicleBrand} ${vehicleModel}`,
+                                            plate: vehiclePlate,
+                                            service: serviceInfo,
+                                            mileage: mileage,
+                                            notes: notes || ''
+                                        });
+                                        break;
+                                    case 'active':
+                                        navigation.navigate('OrderDetails', { 
+                                            orderId: id,  // id -> No Modificar
+                                            vehicle: `${vehicleYear} ${vehicleBrand} ${vehicleModel}`,
+                                            plate: vehiclePlate,
+                                            service: serviceInfo,
+                                            mileage: mileage,
+                                            notes: notes || ''
+                                        });
+                                        break;
                                 }
                             }}
                         >

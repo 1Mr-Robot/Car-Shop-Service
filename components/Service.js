@@ -9,7 +9,7 @@ const Service = ({ title, status }) => {
                 return (
                     <Feather name="check-circle" size={18} color="#22C55E" />
                 );
-            case "En Progreso":
+            case "En Progreso":  // No Modificar -> Cambio: "En Proceso " -> "En progreso"
                 return <Feather name="clock" size={18} color="#FFD43B" />;
             case "Pendiente":
                 return <Feather name="x-circle" size={18} color="#EF4444" />;
