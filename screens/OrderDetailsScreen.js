@@ -96,11 +96,12 @@ const OrderDetailsScreen = ({ navigation, route }) => {
         vehicle,
         plate,
         vehicleColor,
-        vehicleVIN,
+        ownerName, // <-- Extraemos el nombre dinámico
         service,
         mileage,
         notes,
-    } = route.params || {};
+    } = route.params || {}; // Se eliminó vehicleVIN de la extracción
+    
     const insets = useSafeAreaInsets();
 
     // No Modificar: Lista dinamica
@@ -167,6 +168,7 @@ const OrderDetailsScreen = ({ navigation, route }) => {
                             Orden #{orderId || "---"}
                         </Text>
                     </View>
+                    
                     <VehicleCard
                         status="active"
                         vehicleYear={vehicle ? vehicle.split(" ")[0] : ""}
@@ -174,12 +176,13 @@ const OrderDetailsScreen = ({ navigation, route }) => {
                         vehicleModel={
                             vehicle ? vehicle.split(" ").slice(2).join(" ") : ""
                         }
-                        owner="Pedro Maromas"
-                        color={vehicleColor || "Blanco Perlado"}
+                        owner={ownerName || "Cliente sin nombre"} // <-- Pasamos el nombre dinámicamente
+                        color={vehicleColor || "Sin color"}
                         plate={plate || "ABC-1234"}
                         mileage={mileage}
-                        vin={vehicleVIN || "no hay NIV disponible"}
+                        // Se eliminó la propiedad vin del componente
                     />
+
                     <View style={[styles.card]}>
                         <Text style={styles.carTitle}>Servicios</Text>
                         <FlatList

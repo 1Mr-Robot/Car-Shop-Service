@@ -18,67 +18,80 @@ import { Ionicons, MaterialCommunityIcons, Feather } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
 import BottomNav from "../components/BottomNav";
 import { useNavigation } from "@react-navigation/native"; //NAVEGACION
+import Checkbox from "expo-checkbox";
 
-const productsData = [                                           //CREAR LISTA SOLO FRONT, BACKEND CONSULTA -> JSON
-    {
-        id: "1",
-        name: "Aceite de motor 5W-30"
-    },
-    {
-        id: "2",
-        name: "Filtro de aceite"
-    },
-    {
-        id: "3",
-        name: "Filtro de aire"
-    },
-    {
-        id: "4",
-        name: "Filtro de gasolina"
-    },
-    {
-        id: "5",
-        name: "Bujía"
-    },
-    {
-        id: "6",
-        name: "Pastillas de freno"
-    },
-    {
-        id: "7",
-        name: "Disco de freno"
-    },
-    {
-        id: "8",
-        name: "Anticongelante"
-    },
-    {
-        id: "9",
-        name: "Líquido de frenos"
-    },
-    {
-        id: "10",
-        name: "Batería"
-    }
-
+// No Modificar: productsData -> INITIAL_PRODUCTS - paginacion API: (GET /api/v1/productos?page=1&limit=10)
+const INITIAL_PRODUCTS = [
+    { id: "1", name: "Aceite de motor 5W-30" },
+    { id: "2", name: "Filtro de aceite" },
+    { id: "3", name: "Filtro de aire" },
+    { id: "4", name: "Filtro de gasolina" },
+    { id: "5", name: "Bujía" },
+    { id: "6", name: "Pastillas de freno" },
+    { id: "7", name: "Disco de freno" },
+    { id: "8", name: "Anticongelante" },
+    { id: "9", name: "Líquido de frenos" },
+    { id: "10", name: "Batería" }
 ];
 
-const Service = ({ name, description }) => (
-    <View style={{
-        paddingVertical: 12,
-        paddingHorizontal: 15
-    }}>
-        <Text style={styles.serviceTitle}>{name}</Text>
-        <Text style={styles.subText}>{description}</Text>
-    </View>
+// Transformado para ser interactivo y recibir estado
+const SelectableProduct = ({ id, name, isSelected, onToggle }) => (
+    <Pressable 
+        style={{
+            paddingVertical: 12,
+            paddingHorizontal: 15,
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between'
+        }}
+        onPress={() => onToggle(id)}
+    >
+        <View style={{ flex: 1, paddingRight: 10 }}>
+            <Text style={styles.serviceTitle}>{name}</Text>
+        </View>
+        <Checkbox
+            value={isSelected}
+            onValueChange={() => onToggle(id)}
+            color={isSelected ? '#FFD43B' : undefined}
+        />
+    </Pressable>
 );
 
 const AddProductScreen= ({navigation, route}) => {
-    // No Modificar: orderId
+    // 1. Extraemos correctamente el orderId de los parámetros
     const { orderId, vehicle, plate, service, mileage, notes } = route.params || {};
     const insets = useSafeAreaInsets();
 
-return (
+    // 2. Estados para la API y la selección
+    const [availableProducts, setAvailableProducts] = useState(INITIAL_PRODUCTS);
+    const [selectedProductIds, setSelectedProductIds] = useState([]);
+
+    // 3. Función para manejar la selección múltiple
+    const toggleSelection = (productId) => {
+        setSelectedProductIds((prevSelected) => {
+            if (prevSelected.includes(productId)) {
+                return prevSelected.filter(id => id !== productId); 
+            } else {
+                return [...prevSelected, productId]; 
+            }
+        });
+    };
+
+    // 4. Función para enviar datos (Preparación para POST RESTful)
+    const handleAddProductsToOrder = () => {
+        if (selectedProductIds.length === 0) {
+            alert("Por favor selecciona al menos un producto.");
+            return;
+        }
+
+        console.log(`Listo para hacer POST /api/v1/ordenes/${orderId}/productos`);
+        console.log("Productos seleccionados (IDs):", selectedProductIds);
+        
+        // Aquí eventualmente haremos el fetch() a la BD
+        navigation.goBack();
+    };
+
+    return (
         <SafeAreaProvider>
             <SafeAreaView
                 style={[styles.container, { }]}
@@ -91,7 +104,7 @@ return (
                     paddingVertical: 10,
                 }}>
                     <Pressable 
-                        onPress={() => navigation.goBack()}  //IR ATRAS
+                        onPress={() => navigation.goBack()}
                         hitSlop={12}
                         style={{ padding: 1}}
                         >
@@ -105,57 +118,68 @@ return (
                     style={{
                         color: "#ffff",
                         fontSize: 18,
-                        fontWeight: "",
+                        fontWeight: "bold",
                         marginLeft: 0,
                         flex: 1,
                         textAlign: "center"
-                    }}                  //PONER EL NUMERO DE ORDEM               
+                    }}                           
                     >
-                        Agregar Productos
-
+                        Orden #{orderId || '---'} {/* Confirmamos que tenemos el ID */}
                     </Text>    
                 </View>
-                <View style={{
-                    height: 1,
-                    backgroundColor: "#2A2F36",
-                    width: "100%"
-                }}>
-                </View>
-                <View style={{
-                    marginTop: 20
-                }}>
+                <View style={{ height: 1, backgroundColor: "#2A2F36", width: "100%" }} />
+                
+                <View style={{ marginTop: 20 }}>
                     <Text style={[styles.carTitle]}>Lista de productos</Text>                  
                 </View>
-                <View style={{
-                    marginTop: 1
-                }}>
-                    <Text style={[styles.subText]}>Selecciona uno o mas productos requeridos para este vehiculo</Text>  
+                <View style={{ marginTop: 1 }}>
+                    <Text style={[styles.subText]}>Selecciona uno o más productos requeridos para este vehículo</Text>  
                 </View>
+
+                {/* Lista preparada para Paginación */}
                 <FlatList style={{marginTop: 25}}
-                    data={productsData}
-                    renderItem={({ item }) => <Service 
-                        name={item.name}
-                        description={item.description}
-                        />}
+                    data={availableProducts}
                     keyExtractor={item => item.id}
+                    renderItem={({ item }) => (
+                        <SelectableProduct 
+                            id={item.id}
+                            name={item.name}
+                            isSelected={selectedProductIds.includes(item.id)}
+                            onToggle={toggleSelection}
+                        />
+                    )}
                     ItemSeparatorComponent={()=> (
                         <View style={styles.hr}></View>
                     )}
                     showsVerticalScrollIndicator={false}
+                    // Botón simulado para paginación
+                    ListFooterComponent={() => (
+                        <TouchableOpacity style={{ padding: 20, alignItems: 'center' }}>
+                            <Text style={{ color: '#FFD43B' }}>Cargar más productos...</Text>
+                        </TouchableOpacity>
+                    )}
                 />                                  
-                <View style={{flexDirection:"row", gap:15}}>
+                
+                <View style={{flexDirection:"row", gap:15, marginBottom: 20}}>
                     <View style={[styles.card, styles.half]}>
                         <Text style={[styles.subText]}>Total de Productos</Text>  
-                        <Text style={styles.carTitle}>3</Text>
+                        <Text style={styles.carTitle}>{selectedProductIds.length}</Text> {/* Contador dinámico */}
                     </View>
-                    <Pressable style={[styles.primaryButton, styles.half]}>
+                    <Pressable 
+                        style={[
+                            styles.primaryButton, 
+                            styles.half,
+                            { opacity: selectedProductIds.length > 0 ? 1 : 0.5 } // Feedback visual
+                        ]}
+                        onPress={handleAddProductsToOrder}
+                        disabled={selectedProductIds.length === 0}
+                    >
                         <Text style={styles.primaryButtonText}>Continuar</Text>
                     </Pressable>
                 </View>
  
             </SafeAreaView>
         </SafeAreaProvider>
-
   );
 }
 
@@ -338,7 +362,7 @@ const styles = StyleSheet.create({
         elevation: 8,
     },
     half: {
-        flex: 1
+        flex: 1,
     },
     productButton: {
         backgroundColor: "#111827",
@@ -352,10 +376,6 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         gap: 8,
     },
-    productButtonText: {
-        color: "#fff",
-        fontWeight: "700",
-    },
     serviceButton: {
         backgroundColor: "#111827",
         paddingVertical: 14,
@@ -367,5 +387,5 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         justifyContent: "center",
         gap: 8,
-    }
+    },
 });

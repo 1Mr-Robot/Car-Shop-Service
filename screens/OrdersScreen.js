@@ -65,7 +65,7 @@ export default function OrdersScreen({ navigation }) {
                             vehicleModel={ACTIVE_ORDER.vehicleModel}
                             vehiclePlate={ACTIVE_ORDER.vehiclePlate}
                             vehicleColor={ACTIVE_ORDER.vehicleColor}
-                            vehicleVIN={ACTIVE_ORDER.vehicleVIN}
+                            ownerName={ACTIVE_ORDER.ownerName} // <-- Agregado, vehicleVIN eliminado
                             services={ACTIVE_ORDER.services}
                             notes={ACTIVE_ORDER.notes}
                             time={ACTIVE_ORDER.time}
@@ -101,7 +101,7 @@ export default function OrdersScreen({ navigation }) {
                                         vehicleModel={order.vehicleModel}
                                         vehiclePlate={order.vehiclePlate}
                                         vehicleColor={order.vehicleColor}
-                                        vehicleVIN={order.vehicleVIN}
+                                        ownerName={ACTIVE_ORDER.ownerName} // <-- Agregado, vehicleVIN eliminado
                                         services={order.services}
                                         notes={order.notes}
                                         time={order.time}
@@ -144,7 +144,7 @@ const ACTIVE_ORDER = {
     vehicleModel: 'Civic',
     vehiclePlate: 'AB123D',
     vehicleColor: 'Rojo',
-    vehicleVIN: '1HGCM82633A000001',
+    ownerName: 'Pedro Maromas', // <-- Agregado
     vehicleMileage: '10,000 km',
     time: '09:00 AM',
     notes: 'Cambio de aceite y revisión general',
@@ -162,7 +162,7 @@ const UPCOMING_ORDERS = [
         vehicleModel: 'F-150',
         vehiclePlate: 'PL-9988',
         vehicleColor: 'Amarillo',
-        vehicleVIN: '1FTFW1E50KFA00001',
+        ownerName: 'Maria Silva', // <-- Agregado
         vehicleMileage: '60,000 km',
         time: 'HOY, 02:30 PM',
         dayKey: 'HOY',
@@ -178,7 +178,7 @@ const UPCOMING_ORDERS = [
         vehicleModel: 'RAV4',
         vehiclePlate: 'TX-5544',
         vehicleColor: 'Blanco',
-        vehicleVIN: '2T3P1RFV0NW000001',
+        ownerName: 'Carlos Garza', // <-- Agregado
         vehicleMileage: '70,000 km',
         time: 'MAÑANA, 09:00 AM',
         dayKey: 'MAÑANA',
@@ -194,7 +194,7 @@ const UPCOMING_ORDERS = [
         vehicleModel: 'X5',
         vehiclePlate: 'BM-2233',
         vehicleColor: 'Amarillo camello',
-        vehicleVIN: '5UXCR6C0XNA000001',
+        ownerName: 'Ana Gomez', // <-- Agregado
         vehicleMileage: '80,000 km',
         time: 'MAÑANA, 11:00 AM',
         dayKey: 'MAÑANA',
@@ -210,7 +210,7 @@ const UPCOMING_ORDERS = [
         vehicleModel: 'Sentra',
         vehiclePlate: 'NS-8877',
         vehicleColor: 'Rojo clarito',
-        vehicleVIN: '3N1AB7AP0KY000001',
+        ownerName: 'Luis Ramirez', // <-- Agregado
         vehicleMileage: '50,000 km',
         time: '20/03/2026, 10:00 AM',
         dayKey: '20/03/2026',
@@ -226,7 +226,7 @@ const UPCOMING_ORDERS = [
         vehicleModel: 'Malibu',
         vehiclePlate: 'CH-4455',
         vehicleColor: 'Rosa chillon',
-        vehicleVIN: '1G1ZD5ST0LF000001',
+        ownerName: 'Sofia Castro', // <-- Agregado
         vehicleMileage: '65,000 km',
         time: '21/03/2026, 02:00 PM',
         dayKey: '21/03/2026',
@@ -242,7 +242,7 @@ const UPCOMING_ORDERS = [
         vehicleModel: 'CX-5',
         vehiclePlate: 'MZ-1122',
         vehicleColor: 'Naranja fosfo',
-        vehicleVIN: 'JM3KFBDY0N0000001',
+        ownerName: 'Jorge Perez', // <-- Agregado
         vehicleMileage: '45,000 km',
         time: '22/03/2026, 09:30 AM',
         dayKey: '22/03/2026',

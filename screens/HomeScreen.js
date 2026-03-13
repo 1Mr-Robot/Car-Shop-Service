@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
     View,
     Text,
@@ -6,6 +6,7 @@ import {
     ScrollView,
     TouchableOpacity,
     Modal,
+    ActivityIndicator,
 } from "react-native";
 import {
     SafeAreaProvider,
@@ -16,12 +17,103 @@ import { Feather } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
 import BottomNav from "../components/BottomNav";
 import OrderCard from "../components/OrderCard";
+import OrderService from "../services/OrderService";
+
+// POR NADA DEL MUNDO TOCAR ESTE IMPORT!!!!
+import { getAuth } from "firebase/auth";
+import { app } from "../firebaseConfig";
+
+const auth = getAuth(app);
+
 
 const HomeScreen = ({ navigation }) => {
     const [expandedId, setExpandedId] = useState(null);
     const [showLogoutModal, setShowLogoutModal] = useState(false);
     const insets = useSafeAreaInsets();
     
+    const [activeOrder, setActiveOrder] = useState(null);
+    const [upcomingOrders, setUpcomingOrders] = useState([]);
+    const [completedOrders, setCompletedOrders] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    const fetchOrders = async (uid) => {
+        // Guarda de seguridad: Si no hay UID, no disparamos nada a la base de datos
+        if (!uid) return;
+
+        try {
+            setIsLoading(true);
+            setError(null);
+
+            // SOLUCIÓN: Hacemos peticiones secuenciales en lugar de simultáneas.
+            // Esto evita el error "too many connections" en CleverCloud.
+            const active = await OrderService.getActiveOrder(uid);
+            const upcoming = await OrderService.getUpcomingOrders(uid);
+            const completed = await OrderService.getCompletedOrders(uid);
+
+            setActiveOrder(active);
+            setUpcomingOrders(upcoming);
+            setCompletedOrders(completed);
+
+        } catch (err) {
+            console.error("Error al cargar órdenes:", err);
+            setError("No se pudieron cargar las órdenes. Verifica tu conexión e intenta de nuevo.");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        // 1. Escuchamos activamente a Firebase. 
+        // En cuanto Firebase "despierte" y nos dé el usuario, disparamos la búsqueda de forma segura.
+        const unsubscribeAuth = auth.onAuthStateChanged((user) => {
+            if (user) {
+                fetchOrders(user.uid);
+            } else {
+                setIsLoading(false); // Si no hay usuario, quitamos el loading
+            }
+        });
+
+        // 2. Si venimos de otra pantalla (ej. Detalles), recargamos, 
+        // pero verificamos primero que la sesión de Firebase esté viva.
+        const unsubscribeFocus = navigation.addListener('focus', () => {
+            const currentUser = auth.currentUser;
+            if (currentUser) {
+                fetchOrders(currentUser.uid);
+            }
+        });
+
+        return () => {
+            unsubscribeAuth();
+            unsubscribeFocus();
+        };
+    }, [navigation]);
+
+    if (isLoading && !activeOrder && upcomingOrders.length === 0) {
+        return (
+            <SafeAreaProvider>
+                <SafeAreaView style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+                    <ActivityIndicator size="large" color="#FFD43B" />
+                    <Text style={{ color: "#888", marginTop: 15 }}>Sincronizando con el taller...</Text>
+                </SafeAreaView>
+            </SafeAreaProvider>
+        );
+    }
+
+    if (error) {
+        return (
+            <SafeAreaProvider>
+                <SafeAreaView style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+                    <Feather name="alert-triangle" size={40} color="#FF4D4D" />
+                    <Text style={{ color: "#fff", marginTop: 15, textAlign: 'center', paddingHorizontal: 20 }}>{error}</Text>
+                    <TouchableOpacity onPress={() => fetchOrders(auth?.currentUser?.uid)} style={[styles.detailsButton, { marginTop: 20 }]}>
+                        <Text style={styles.detailsButtonText}>Reintentar</Text>
+                    </TouchableOpacity>
+                </SafeAreaView>
+            </SafeAreaProvider>
+        );
+    }
+
     return (
         <SafeAreaProvider>
             <StatusBar style="light" />
@@ -52,20 +144,20 @@ const HomeScreen = ({ navigation }) => {
 
                     <Text style={styles.sectionTitle}>Ordenes activas</Text>
 
-                    {ACTIVE_ORDER ? (
+                    {activeOrder ? (
                         <OrderCard
-                            id={ACTIVE_ORDER.id}  // id -> No Modificar
+                            id={activeOrder.id}
                             type="active"
-                            vehicleYear={ACTIVE_ORDER.vehicleYear}
-                            vehicleBrand={ACTIVE_ORDER.vehicleBrand}
-                            vehicleModel={ACTIVE_ORDER.vehicleModel}
-                            vehiclePlate={ACTIVE_ORDER.vehiclePlate}
-                            vehicleColor={ACTIVE_ORDER.vehicleColor}
-                            vehicleVIN={ACTIVE_ORDER.vehicleVIN}
-                            services={ACTIVE_ORDER.services}
-                            notes={ACTIVE_ORDER.notes}
-                            time={ACTIVE_ORDER.since}
-                            mileage={ACTIVE_ORDER.vehicleMileage}
+                            vehicleYear={activeOrder.vehicleYear}
+                            vehicleBrand={activeOrder.vehicleBrand}
+                            vehicleModel={activeOrder.vehicleModel}
+                            vehiclePlate={activeOrder.vehiclePlate}
+                            vehicleColor={activeOrder.vehicleColor}
+                            ownerName={activeOrder.ownerName}
+                            services={activeOrder.services}
+                            notes={activeOrder.notes}
+                            time={activeOrder.since}
+                            mileage={activeOrder.vehicleMileage}
                             navigation={navigation}
                             expandedId={expandedId}
                             setExpandedId={setExpandedId}
@@ -85,18 +177,18 @@ const HomeScreen = ({ navigation }) => {
                         </TouchableOpacity>
                     </View>
 
-                    {UPCOMING_ORDERS.length > 0 ? (
-                        UPCOMING_ORDERS.map((order) => (
+                    {upcomingOrders.length > 0 ? (
+                        upcomingOrders.map((order) => (
                             <OrderCard
                                 key={order.id}
-                                id={order.id}  // id -> No Modificar
+                                id={order.id}
                                 type="upcoming"
                                 vehicleYear={order.vehicleYear}
                                 vehicleBrand={order.vehicleBrand}
                                 vehicleModel={order.vehicleModel}
                                 vehiclePlate={order.vehiclePlate}
                                 vehicleColor={order.vehicleColor}
-                                vehicleVIN={order.vehicleVIN}
+                                ownerName={order.ownerName}
                                 services={order.services}
                                 notes={order.notes}
                                 time={order.time}
@@ -119,18 +211,18 @@ const HomeScreen = ({ navigation }) => {
                         <Text style={styles.subtle}>Ultimas 24h</Text>
                     </View>
 
-                    {COMPLETED_ORDERS.length > 0 ? (
-                        COMPLETED_ORDERS.map((order) => (
+                    {completedOrders.length > 0 ? (
+                        completedOrders.map((order) => (
                             <OrderCard
                                 key={order.id}
-                                id={order.id}  // id -> No Modificar
+                                id={order.id}
                                 type="completed"
                                 vehicleYear={order.vehicleYear}
                                 vehicleBrand={order.vehicleBrand}
                                 vehicleModel={order.vehicleModel}
                                 vehiclePlate={order.vehiclePlate}
                                 vehicleColor={order.vehicleColor}
-                                vehicleVIN={order.vehicleVIN}
+                                ownerName={order.ownerName}
                                 services={order.services}
                                 time={order.time}
                                 mileage={order.vehicleMileage}
@@ -186,93 +278,6 @@ const HomeScreen = ({ navigation }) => {
 
 export default HomeScreen;
 
-const ACTIVE_ORDER = {
-    id: '1',
-    vehicleYear: '2026',
-    vehicleBrand: 'Ferrari',
-    vehicleModel: 'SF-26',
-    vehiclePlate: '62SBG2',
-    vehicleColor: 'Rojo',
-    vehicleVIN: 'ZFF92XXJ000000001',
-    vehicleMileage: '50,000 km',
-    status: 'EN PROGRESO',
-    since: '09:00 AM',
-    notes: 'El cliente reporta ruido extraño al abrir el DRS. También pidió que se revisara el sistema de escape por posibles fugas.',
-    services: [
-        { id: '1', title: 'Cambio alerón delantero', status: 'Finalizado' },
-        { id: '2', title: 'Inspección de unidad de potencia', status: 'Pendiente' },
-        { id: '3', title: 'Reparación turbo', status: 'En Progreso' },   // No Modificar -> Cambio: "En Proceso " -> "En progreso"
-        { id: '4', title: 'Cambio de discos carbono-ceramicos', status: 'En Progreso' },  // No Modificar -> Cambio: "En Proceso " -> "En progreso"
-        { id: '5', title: 'Chequeo de fondo plano', status: 'En Progreso' },  // No Modificar -> Cambio: "En Proceso " -> "En progreso"
-        { id: '6', title: 'Cambio de llantas a compuesto blando', status: 'Pendiente' },
-    ]
-}
-
-const UPCOMING_ORDERS = [
-    {
-        id: '2',
-        vehicleYear: '2019',
-        vehicleBrand: 'Ford',
-        vehicleModel: 'F-150',
-        vehiclePlate: '57SBG3',
-        vehicleColor: 'Gris',
-        vehicleVIN: '1FTFW1E50KFA00001',
-        vehicleMileage: '60,000 km',
-        time: 'Hoy, 02:30 PM',
-        notes: 'El cliente pidió que se revisara la presión de las llantas.',
-        services: [
-            { id: '1', title: 'Diagnóstico de Motor', status: 'Pendiente' },
-        ]
-    },
-    {
-        id: '3',
-        vehicleYear: '2022',
-        vehicleBrand: 'Toyota',
-        vehicleModel: 'RAV4',
-        vehiclePlate: '29HJK1',
-        vehicleColor: 'Azul',
-        vehicleVIN: '2T3P1RFV0NW000001',
-        vehicleMileage: '70,000 km',
-        time: 'Mañana, 09:00 AM',
-        notes: 'El cliente solicita que se revise el sistema de aire acondicionado.',
-        services: [
-            { id: '1', title: 'Reemplazo de Batería', status: 'Pendiente' },
-        ]
-    }
-]
-
-const COMPLETED_ORDERS = [
-    {
-        id: '4',
-        vehicleYear: '2023',
-        vehicleBrand: 'BMW',
-        vehicleModel: 'X5',
-        vehiclePlate: '45JLM2',
-        vehicleColor: 'Morado',
-        vehicleVIN: '5UXCR6C0XNA000001',
-        vehicleMileage: '80,000 km',
-        time: '08:15 AM',
-        notes: 'El cliente pidió que se revisara la alarma.',
-        services: [
-            { id: '1', title: 'Cambio de Aceite y Filtro', status: 'Finalizado' },
-        ]
-    },
-    {
-        id: '5',
-        vehicleYear: '2021',
-        vehicleBrand: 'Audi',
-        vehicleModel: 'A4',
-        vehiclePlate: '78NPQ5',
-        vehicleColor: 'Verde',
-        vehicleVIN: 'WAUENAF48MN000001',
-        vehicleMileage: '90,000 km',
-        time: 'Ayer',
-        notes: 'El cliente solicitó cambio de luces LED.',
-        services: [
-            { id: '1', title: 'Recarga de Aire Acondicionado', status: 'Finalizado' },
-        ]
-    }
-]
 
 const styles = StyleSheet.create({
     container: {
