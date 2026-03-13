@@ -26,107 +26,86 @@ const INITIAL_SERVICES = [                                           //CREAR LIS
     {
         id: "1",
         name: "Alineación y balanceo",
-        description: "Ajuste de posición de las llants"
     },
     {
         id: "2",
         name: "Cambio de filtro de aire acondicionado",
-        description: "Reemplazo del filtro del aire acondicionado"
     },
     {
         id: "3",
         name: "Lavado de motor",
-        description: "Lavado exprés de motor"
     },
     {
         id: "4",
         name: "Cambio de aceite",
-        description: "Incluye filtro y hasta 5 litros de aceite sintetico"
     },
     {
         id: "5",
         name: "Inflado de llantas con nitrogeno",
-        description: "Inflado y calibración de llantas con nitrógeno"
     },
     {
         id: "6",
         name: "Rotación de llantas",
-        description: "Intercambio de posición de llantas para desgaste uniforme"
     },
     {
         id: "7",
         name: "Balanceo de llantas",
-        description: "Corrección de vibraciones en ruedas"
     },
     {
         id: "8",
         name: "Cambio de balatas",
-        description: "Reemplazo de balatas delanteras o traseras"
     },
     {
         id: "9",
         name: "Rectificación de discos",
-        description: "Ajuste de discos de freno para eliminar vibración"
     },
     {
         id: "10",
         name: "Revisión de frenos",
-        description: "Inspección del sistema de frenado"
     },
     {
         id: "11",
         name: "Diagnóstico con escáner",
-        description: "Lectura de códigos de falla del vehículo"
     },
     {
         id: "12",
         name: "Cambio de batería",
-        description: "Instalación de batería nueva"
     },
     {
         id: "13",
         name: "Revisión de batería",
-        description: "Prueba de carga y estado de batería"
     },
     {
         id: "14",
         name: "Cambio de bujías",
-        description: "Reemplazo de bujías del motor"
     },
     {
         id: "15",
         name: "Cambio de filtro de aire",
-        description: "Reemplazo del filtro de aire del motor"
     },
     {
         id: "16",
         name: "Cambio de filtro de gasolina",
-        description: "Reemplazo del filtro de combustible"
     },
     {
         id: "17",
         name: "Cambio de anticongelante",
-        description: "Sustitución del refrigerante del motor"
     },
     {
         id: "18",
         name: "Cambio de líquido de frenos",
-        description: "Reemplazo del líquido del sistema de frenos"
     },
     {
         id: "19",
         name: "Cambio de aceite de transmisión",
-        description: "Reemplazo del aceite de la transmisión"
     },
     {
         id: "20",
         name: "Afinación mayor",
-        description: "Servicio completo de afinación del motor"
     },
     {
         id: "21",
         name: "Afinación menor",
-        description: "Revisión básica y ajustes del motor"
     },
 
 ];
