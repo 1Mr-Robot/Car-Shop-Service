@@ -64,6 +64,7 @@ export default function OrdersScreen({ navigation }) {
                             vehicleBrand={ACTIVE_ORDER.vehicleBrand}
                             vehicleModel={ACTIVE_ORDER.vehicleModel}
                             vehiclePlate={ACTIVE_ORDER.vehiclePlate}
+                            vehicleColor={ACTIVE_ORDER.vehicleColor}
                             services={ACTIVE_ORDER.services}
                             notes={ACTIVE_ORDER.notes}
                             time={ACTIVE_ORDER.time}
@@ -98,6 +99,7 @@ export default function OrdersScreen({ navigation }) {
                                         vehicleBrand={order.vehicleBrand}
                                         vehicleModel={order.vehicleModel}
                                         vehiclePlate={order.vehiclePlate}
+                                        vehicleColor={order.vehicleColor}
                                         services={order.services}
                                         notes={order.notes}
                                         time={order.time}
@@ -139,6 +141,7 @@ const ACTIVE_ORDER = {
     vehicleBrand: 'Honda',
     vehicleModel: 'Civic',
     vehiclePlate: 'AB123D',
+    vehicleColor: 'Rojo',
     vehicleMileage: '10,000 km',
     time: '09:00 AM',
     notes: 'Cambio de aceite y revisión general',
@@ -155,6 +158,7 @@ const UPCOMING_ORDERS = [
         vehicleBrand: 'Ford',
         vehicleModel: 'F-150',
         vehiclePlate: 'PL-9988',
+        vehicleColor: 'Amarillo',
         vehicleMileage: '60,000 km',
         time: 'HOY, 02:30 PM',
         dayKey: 'HOY',
@@ -169,6 +173,7 @@ const UPCOMING_ORDERS = [
         vehicleBrand: 'Toyota',
         vehicleModel: 'RAV4',
         vehiclePlate: 'TX-5544',
+        vehicleColor: 'Blanco',
         vehicleMileage: '70,000 km',
         time: 'MAÑANA, 09:00 AM',
         dayKey: 'MAÑANA',
@@ -183,6 +188,7 @@ const UPCOMING_ORDERS = [
         vehicleBrand: 'BMW',
         vehicleModel: 'X5',
         vehiclePlate: 'BM-2233',
+        vehicleColor: 'Amarillo camello',
         vehicleMileage: '80,000 km',
         time: 'MAÑANA, 11:00 AM',
         dayKey: 'MAÑANA',
@@ -197,6 +203,7 @@ const UPCOMING_ORDERS = [
         vehicleBrand: 'Nissan',
         vehicleModel: 'Sentra',
         vehiclePlate: 'NS-8877',
+        vehicleColor: 'Rojo clarito',
         vehicleMileage: '50,000 km',
         time: '20/03/2026, 10:00 AM',
         dayKey: '20/03/2026',
@@ -211,6 +218,7 @@ const UPCOMING_ORDERS = [
         vehicleBrand: 'Chevrolet',
         vehicleModel: 'Malibu',
         vehiclePlate: 'CH-4455',
+        vehicleColor: 'Rosa chillon',
         vehicleMileage: '65,000 km',
         time: '21/03/2026, 02:00 PM',
         dayKey: '21/03/2026',
@@ -225,6 +233,7 @@ const UPCOMING_ORDERS = [
         vehicleBrand: 'Mazda',
         vehicleModel: 'CX-5',
         vehiclePlate: 'MZ-1122',
+        vehicleColor: 'Naranja fosfo',
         vehicleMileage: '45,000 km',
         time: '22/03/2026, 09:30 AM',
         dayKey: '22/03/2026',

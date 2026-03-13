@@ -13,7 +13,7 @@ import { StatusBar } from "expo-status-bar";
 import BottomNav from "../components/BottomNav";
 
 const LastServiceScreen = ({ navigation, route }) => {
-    const { vehicle, plate, service, mileage, notes, servicesList } = route.params || {};
+    const { vehicle, plate, vehicleColor, service, mileage, notes, servicesList } = route.params || {};
 
     return (
         <SafeAreaProvider>
@@ -57,7 +57,7 @@ const LastServiceScreen = ({ navigation, route }) => {
                                 {plate || "ABC-1234"}
                             </Text>{" "}
                             | Color:{" "}
-                            <Text style={{ color: "white" }}>Silver</Text>
+                            <Text style={{ color: "white" }}>{vehicleColor || "Silver"}</Text>
                         </Text>
 
                         <Text style={[styles.labelGold, { marginTop: 20 }]}>

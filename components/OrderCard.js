@@ -5,7 +5,7 @@ import { Ionicons, Feather } from "@expo/vector-icons";
 import Service from "./Service";
 
 // id -> No Modificar
-const OrderCard = ({ id, type, vehicleYear, vehicleBrand, vehicleModel, vehiclePlate, services, notes, time, mileage, navigation, expandedId, setExpandedId }) => {
+const OrderCard = ({ id, type, vehicleYear, vehicleBrand, vehicleModel, vehiclePlate, vehicleColor, services, notes, time, mileage, navigation, expandedId, setExpandedId }) => {
     const isExpanded = expandedId === `${type}-${vehiclePlate}`;
     
     const handlePress = () => {
@@ -125,6 +125,7 @@ const OrderCard = ({ id, type, vehicleYear, vehicleBrand, vehicleModel, vehicleP
                                             orderId: id,  // id -> No Modificar
                                             vehicle: `${vehicleYear} ${vehicleBrand} ${vehicleModel}`,
                                             plate: vehiclePlate,
+                                            vehicleColor: vehicleColor,
                                             service: serviceInfo,
                                             servicesList: services,
                                             mileage: mileage,
@@ -136,6 +137,7 @@ const OrderCard = ({ id, type, vehicleYear, vehicleBrand, vehicleModel, vehicleP
                                             orderId: id,  // id -> No Modificar
                                             vehicle: `${vehicleYear} ${vehicleBrand} ${vehicleModel}`,
                                             plate: vehiclePlate,
+                                            vehicleColor: vehicleColor,
                                             service: serviceInfo,
                                             servicesList: services,
                                             mileage: mileage,
@@ -147,6 +149,7 @@ const OrderCard = ({ id, type, vehicleYear, vehicleBrand, vehicleModel, vehicleP
                                             orderId: id,  // id -> No Modificar
                                             vehicle: `${vehicleYear} ${vehicleBrand} ${vehicleModel}`,
                                             plate: vehiclePlate,
+                                            vehicleColor: vehicleColor,
                                             service: serviceInfo,
                                             servicesList: services,
                                             mileage: mileage,

@@ -60,6 +60,7 @@ const HomeScreen = ({ navigation }) => {
                             vehicleBrand={ACTIVE_ORDER.vehicleBrand}
                             vehicleModel={ACTIVE_ORDER.vehicleModel}
                             vehiclePlate={ACTIVE_ORDER.vehiclePlate}
+                            vehicleColor={ACTIVE_ORDER.vehicleColor}
                             services={ACTIVE_ORDER.services}
                             notes={ACTIVE_ORDER.notes}
                             time={ACTIVE_ORDER.since}
@@ -93,6 +94,7 @@ const HomeScreen = ({ navigation }) => {
                                 vehicleBrand={order.vehicleBrand}
                                 vehicleModel={order.vehicleModel}
                                 vehiclePlate={order.vehiclePlate}
+                                vehicleColor={order.vehicleColor}
                                 services={order.services}
                                 notes={order.notes}
                                 time={order.time}
@@ -125,6 +127,7 @@ const HomeScreen = ({ navigation }) => {
                                 vehicleBrand={order.vehicleBrand}
                                 vehicleModel={order.vehicleModel}
                                 vehiclePlate={order.vehiclePlate}
+                                vehicleColor={order.vehicleColor}
                                 services={order.services}
                                 time={order.time}
                                 mileage={order.vehicleMileage}
@@ -186,6 +189,7 @@ const ACTIVE_ORDER = {
     vehicleBrand: 'Ferrari',
     vehicleModel: 'SF-26',
     vehiclePlate: '62SBG2',
+    vehicleColor: 'Rojo',
     vehicleMileage: '50,000 km',
     status: 'EN PROGRESO',
     since: '09:00 AM',
@@ -207,6 +211,7 @@ const UPCOMING_ORDERS = [
         vehicleBrand: 'Ford',
         vehicleModel: 'F-150',
         vehiclePlate: '57SBG3',
+        vehicleColor: 'Gris',
         vehicleMileage: '60,000 km',
         time: 'Hoy, 02:30 PM',
         notes: 'El cliente pidió que se revisara la presión de las llantas.',
@@ -220,6 +225,7 @@ const UPCOMING_ORDERS = [
         vehicleBrand: 'Toyota',
         vehicleModel: 'RAV4',
         vehiclePlate: '29HJK1',
+        vehicleColor: 'Azul',
         vehicleMileage: '70,000 km',
         time: 'Mañana, 09:00 AM',
         notes: 'El cliente solicita que se revise el sistema de aire acondicionado.',
@@ -236,6 +242,7 @@ const COMPLETED_ORDERS = [
         vehicleBrand: 'BMW',
         vehicleModel: 'X5',
         vehiclePlate: '45JLM2',
+        vehicleColor: 'Morado',
         vehicleMileage: '80,000 km',
         time: '08:15 AM',
         notes: 'El cliente pidió que se revisara la alarma.',
@@ -249,6 +256,7 @@ const COMPLETED_ORDERS = [
         vehicleBrand: 'Audi',
         vehicleModel: 'A4',
         vehiclePlate: '78NPQ5',
+        vehicleColor: 'Verde',
         vehicleMileage: '90,000 km',
         time: 'Ayer',
         notes: 'El cliente solicitó cambio de luces LED.',

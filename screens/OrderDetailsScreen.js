@@ -92,7 +92,7 @@ const Item = ({ id, title, status, onToggle }) => {
 
 const OrderDetailsScreen= ({navigation, route}) => {
     // No Modificar: orderId
-    const { orderId, vehicle, plate, service, mileage, notes } = route.params || {};
+    const { orderId, vehicle, plate, vehicleColor, service, mileage, notes } = route.params || {};
     const insets = useSafeAreaInsets();
 
     // No Modificar: Lista dinamica
@@ -174,7 +174,7 @@ const OrderDetailsScreen= ({navigation, route}) => {
                         <View style={[styles.row, { marginTop: 20 }]}>
                             <View style={{ flex: 1 }}>
                                 <Text style={styles.label}>COLOR</Text>
-                                <Text style={styles.value}>Blanco Perlado</Text>
+                                <Text style={styles.value}>{vehicleColor || "Blanco Perlado"}</Text>
                             </View>
 
                             <View style={{ flex: 1 }}>
