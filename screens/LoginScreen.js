@@ -11,28 +11,15 @@ import {
     ActivityIndicator,
     ScrollView,
     Modal,
+    Image,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
 //Importaciones de Firebase
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { app } from "../firebaseConfig"; 
-
-const CarShopIcon = () => (
-    <View style={styles.logoContainer}>
-        <View style={styles.logoBox}>
-            <MaterialCommunityIcons
-                name="hammer-screwdriver"
-                size={48}
-                color="black"
-            />
-        </View>
-        <View style={styles.logoGlow} />
-    </View>
-);
 
 export default function LoginScreen({ navigation }) {
     const [email, setEmail] = useState("");
@@ -127,7 +114,10 @@ export default function LoginScreen({ navigation }) {
                 >
                     {/* Header / Logo */}
                     <View style={styles.header}>
-                        <CarShopIcon />
+                        <Image
+                            source={require("../assets/logo.png")}
+                            style={styles.logoImage}
+                        />
                         <View style={styles.titleRow}>
                             <Text style={styles.titleWhite}>Car Shop </Text>
                             <Text style={styles.titleYellow}>Service</Text>
@@ -332,6 +322,12 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "center",
         marginBottom: 20,
+    },
+    logoImage: {
+        width: 120,
+        height: 120,
+        resizeMode: "contain",
+        marginBottom: 0,
     },
     logoBox: {
         width: 80,
