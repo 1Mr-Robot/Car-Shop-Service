@@ -12,6 +12,7 @@ import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import BottomNav from "../components/BottomNav";
 import Service from "../components/Service";
+import VehicleCard from "../components/VehicleCard";
 
 const NextServiceScreen = ({ navigation, route }) => {
     const { vehicle, plate, vehicleColor, vehicleVIN, service, mileage, notes, servicesList } = route.params || {};
@@ -42,37 +43,17 @@ const NextServiceScreen = ({ navigation, route }) => {
                     </View>
 
                     {/* Vehicle Card */}
-                    <View style={styles.card}>
-                        <View style={styles.rowBetween}>
-                            <Text style={styles.carTitle}>
-                                {vehicle || "Toyota Corolla 2022"}
-                            </Text>
-                            <View style={styles.badge}>
-                                <Text style={styles.badgeText}>PROGRAMADO</Text>
-                            </View>
-                        </View>
-
-                        <Text style={styles.subText}>Dueño: Juan Pérez</Text>
-
-                        <View style={[styles.row, { marginTop: 20 }]}>
-                            <View style={{ flex: 1 }}>
-                                <Text style={styles.label}>COLOR</Text>
-                                <Text style={styles.value}>{vehicleColor || "Blanco Perlado"}</Text>
-                            </View>
-
-                            <View style={{ flex: 1 }}>
-                                <Text style={styles.label}>PLACA</Text>
-                                <Text style={styles.value}>
-                                    {plate || "ABC-1234"}
-                                </Text>
-                            </View>
-                        </View>
-
-                        <Text style={[styles.label, { marginTop: 15 }]}>
-                            NIV / VIN
-                        </Text>
-                        <Text style={styles.value}>{vehicleVIN || '1HGBH456789012345'}</Text>
-                    </View>
+                    <VehicleCard
+                        status="upcoming"
+                        vehicleYear={vehicle ? vehicle.split(' ')[0] : ''}
+                        vehicleBrand={vehicle ? vehicle.split(' ')[1] : ''}
+                        vehicleModel={vehicle ? vehicle.split(' ').slice(2).join(' ') : ''}
+                        owner="Juan Pérez"
+                        color={vehicleColor || "Blanco Perlado"}
+                        plate={plate || "ABC-1234"}
+                        mileage={mileage || "50,000 km"}
+                        vin={vehicleVIN || "1HGBH456789012345"}
+                    />
 
                     {/* Services Card */}
                     <Text style={styles.sectionTitle}>
@@ -164,7 +145,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#0F1115",
-        paddingHorizontal: 24,
+        paddingHorizontal: 18,
         paddingTop: 24,
     },
 

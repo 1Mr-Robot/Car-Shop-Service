@@ -12,6 +12,7 @@ import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import BottomNav from "../components/BottomNav";
 import Service from "../components/Service";
+import VehicleCard from "../components/VehicleCard";
 
 const LastServiceScreen = ({ navigation, route }) => {
     const { vehicle, plate, vehicleColor, vehicleVIN, service, mileage, notes, servicesList } = route.params || {};
@@ -46,31 +47,17 @@ const LastServiceScreen = ({ navigation, route }) => {
                     </View>
 
                     {/* Vehicle Card */}
-                    <View style={styles.card}>
-                        <Text style={styles.labelGold}>VEHÍCULO</Text>
-                        <Text style={styles.carTitleLarge}>
-                            {vehicle || "Toyota Corolla 2022"}
-                        </Text>
-
-                        <Text style={styles.subText}>
-                            Placa:{" "}
-                            <Text style={{ color: "white" }}>
-                                {plate || "ABC-1234"}
-                            </Text>{" "}
-                            | Color:{" "}
-                            <Text style={{ color: "white" }}>{vehicleColor || "Silver"}</Text>
-                        </Text>
-
-                        <Text style={[styles.labelGold, { marginTop: 20 }]}>
-                            VIN / NIV
-                        </Text>
-                        <Text style={styles.value}>{vehicleVIN || '1B3HB48M2X8D12345'}</Text>
-
-                        <Text style={[styles.labelGold, { marginTop: 20 }]}>
-                            PROPIETARIO
-                        </Text>
-                        <Text style={styles.value}>Juan Pérez</Text>
-                    </View>
+                    <VehicleCard
+                        status="completed"
+                        vehicleYear={vehicle ? vehicle.split(' ')[0] : ''}
+                        vehicleBrand={vehicle ? vehicle.split(' ')[1] : ''}
+                        vehicleModel={vehicle ? vehicle.split(' ').slice(2).join(' ') : ''}
+                        owner="Juan Pérez"
+                        color={vehicleColor || "Silver"}
+                        plate={plate || "ABC-1234"}
+                        mileage={mileage || "45,000 km"}
+                        vin={vehicleVIN || "1B3HB48M2X8D12345"}
+                    />
 
                     {/* Services Card */}
                     <Text style={styles.sectionTitle}>
@@ -167,7 +154,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#0F1115",
-        paddingHorizontal: 24,
+        paddingHorizontal: 18,
         paddingTop: 24,
     },
 

@@ -16,6 +16,7 @@ import {
 import { MaterialCommunityIcons, Feather } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
 import { useNavigation } from "@react-navigation/native"; //NAVEGACION
+import VehicleCard from "../components/VehicleCard";
 
 // NO Modificar: Se tomara como punto de partida para implementar la logica de cambio de estado
 const INITIAL_DATA = [
@@ -166,48 +167,17 @@ const OrderDetailsScreen = ({ navigation, route }) => {
                             Orden #{orderId || "---"}
                         </Text>
                     </View>
-                    <View
-                        style={[
-                            styles.card,
-                            { borderWidth: 1 },
-                            { marginTop: 10 },
-                        ]}
-                    >
-                        <View style={styles.rowBetween}>
-                            <Text style={styles.carTitle}>{vehicle}</Text>
-                            <View style={styles.badge}>
-                                <Text style={styles.badgeText}>EN CURSO</Text>
-                            </View>
-                        </View>
-                        <Text style={styles.subText}>Dueño: Pedro Maromas</Text>
-                        <View style={[styles.row, { marginTop: 20 }]}>
-                            <View style={{ flex: 1 }}>
-                                <Text style={styles.label}>COLOR</Text>
-                                <Text style={styles.value}>
-                                    {vehicleColor || "Blanco Perlado"}
-                                </Text>
-                            </View>
-
-                            <View style={{ flex: 1 }}>
-                                <Text style={styles.label}>PLACA</Text>
-                                <Text style={styles.value}>
-                                    {plate || "ABC-1234"}
-                                </Text>
-                            </View>
-                        </View>
-                        <View style={[styles.row, { marginTop: 20 }]}>
-                            <View style={{ flex: 1 }}>
-                                <Text style={styles.label}>KILOMETRAJE</Text>
-                                <Text style={styles.value}>{mileage}</Text>
-                            </View>
-                            <View style={{ flex: 1 }}>
-                                <Text style={styles.label}>VIN/NIV</Text>
-                                <Text style={styles.value}>
-                                    {vehicleVIN || "no hay NIV disponible"}
-                                </Text>
-                            </View>
-                        </View>
-                    </View>
+                    <VehicleCard
+                        status="active"
+                        vehicleYear={vehicle ? vehicle.split(' ')[0] : ''}
+                        vehicleBrand={vehicle ? vehicle.split(' ')[1] : ''}
+                        vehicleModel={vehicle ? vehicle.split(' ').slice(2).join(' ') : ''}
+                        owner="Pedro Maromas"
+                        color={vehicleColor || "Blanco Perlado"}
+                        plate={plate || "ABC-1234"}
+                        mileage={mileage}
+                        vin={vehicleVIN || "no hay NIV disponible"}
+                    />
                     <View style={[styles.card]}>
                         <Text style={styles.carTitle}>Servicios</Text>
                         <FlatList
