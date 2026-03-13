@@ -13,6 +13,7 @@ import PastRepairsScreen from "./screens/PastRepairsScreen";
 import OrderDetailsScreen from "./screens/OrderDetailsScreen";
 import NextServiceScreen from "./screens/NextServiceScreen";
 import LastServiceScreen from "./screens/LastServiceScreen";
+import AddProductScreen  from "./screens/AddProductScreen";
 
 import { app } from "./firebaseConfig";
 
@@ -81,6 +82,11 @@ export default function App() {
                     name="LastService"
                     component={LastServiceScreen}
                     options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                    name="AddProduct"
+                    component={AddProductScreen}
+                    options={{ headerShown: false}}
                 />
             </Stack.Navigator>
         </NavigationContainer>

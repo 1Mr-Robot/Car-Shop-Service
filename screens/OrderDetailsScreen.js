@@ -120,83 +120,84 @@ const OrderDetailsScreen= ({navigation, route}) => {
             <StatusBar style="light" />
             <SafeAreaView
                 style={[styles.container, { }]}
-                edges={["top", "bottom"]}
+                edges={["top", ]}
             >
-                <View style={{
-                    flexDirection:"row",
-                    alignItems: "center",
-                    paddingHorizontal: 15,
-                    paddingVertical: 10,
-                    backgroundColor: "#0B0F14",
-                }}>
-                    <Pressable 
-                        onPress={() => navigation.navigate("Orders")}
-                        hitSlop={12}
-                        style={{ padding: 1}}
-                        >
-                        <MaterialCommunityIcons
-                            name="arrow-left"
-                            size={24}
-                            color={"#ffff"}                       
-                        />           
-                    </Pressable>
-                    <Text
-                    style={{
-                        color: "#ffff",
-                        fontSize: 24,
-                        fontWeight: "bold",
-                        marginLeft: 20,
 
-                    }}                              
-                    >
-                        {/* No modificar: Orden Dinamica */}
-                        Orden #{orderId || '---'}
-
-                    </Text>                    
-                </View>
 
                 <ScrollView>
+                    <View style={{
+                        flexDirection:"row",
+                        alignItems: "center",
+                        paddingHorizontal: 15,
+                        paddingVertical: 10,
+                        backgroundColor: "#0F1115",
+                    }}>
+                        <Pressable 
+                            onPress={() => navigation.navigate("Orders")}
+                            hitSlop={12}
+                            style={{ padding: 1}}
+                            >
+                            <MaterialCommunityIcons
+                                name="arrow-left"
+                                size={24}
+                                color={"#ffff"}                       
+                            />           
+                        </Pressable>
+                        <Text
+                        style={{
+                            color: "#ffff",
+                            fontSize: 24,
+                            fontWeight: "bold",
+                            marginLeft: 20,
+
+                        }}                              
+                        >
+                            {/* No modificar: Orden Dinamica */}
+                            Orden #{orderId || '---'}
+
+                        </Text>                    
+                    </View>
                     <View
                         style={[
                             styles.card,
-                            { borderColor: "#FFD43B" },
                             { borderWidth: 1},
-                            { marginTop: 15}
+                            { marginTop: 10}
                         ]}
                     >
                         <View style={styles.rowBetween}>
-                            <View>
-                                <Text style={styles.carTitle}>{vehicle}</Text>
-                                <View style={{
-                                    flexDirection: "row"}}>                                    
-                                    <Text style={styles.subText}>{plate}</Text>
-                                    <Text style={styles.subText}>   Gris</Text>
-                                    <Text style={styles.subText}> {mileage}</Text>
-                                </View>
-                                                                
+                            <Text style={styles.carTitle}>{vehicle}</Text>
+                            <View style={styles.badge}>
+                                <Text style={styles.badgeText}>EN CURSO</Text>
                             </View>
-                            <View style={{
-                                alignItems: "flex-end"
-                            }}>
-                                <Text style={{
-                                    fontSize: 15,
-                                    color: "rgba(255,255,255,0.6)",
-                                    letterSpacing: 1
-                                }}>
-                                    Fecha Estimada                
+                        </View>
+                        <Text style={styles.subText}>Dueño: Pedro Maromas</Text>
+                        <View style={[styles.row, { marginTop: 20 }]}>
+                            <View style={{ flex: 1 }}>
+                                <Text style={styles.label}>COLOR</Text>
+                                <Text style={styles.value}>Blanco Perlado</Text>
+                            </View>
+
+                            <View style={{ flex: 1 }}>
+                                <Text style={styles.label}>PLACA</Text>
+                                <Text style={styles.value}>
+                                    {plate || "ABC-1234"}
                                 </Text>
-                                <Text style={{
-                                    color: "#FFD43B"
-                                }}>
-                                    28/02/26</Text>
                             </View>
+                        </View>
+                        <View style={[styles.row, { marginTop: 20}]}>
+                            <View style={{ flex: 1 }}>
+                                <Text style={styles.label}>KILOMETRAJE</Text>
+                                <Text style={styles.value}>{mileage}</Text>
+                            </View>
+                            <View style={{ flex: 1 }}>
+                                <Text style={styles.label}>VIN/NIV</Text>
+                                <Text style={styles.value}>1HGBH456789012345</Text> 
+                            </View>                            
                         </View>
                     </View>
                     <View 
                         style={[
                             styles.card,
-                            {borderColor: "#ffffffa8"},
-                            {borderWidth: 1}
                         ]}
                     >
                         <Text style={styles.carTitle}>Servicios</Text>   
@@ -216,13 +217,12 @@ const OrderDetailsScreen= ({navigation, route}) => {
                     </View>
                     <View style={[
                         styles.card,
-                        {borderColor: "#ffffffa8"},
                         {borderWidth: 1}
                         ]}>
-                        <Text style={styles.carTitle}>Notas</Text>
+                        <Text style={styles.notesSectionTitle}>NOTAS DEL CLIENTE</Text>
                         <Text style={[
                             { fontSize: 15 },
-                            { marginTop: 15},
+                            { marginTop: 1},
                             { color: "#969494ff"}                          
 
                         ]}>{notes}</Text>
@@ -230,7 +230,8 @@ const OrderDetailsScreen= ({navigation, route}) => {
                     </View>
                     <View style={{
                             flexDirection: "row",
-                            gap: 15
+                            gap: 15,
+                            marginTop: -15
                          }}>
                         {/* No Modificar: Preparación para el envio del orderId a las pantallas: Agregar ../.. */}
                         <TouchableOpacity 
@@ -280,6 +281,15 @@ const styles = StyleSheet.create({
         marginBottom: 15,
         marginTop: 10,
     },
+    label: {
+        color: "#8B90A0",
+        fontSize: 12,
+    },
+    value: {
+        color: "white",
+        fontSize: 14,
+        marginTop: 3,
+    },
     card: {
         backgroundColor: "#1A1D24",
         borderRadius: 20,
@@ -289,6 +299,10 @@ const styles = StyleSheet.create({
     rowBetween: {
         flexDirection: "row",
         justifyContent: "space-between",
+        alignItems: "center",
+    },
+    row: {
+        flexDirection: "row",
         alignItems: "center",
     },
     carTitle: {
@@ -354,6 +368,12 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         paddingVertical: 8,
         borderRadius: 12,
+    },
+    notesSectionTitle: {
+        color: "#FFD43B",
+        fontSize: 12,
+        fontWeight: "600",
+        marginBottom: 8,
     },
     smallButtonText: {
         color: "#000",
