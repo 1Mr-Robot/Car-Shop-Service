@@ -17,42 +17,9 @@ import { Ionicons, MaterialCommunityIcons, Feather } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
 import { useNavigation } from "@react-navigation/native"; //NAVEGACION
 import VehicleCard from "../components/VehicleCard";
+import OrderService from "../services/OrderService"; // POR NADA DEL MUNDO TOCAR ESTE IMPORT
 
-// NO Modificar: Se tomara como punto de partida para implementar la logica de cambio de estado
-const INITIAL_DATA = [
-    {
-        id: "1",
-        title: "Alineación y balanceo",
-        status: "Finalizado",
-    },
-    {
-        id: "2",
-        title: "Cambio filtro aire acondicionado",
-        status: "Pendiente",
-    },
-    {
-        id: "3",
-        title: "Lavado de motor",
-        status: "En Progreso", // No Modificar -> Cambio: "En Proceso " -> "En progreso"
-    },
-    {
-        id: "4",
-        title: "Cambio de aceite",
-        status: "En Progreso", // No Modificar -> Cambio: "En Proceso " -> "En progreso"
-    },
-    {
-        id: "5",
-        title: "Cambio de filtro de aceite",
-        status: "En Progreso", // No Modificar -> Cambio: "En Proceso " -> "En progreso"
-    },
-    {
-        id: "6",
-        title: "Inflado de llantas con nitrogeno",
-        status: "Pendiente",
-    },
-];
 
-// No modificar: id & onToggle()
 const Item = ({ id, title, status, onToggle }) => {
     const renderIcon = () => {
         switch (status) {
@@ -60,7 +27,7 @@ const Item = ({ id, title, status, onToggle }) => {
                 return (
                     <Feather name="check-circle" size={18} color="#22C55E" />
                 );
-            case "En Progreso": // No Modificar -> Cambio: "En Proceso " -> "En progreso"
+            case "En Progreso":
                 return <Feather name="clock" size={18} color="#FFD43B" />;
             case "Pendiente":
                 return <Feather name="x-circle" size={18} color="#EF4444" />;
@@ -70,7 +37,6 @@ const Item = ({ id, title, status, onToggle }) => {
     };
 
     return (
-        // No modificar: View -> TouchableOpacity
         <TouchableOpacity
             activeOpacity={0.7}
             onPress={() => onToggle(id)}
@@ -83,45 +49,63 @@ const Item = ({ id, title, status, onToggle }) => {
             }}
         >
             <Text style={{ color: "#fff", fontWeight: "bold" }}>{title}</Text>
-
             {renderIcon()}
         </TouchableOpacity>
     );
 };
 
 const OrderDetailsScreen = ({ navigation, route }) => {
-    // No Modificar: orderId
+    // 1. Extraemos los datos dinámicos, incluyendo la nueva variable 'servicesList'
     const {
         orderId,
         vehicle,
         plate,
         vehicleColor,
-        ownerName, // <-- Extraemos el nombre dinámico
+        ownerName,
         service,
+        servicesList, // <-- ¡Aquí vienen los servicios reales de la base de datos!
         mileage,
         notes,
-    } = route.params || {}; // Se eliminó vehicleVIN de la extracción
+    } = route.params || {}; 
     
     const insets = useSafeAreaInsets();
 
-    // No Modificar: Lista dinamica
-    const [orderServices, setOrderServices] = useState(INITIAL_DATA);
-    // Logica de cambio
-    const toggleServiceStatus = (serviceId) => {
-        setOrderServices((prevServices) =>
-            prevServices.map((item) => {
-                if (item.id === serviceId) {
-                    let nextStatus;
-                    if (item.status === "Pendiente") nextStatus = "En Progreso";
-                    else if (item.status === "En Progreso")
-                        nextStatus = "Finalizado";
-                    else nextStatus = "Pendiente";
+    // 2. Inicializamos el estado con los datos reales de la BD
+    const [orderServices, setOrderServices] = useState(servicesList || []);
 
-                    return { ...item, status: nextStatus };
-                }
-                return item;
-            }),
+    // 3. Lógica de cambio de estatus (UI y preparación para Backend)
+    const toggleServiceStatus = async (serviceId) => {
+        // Encontramos el servicio actual
+        const servicioActual = orderServices.find(s => s.id === serviceId);
+        if (!servicioActual) return;
+
+        let nextStatus;
+        if (servicioActual.status === "Pendiente") nextStatus = "En Progreso";
+        else if (servicioActual.status === "En Progreso") nextStatus = "Finalizado";
+        else nextStatus = "Pendiente";
+
+        // Actualización "Optimista": Cambiamos la UI al instante para que sea veloz
+        setOrderServices((prevServices) =>
+            prevServices.map((item) =>
+                item.id === serviceId ? { ...item, status: nextStatus } : item
+            )
         );
+
+        /* * ==========================================
+         * CONEXIÓN RESTful (PATCH) - APARCADA
+         * ==========================================
+         * Descomenta el siguiente bloque cuando estés listo 
+         * para que los cambios se guarden en PostgreSQL.
+         */
+        /*
+        try {
+            await OrderService.updateServiceStatus(orderId, serviceId, nextStatus);
+        } catch (error) {
+            console.error("Error al actualizar estatus:", error);
+            alert("No se pudo guardar el cambio en la base de datos.");
+            // Si falla en el backend, podríamos revertir la UI aquí
+        }
+        */
     };
 
     return (
@@ -164,7 +148,6 @@ const OrderDetailsScreen = ({ navigation, route }) => {
                                 marginLeft: 20,
                             }}
                         >
-                            {/* No modificar: Orden Dinamica */}
                             Orden #{orderId || "---"}
                         </Text>
                     </View>
@@ -176,27 +159,29 @@ const OrderDetailsScreen = ({ navigation, route }) => {
                         vehicleModel={
                             vehicle ? vehicle.split(" ").slice(2).join(" ") : ""
                         }
-                        owner={ownerName || "Cliente sin nombre"} // <-- Pasamos el nombre dinámicamente
+                        owner={ownerName || "Cliente sin nombre"} 
                         color={vehicleColor || "Sin color"}
                         plate={plate || "ABC-1234"}
                         mileage={mileage}
-                        // Se eliminó la propiedad vin del componente
                     />
 
                     <View style={[styles.card]}>
                         <Text style={styles.carTitle}>Servicios</Text>
                         <FlatList
                             scrollEnabled={false}
-                            data={orderServices} // No Modificar: Cambio de variable: DATA -> orderServices
-                            keyExtractor={(item) => item.id}
+                            data={orderServices} 
+                            keyExtractor={(item) => item.id.toString()} // Aseguramos que el ID sea string
                             renderItem={({ item }) => (
-                                <Item // No modificar id & onToggle
+                                <Item 
                                     id={item.id}
                                     title={item.title}
                                     status={item.status}
                                     onToggle={toggleServiceStatus}
                                 />
                             )}
+                            ListEmptyComponent={
+                                <Text style={{color: "#888", marginTop: 10}}>No hay servicios registrados.</Text>
+                            }
                         />
                     </View>
                     <View style={[styles.card, { borderWidth: 1 }]}>
@@ -217,7 +202,7 @@ const OrderDetailsScreen = ({ navigation, route }) => {
                                 { color: "#969494ff" },
                             ]}
                         >
-                            {notes}
+                            {notes || "Sin notas adicionales."}
                         </Text>
                     </View>
                     <View
@@ -227,7 +212,6 @@ const OrderDetailsScreen = ({ navigation, route }) => {
                             marginTop: -15,
                         }}
                     >
-                        {/* No Modificar: Preparación para el envio del orderId a las pantallas: Agregar ../.. */}
                         <TouchableOpacity
                             style={[styles.productButton, styles.half]}
                             onPress={() =>
@@ -265,6 +249,7 @@ const OrderDetailsScreen = ({ navigation, route }) => {
 };
 
 export default OrderDetailsScreen;
+
 
 const styles = StyleSheet.create({
     container: {

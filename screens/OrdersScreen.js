@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
     View,
     Text,
     StyleSheet,
     ScrollView,
+    ActivityIndicator,
+    TouchableOpacity,
 } from "react-native";
 import { Octicons } from "@expo/vector-icons";
 import {
@@ -15,10 +17,134 @@ import { StatusBar } from "expo-status-bar";
 import BottomNav from "../components/BottomNav";
 import OrderCard from "../components/OrderCard";
 
+// POR NADA DEL MUNDO TOCAR ESTOS IMPORTS!!
+import OrderService from "../services/OrderService";
+import { getAuth } from "firebase/auth";
+import { app } from "../firebaseConfig";
+
+
+const auth = getAuth(app);
+
+// Helper para procesar fechas de Postgres a 'HOY', 'MAÑANA' o 'DD/MM/YYYY'
+const processUpcomingOrders = (orders) => {
+    const today = new Date();
+    const tomorrow = new Date();
+    tomorrow.setDate(today.getDate() + 1);
+
+    const formatD = (d) => {
+        const day = String(d.getDate()).padStart(2, '0');
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const year = d.getFullYear();
+        return `${day}/${month}/${year}`;
+    };
+
+    const todayStr = formatD(today);
+    const tomorrowStr = formatD(tomorrow);
+
+    return orders.map(order => {
+        let dayKey = 'SIN FECHA';
+        let displayTime = order.time;
+
+        if (order.time) {
+            // El backend retorna 'DD/MM/YYYY, HH12:MI AM'
+            const parts = order.time.split(', ');
+            if (parts.length === 2) {
+                const datePart = parts[0];
+                const timePart = parts[1];
+                
+                if (datePart === todayStr) {
+                    dayKey = 'HOY';
+                    displayTime = `HOY, ${timePart}`;
+                } else if (datePart === tomorrowStr) {
+                    dayKey = 'MAÑANA';
+                    displayTime = `MAÑANA, ${timePart}`;
+                } else {
+                    dayKey = datePart;
+                }
+            }
+        }
+        return { ...order, dayKey, displayTime };
+    });
+};
+
+const groupOrdersByDay = (orders) => {
+    const groups = {};
+    orders.forEach((order) => {
+        const day = order.dayKey;
+        if (!groups[day]) {
+            groups[day] = [];
+        }
+        groups[day].push(order);
+    });
+    return groups;
+};
+
 export default function OrdersScreen({ navigation }) {
-    const [expandedId, setExpandedId] = useState(ACTIVE_ORDER ? `active-${ACTIVE_ORDER.vehiclePlate}` : null);
+    const [expandedId, setExpandedId] = useState(null);
     const insets = useSafeAreaInsets();
-    const groupedOrders = groupOrdersByDay(UPCOMING_ORDERS);
+    
+    // Estados para la API RESTful
+    const [activeOrder, setActiveOrder] = useState(null);
+    const [upcomingOrders, setUpcomingOrders] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    const fetchOrders = async (uid) => {
+        if (!uid) return;
+        try {
+            setIsLoading(true);
+
+            // Consultas secuenciales (Protegiendo CleverCloud)
+            const active = await OrderService.getActiveOrder(uid);
+            const upcomingRaw = await OrderService.getUpcomingOrders(uid);
+
+            setActiveOrder(active);
+            setUpcomingOrders(processUpcomingOrders(upcomingRaw));
+
+        } catch (err) {
+            console.error("Error al cargar la agenda:", err);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        // Escuchamos a Firebase para obtener el UID
+        const unsubscribeAuth = auth.onAuthStateChanged((user) => {
+            if (user) {
+                fetchOrders(user.uid);
+            } else {
+                setIsLoading(false);
+            }
+        });
+
+        // Recargamos si regresamos de otra pantalla
+        const unsubscribeFocus = navigation.addListener('focus', () => {
+            const currentUser = auth.currentUser;
+            if (currentUser) {
+                fetchOrders(currentUser.uid);
+            }
+        });
+
+        return () => {
+            unsubscribeAuth();
+            unsubscribeFocus();
+        };
+    }, [navigation]);
+
+    // Renderizamos un Loading igual al de HomeScreen
+    if (isLoading && !activeOrder && upcomingOrders.length === 0) {
+        return (
+            <SafeAreaProvider>
+                <SafeAreaView style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+                    <ActivityIndicator size="large" color="#FFD43B" />
+                    <Text style={{ color: "#888", marginTop: 15 }}>Cargando agenda...</Text>
+                </SafeAreaView>
+            </SafeAreaProvider>
+        );
+    }
+
+    const groupedOrders = groupOrdersByDay(upcomingOrders);
+
     return (
         <SafeAreaProvider>
             <StatusBar style="light" />
@@ -56,63 +182,63 @@ export default function OrdersScreen({ navigation }) {
                             Ordenes actuales
                         </Text>
                     </View>
-                    {ACTIVE_ORDER ? (
+                    
+                    {/* Renderización Dinámica de Orden Activa */}
+                    {activeOrder ? (
                         <OrderCard
-                            id={ACTIVE_ORDER.id} // id -> No Modificar
+                            id={activeOrder.id} 
                             type="active"
-                            vehicleYear={ACTIVE_ORDER.vehicleYear}
-                            vehicleBrand={ACTIVE_ORDER.vehicleBrand}
-                            vehicleModel={ACTIVE_ORDER.vehicleModel}
-                            vehiclePlate={ACTIVE_ORDER.vehiclePlate}
-                            vehicleColor={ACTIVE_ORDER.vehicleColor}
-                            ownerName={ACTIVE_ORDER.ownerName} // <-- Agregado, vehicleVIN eliminado
-                            services={ACTIVE_ORDER.services}
-                            notes={ACTIVE_ORDER.notes}
-                            time={ACTIVE_ORDER.time}
-                            mileage={ACTIVE_ORDER.vehicleMileage}
+                            vehicleYear={activeOrder.vehicleYear}
+                            vehicleBrand={activeOrder.vehicleBrand}
+                            vehicleModel={activeOrder.vehicleModel}
+                            vehiclePlate={activeOrder.vehiclePlate}
+                            vehicleColor={activeOrder.vehicleColor}
+                            ownerName={activeOrder.ownerName} 
+                            services={activeOrder.services}
+                            notes={activeOrder.notes}
+                            time={activeOrder.since}
+                            mileage={activeOrder.vehicleMileage}
                             navigation={navigation}
                             expandedId={expandedId}
                             setExpandedId={setExpandedId}
                         />
                     ) : (
                         <View style={styles.emptyState}>
-                            <Text style={styles.emptyText}>No hay órdenes activas</Text>
+                            <Text style={styles.emptyText}>No hay órdenes en progreso</Text>
                         </View>
                     )}
 
-                    {UPCOMING_ORDERS.length === 0 && (
+                    {upcomingOrders.length === 0 && (
                         <View style={styles.emptyState}>
-                            <Text style={styles.emptyText}>No hay órdenes próximas</Text>
+                            <Text style={styles.emptyText}>No tienes órdenes agendadas próximamente</Text>
                         </View>
                     )}
 
-                    {/* UPCOMING */}
-                    {dayOrder.map((day) => (
-                        groupedOrders[day] && (
-                            <View key={day}>
-                                <Text style={styles.sectionLabel}>{day.toUpperCase()}</Text>
-                                {groupedOrders[day].map((order) => (
-                                    <OrderCard
-                                        key={order.id}
-                                        id={order.id} // id -> No Modificar
-                                        type="upcoming"
-                                        vehicleYear={order.vehicleYear}
-                                        vehicleBrand={order.vehicleBrand}
-                                        vehicleModel={order.vehicleModel}
-                                        vehiclePlate={order.vehiclePlate}
-                                        vehicleColor={order.vehicleColor}
-                                        ownerName={ACTIVE_ORDER.ownerName} // <-- Agregado, vehicleVIN eliminado
-                                        services={order.services}
-                                        notes={order.notes}
-                                        time={order.time}
-                                        mileage={order.vehicleMileage}
-                                        navigation={navigation}
-                                        expandedId={expandedId}
-                                        setExpandedId={setExpandedId}
-                                    />
-                                ))}
-                            </View>
-                        )
+                    {/* Renderización Dinámica y Agrupada de Órdenes Próximas */}
+                    {Object.keys(groupedOrders).map((day) => (
+                        <View key={day}>
+                            <Text style={styles.sectionLabel}>{day}</Text>
+                            {groupedOrders[day].map((order) => (
+                                <OrderCard
+                                    key={order.id}
+                                    id={order.id} 
+                                    type="upcoming"
+                                    vehicleYear={order.vehicleYear}
+                                    vehicleBrand={order.vehicleBrand}
+                                    vehicleModel={order.vehicleModel}
+                                    vehiclePlate={order.vehiclePlate}
+                                    vehicleColor={order.vehicleColor}
+                                    ownerName={order.ownerName} // BUG ARREGLADO (Antes era ACTIVE_ORDER.ownerName)
+                                    services={order.services}
+                                    notes={order.notes}
+                                    time={order.displayTime || order.time}
+                                    mileage={order.vehicleMileage}
+                                    navigation={navigation}
+                                    expandedId={expandedId}
+                                    setExpandedId={setExpandedId}
+                                />
+                            ))}
+                        </View>
                     ))}
 
                     <View style={{ height: 120 }} />
@@ -123,135 +249,6 @@ export default function OrdersScreen({ navigation }) {
     );
 }
 
-const groupOrdersByDay = (orders) => {
-    const groups = {};
-    orders.forEach((order) => {
-        const day = order.dayKey;
-        if (!groups[day]) {
-            groups[day] = [];
-        }
-        groups[day].push(order);
-    });
-    return groups;
-};
-
-const dayOrder = ['HOY', 'MAÑANA', '20/03/2026', '21/03/2026', '22/03/2026'];
-
-const ACTIVE_ORDER = {
-    id: 'active',
-    vehicleYear: '2027',
-    vehicleBrand: 'Honda',
-    vehicleModel: 'Civic',
-    vehiclePlate: 'AB123D',
-    vehicleColor: 'Rojo',
-    ownerName: 'Pedro Maromas', // <-- Agregado
-    vehicleMileage: '10,000 km',
-    time: '09:00 AM',
-    notes: 'Cambio de aceite y revisión general',
-    services: [
-        { id: '1', title: 'Cambio de aceite', status: 'En Progreso' }, // No Modificar -> Cambio: "En Proceso " -> "En progreso"
-        { id: '2', title: 'Revisión de frenos', status: 'Pendiente' },
-    ]
-};
-
-const UPCOMING_ORDERS = [
-    {
-        id: '1',
-        vehicleYear: '2019',
-        vehicleBrand: 'Ford',
-        vehicleModel: 'F-150',
-        vehiclePlate: 'PL-9988',
-        vehicleColor: 'Amarillo',
-        ownerName: 'Maria Silva', // <-- Agregado
-        vehicleMileage: '60,000 km',
-        time: 'HOY, 02:30 PM',
-        dayKey: 'HOY',
-        notes: 'Diagnostico de motor',
-        services: [
-            { id: '1', title: 'Diagnostico de motor', status: 'Pendiente' },
-        ]
-    },
-    {
-        id: '2',
-        vehicleYear: '2022',
-        vehicleBrand: 'Toyota',
-        vehicleModel: 'RAV4',
-        vehiclePlate: 'TX-5544',
-        vehicleColor: 'Blanco',
-        ownerName: 'Carlos Garza', // <-- Agregado
-        vehicleMileage: '70,000 km',
-        time: 'MAÑANA, 09:00 AM',
-        dayKey: 'MAÑANA',
-        notes: 'Servicio de mantenimiento',
-        services: [
-            { id: '1', title: 'Servicio de mantenimiento', status: 'Pendiente' },
-        ]
-    },
-    {
-        id: '3',
-        vehicleYear: '2023',
-        vehicleBrand: 'BMW',
-        vehicleModel: 'X5',
-        vehiclePlate: 'BM-2233',
-        vehicleColor: 'Amarillo camello',
-        ownerName: 'Ana Gomez', // <-- Agregado
-        vehicleMileage: '80,000 km',
-        time: 'MAÑANA, 11:00 AM',
-        dayKey: 'MAÑANA',
-        notes: 'Cambio de aceite',
-        services: [
-            { id: '1', title: 'Cambio de aceite', status: 'Pendiente' },
-        ]
-    },
-    {
-        id: '4',
-        vehicleYear: '2021',
-        vehicleBrand: 'Nissan',
-        vehicleModel: 'Sentra',
-        vehiclePlate: 'NS-8877',
-        vehicleColor: 'Rojo clarito',
-        ownerName: 'Luis Ramirez', // <-- Agregado
-        vehicleMileage: '50,000 km',
-        time: '20/03/2026, 10:00 AM',
-        dayKey: '20/03/2026',
-        notes: 'Revisión de frenos',
-        services: [
-            { id: '1', title: 'Revisión de frenos', status: 'Pendiente' },
-        ]
-    },
-    {
-        id: '5',
-        vehicleYear: '2020',
-        vehicleBrand: 'Chevrolet',
-        vehicleModel: 'Malibu',
-        vehiclePlate: 'CH-4455',
-        vehicleColor: 'Rosa chillon',
-        ownerName: 'Sofia Castro', // <-- Agregado
-        vehicleMileage: '65,000 km',
-        time: '21/03/2026, 02:00 PM',
-        dayKey: '21/03/2026',
-        notes: 'Diagnóstico eléctrico',
-        services: [
-            { id: '1', title: 'Diagnóstico eléctrico', status: 'Pendiente' },
-        ]
-    },
-    {
-        id: '6',
-        vehicleYear: '2022',
-        vehicleBrand: 'Mazda',
-        vehicleModel: 'CX-5',
-        vehiclePlate: 'MZ-1122',
-        vehicleColor: 'Naranja fosfo',
-        ownerName: 'Jorge Perez', // <-- Agregado
-        vehicleMileage: '45,000 km',
-        time: '22/03/2026, 09:30 AM',
-        dayKey: '22/03/2026',
-        notes: 'Alineación y balanceo',
-        services: [
-            { id: '1', title: 'Alineación y balanceo', status: 'Pendiente' },
-        ]
-    },
-];
 
 const styles = StyleSheet.create({
     container: {
