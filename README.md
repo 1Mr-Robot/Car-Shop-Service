@@ -11,9 +11,13 @@
 | 2132054 | Luis Enrique Ramírez Arellano | ITS |
 
 **Materia:** Ingeniería de Dispositivos Móviles
+
 **Profesor:** MA Sergio Plata Gutiérrez
+
 **Grupo:** 001
+
 **Equipo:** 7
+
 **Brigada:** 2
 
 ---
