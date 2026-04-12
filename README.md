@@ -28,6 +28,10 @@
 
 El sistema cuenta con autenticacion via Firebase y se comunica con un servidor backend desarrollado en Node.js/Express que interactua con una base de datos PostgreSQL para persistir toda la informacion.
 
+<p align="center">
+    <img src="https://uziel.app/media/projects/car-shop-service/og.webp" alt="hero"  />
+</p>
+
 ---
 
 ## Arquitectura
