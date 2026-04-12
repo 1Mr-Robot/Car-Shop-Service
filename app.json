@@ -30,6 +30,13 @@
     },
     "plugins": [
       "expo-router"
-    ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "78ca04e2-f109-4d0f-9b09-dfe9080655dc"
+      }
+    },
+    "owner": "1mr-robot"
   }
 }
