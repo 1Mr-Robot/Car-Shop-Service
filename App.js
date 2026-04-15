@@ -5,6 +5,7 @@ import * as NavigationBar from "expo-navigation-bar";
 
 import LoginScreen from "./screens/LoginScreen";
 import HomeScreen from "./screens/HomeScreen";
+import HomeReceptionistScreen from "./screens/HomeReceptionistScreen";
 import OrdersScreen from "./screens/OrdersScreen";
 import AgendaScreen from "./screens/AgendaScreen";
 import AddServiceScreen from "./screens/AddServiceScreen";
@@ -36,7 +37,7 @@ export default function App() {
 
     return (
         <NavigationContainer>
-            <Stack.Navigator initialRouteName="Login">
+            <Stack.Navigator initialRouteName="Login">{/*Login. Para trabajar con las de recepcionista cambiar a "HomeReceptionist"*/}
                 <Stack.Screen
                     name="Login"
                     component={LoginScreen}
@@ -45,6 +46,11 @@ export default function App() {
                 <Stack.Screen
                     name="Home"
                     component={HomeScreen}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                    name="HomeReceptionist"
+                    component={HomeReceptionistScreen}
                     options={{ headerShown: false }}
                 />
                 <Stack.Screen
