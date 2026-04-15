@@ -238,8 +238,16 @@ const HomeReceptionistScreen = ({ navigation }) => {
                         </View>
                     )}
 
-                    <View style={{ height: 120 }} />
+                    <View style={{ height: 200 }} />
                 </ScrollView>
+
+                <TouchableOpacity 
+                    style={styles.fabButton}
+                    onPress={() => navigation.navigate('CreateOrder')}
+                >
+                    <Feather name="plus" size={20} color="#000" />
+                    <Text style={styles.fabButtonText}>Generar nueva orden</Text>
+                </TouchableOpacity>
 
                 <Modal
                     visible={showLogoutModal}
@@ -422,5 +430,25 @@ const styles = StyleSheet.create({
         color: "#fff",
         fontSize: 14,
         fontWeight: "600",
+    },
+
+    fabButton: {
+        position: "absolute",
+        bottom: 90,
+        left: 18,
+        right: 18,
+        backgroundColor: "#FFD43B",
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+        paddingVertical: 16,
+        borderRadius: 16,
+        gap: 8,
+    },
+
+    fabButtonText: {
+        color: "#000",
+        fontSize: 16,
+        fontWeight: "700",
     },
 });

@@ -15,6 +15,7 @@ import OrderDetailsScreen from "./screens/OrderDetailsScreen";
 import NextServiceScreen from "./screens/NextServiceScreen";
 import LastServiceScreen from "./screens/LastServiceScreen";
 import AddProductScreen  from "./screens/AddProductScreen";
+import CreateOrderScreen from "./screens/CreateOrderScreen";
 
 import { app } from "./firebaseConfig";
 
@@ -37,7 +38,7 @@ export default function App() {
 
     return (
         <NavigationContainer>
-            <Stack.Navigator initialRouteName="Login">{/*Login. Para trabajar con las de recepcionista cambiar a "HomeReceptionist"*/}
+            <Stack.Navigator initialRouteName="HomeReceptionist">{/*Login. Para trabajar con las de recepcionista cambiar a "HomeReceptionist"*/}
                 <Stack.Screen
                     name="Login"
                     component={LoginScreen}
@@ -92,6 +93,11 @@ export default function App() {
                 <Stack.Screen
                     name="AddProduct"
                     component={AddProductScreen}
+                    options={{ headerShown: false}}
+                />
+                <Stack.Screen
+                    name="CreateOrder"
+                    component={CreateOrderScreen}
                     options={{ headerShown: false}}
                 />
             </Stack.Navigator>
