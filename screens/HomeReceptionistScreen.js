@@ -434,7 +434,7 @@ const styles = StyleSheet.create({
 
     fabButton: {
         position: "absolute",
-        bottom: 90,
+        bottom: 130,
         left: 18,
         right: 18,
         backgroundColor: "#FFD43B",
