@@ -17,14 +17,12 @@ import { StatusBar } from "expo-status-bar";
 import BottomNav from "../components/BottomNav";
 import OrderCard from "../components/OrderCard";
 
-// POR NADA DEL MUNDO TOCAR ESTOS IMPORTS!!
+
 import OrderService from "../services/OrderService";
 import { getAuth } from "firebase/auth";
 import { app } from "../firebaseConfig";
 
-
 const auth = getAuth(app);
-
 
 // Helper para procesar fechas de Postgres a 'HOY', 'MAÑANA' o 'DD/MM/YYYY'
 const processUpcomingOrders = (orders) => {
@@ -229,7 +227,7 @@ export default function OrdersScreen({ navigation }) {
                                     vehicleModel={order.vehicleModel}
                                     vehiclePlate={order.vehiclePlate}
                                     vehicleColor={order.vehicleColor}
-                                    ownerName={order.ownerName} // BUG ARREGLADO (Antes era ACTIVE_ORDER.ownerName)
+                                    ownerName={order.ownerName}
                                     services={order.services}
                                     notes={order.notes}
                                     time={order.displayTime || order.time}
@@ -250,25 +248,11 @@ export default function OrdersScreen({ navigation }) {
     );
 }
 
-
 const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#0F1115",
         paddingHorizontal: 18,
-    },
-    sectionRow: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
-        marginTop: 20,
-        marginBottom: 10,
-    },
-    sectionTitle: {
-        color: "#fff",
-        fontSize: 18,
-        fontWeight: "600",
-        marginBottom: 12,
     },
     sectionLabel: {
         color: "#8B90A0",
@@ -288,20 +272,5 @@ const styles = StyleSheet.create({
     emptyText: {
         color: "#777",
         fontSize: 14,
-    },
-    detailsButton: {
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "center",
-        paddingVertical: 8,
-        paddingHorizontal: 16,
-        borderRadius: 10,
-        borderWidth: 1,
-        borderColor: "#FFD43B",
-    },
-    detailsButtonText: {
-        color: "#FFD43B",
-        fontSize: 13,
-        fontWeight: "600",
     },
 });

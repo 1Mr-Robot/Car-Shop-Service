@@ -25,7 +25,6 @@ import { app } from "../firebaseConfig";
 
 const auth = getAuth(app);
 
-
 const HomeScreen = ({ navigation }) => {
     const [expandedId, setExpandedId] = useState(null);
     const [showLogoutModal, setShowLogoutModal] = useState(false);
