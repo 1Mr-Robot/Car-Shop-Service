@@ -5,6 +5,7 @@ import * as NavigationBar from "expo-navigation-bar";
 
 import LoginScreen from "./screens/LoginScreen";
 import HomeScreen from "./screens/HomeScreen";
+import HomeReceptionistScreen from "./screens/HomeReceptionistScreen";
 import OrdersScreen from "./screens/OrdersScreen";
 import AgendaScreen from "./screens/AgendaScreen";
 import AddServiceScreen from "./screens/AddServiceScreen";
@@ -14,6 +15,8 @@ import OrderDetailsScreen from "./screens/OrderDetailsScreen";
 import NextServiceScreen from "./screens/NextServiceScreen";
 import LastServiceScreen from "./screens/LastServiceScreen";
 import AddProductScreen  from "./screens/AddProductScreen";
+import CreateOrderScreen from "./screens/CreateOrderScreen";
+import CartScreen from "./screens/CartScreen";
 
 import { app } from "./firebaseConfig";
 
@@ -36,7 +39,7 @@ export default function App() {
 
     return (
         <NavigationContainer>
-            <Stack.Navigator initialRouteName="Login">
+            <Stack.Navigator initialRouteName="HomeReceptionist">{/*Login. Para trabajar con las de recepcionista cambiar a "HomeReceptionist"*/}
                 <Stack.Screen
                     name="Login"
                     component={LoginScreen}
@@ -45,6 +48,11 @@ export default function App() {
                 <Stack.Screen
                     name="Home"
                     component={HomeScreen}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                    name="HomeReceptionist"
+                    component={HomeReceptionistScreen}
                     options={{ headerShown: false }}
                 />
                 <Stack.Screen
@@ -87,6 +95,16 @@ export default function App() {
                     name="AddProduct"
                     component={AddProductScreen}
                     options={{ headerShown: false}}
+                />
+                <Stack.Screen
+                    name="CreateOrder"
+                    component={CreateOrderScreen}
+                    options={{ headerShown: false}}
+                />
+                <Stack.Screen
+                    name="CartScreen"
+                    component={CartScreen}
+                    options={{ headerShown: false }}
                 />
             </Stack.Navigator>
         </NavigationContainer>

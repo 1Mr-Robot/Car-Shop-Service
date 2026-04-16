@@ -5,7 +5,7 @@ import { Ionicons, Feather } from "@expo/vector-icons";
 import Service from "./Service";
 
 // id -> No Modificar
-const OrderCard = ({ id, type, vehicleYear, vehicleBrand, vehicleModel, vehiclePlate, vehicleColor, ownerName, services, notes, time, mileage, navigation, expandedId, setExpandedId }) => {
+const OrderCard = ({ id, type, vehicleYear, vehicleBrand, vehicleModel, vehiclePlate, vehicleColor, ownerName, services, notes, time, mileage, navigation, expandedId, setExpandedId, mechanicName, showDetailsButton = true }) => {
     const isExpanded = expandedId === `${type}-${vehiclePlate}`;
     
     const handlePress = () => {
@@ -95,6 +95,13 @@ const OrderCard = ({ id, type, vehicleYear, vehicleBrand, vehicleModel, vehicleP
 
                 <Text style={styles.jobTitle}>{vehicleText}</Text>
 
+                {mechanicName && (
+                    <View style={styles.mechanicRow}>
+                        <Feather name="user" size={12} color="#888" />
+                        <Text style={styles.mechanicText}>{mechanicName}</Text>
+                    </View>
+                )}
+
                 {isExpanded && (
                     <View style={styles.expandedContent}>
                         {services.map((item) => (
@@ -115,7 +122,8 @@ const OrderCard = ({ id, type, vehicleYear, vehicleBrand, vehicleModel, vehicleP
                             </View>
                         )}
 
-                        <TouchableOpacity 
+                        {showDetailsButton && (
+                            <TouchableOpacity 
                             style={getDetailsButtonStyle()} 
                             onPress={() => {
                                 const serviceInfo = services.map(s => s.title).join(', ') || 'Servicio general';
@@ -165,6 +173,7 @@ const OrderCard = ({ id, type, vehicleYear, vehicleBrand, vehicleModel, vehicleP
                             <Text style={getDetailsButtonTextStyle()}>Detalles</Text>
                             <Feather name="chevron-right" size={14} color={type === 'active' ? "#000" : "#FFD43B"} />
                         </TouchableOpacity>
+                        )}
                     </View>
                 )}
             </TouchableOpacity>
@@ -236,6 +245,18 @@ const styles = {
         fontSize: 16,
         fontWeight: "600",
         marginTop: 8,
+    },
+
+    mechanicRow: {
+        flexDirection: "row",
+        alignItems: "center",
+        marginTop: 4,
+        gap: 4,
+    },
+
+    mechanicText: {
+        color: "#888",
+        fontSize: 12,
     },
 
     rowBetween: {
