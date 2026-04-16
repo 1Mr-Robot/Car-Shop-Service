@@ -20,11 +20,11 @@ export default function BottomNavReceptionist({ active }) {
                 />
             </Pressable>
 
-            <Pressable onPress={() => navigation.navigate("NuevaVenta")}>
+            <Pressable onPress={() => navigation.navigate("CartScreen")}>
                 <Feather
                     name="shopping-cart"
                     size={24}
-                    color={active === "NuevaVenta" ? activeColor : inactiveColor}
+                    color={active === "CartScreen" ? activeColor : inactiveColor}
                 />
             </Pressable>
 
