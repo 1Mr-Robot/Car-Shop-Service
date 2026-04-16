@@ -13,7 +13,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
 import BottomNavReceptionist from "../components/BottomNavReceptionist";
 
-const CartScreen = ({ navigation }) => {
+const PurchaseMerchScreen = ({ navigation }) => {
     const [cartItems, setCartItems] = useState([
         {
             id: "1",
@@ -241,7 +241,7 @@ const CartScreen = ({ navigation }) => {
                     <View style={{ height: 120 }} />
                 </ScrollView>
 
-                <BottomNavReceptionist active="NuevaVenta" />
+                <BottomNavReceptionist active="PurchaseMerchScreen" />
 
                 {/* Checkout Modal */}
                 <Modal
@@ -286,7 +286,7 @@ const CartScreen = ({ navigation }) => {
     );
 };
 
-export default CartScreen;
+export default PurchaseMerchScreen;
 
 const styles = StyleSheet.create({
     container: {

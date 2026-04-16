@@ -17,7 +17,6 @@ import LastServiceScreen from "./screens/LastServiceScreen";
 import AddProductScreen  from "./screens/AddProductScreen";
 import CreateOrderScreen from "./screens/CreateOrderScreen";
 import CartScreen from "./screens/CartScreen";
-
 import { app } from "./firebaseConfig";
 
 
