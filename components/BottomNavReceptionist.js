@@ -14,7 +14,7 @@ export default function BottomNavReceptionist({ active }) {
         <View style={[styles.bottomBar, { bottom: insets.bottom || 0 }]}>
             <Pressable onPress={() => navigation.navigate("HomeReceptionist")}>
                 <Ionicons
-                    name="grid-outline"
+                    name="add-circle-outline"
                     size={24}
                     color={active === "HomeReceptionist" ? activeColor : inactiveColor}
                 />

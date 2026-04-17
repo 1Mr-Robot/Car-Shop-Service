@@ -16,6 +16,7 @@ import {
     useSafeAreaInsets,
 } from "react-native-safe-area-context";
 import { MaterialCommunityIcons, Feather } from "@expo/vector-icons";
+import BottomNavReceptionist from "../components/BottomNavReceptionist";
 import { StatusBar } from "expo-status-bar";
 
 const INITIAL_CLIENTS = [
@@ -265,6 +266,7 @@ const TimePickerModal = ({ visible, onClose, onSelect, initialTime }) => {
 
 const CreateOrderScreen = ({ navigation }) => {
     const insets = useSafeAreaInsets();
+    const [showLogoutModal, setShowLogoutModal] = useState(false);
     
     const [selectedClient, setSelectedClient] = useState(null);
     const [selectedVehicle, setSelectedVehicle] = useState(null);
@@ -376,12 +378,24 @@ const CreateOrderScreen = ({ navigation }) => {
             <StatusBar style="light" />
             <SafeAreaView style={[styles.container, { paddingBottom: insets.bottom }]}>
                 <View style={styles.header}>
-                    <Pressable onPress={() => navigation.goBack()} hitSlop={12}>
-                        <MaterialCommunityIcons name="arrow-left" size={24} color="#fff" />
-                    </Pressable>
-                    <Text style={styles.headerTitle}>Nueva Orden de Servicio</Text>
-                    <View style={{ width: 24 }} />
+                    <View style={styles.profileRow}>
+                        <View style={styles.avatar}>
+                            <Feather name="user" size={30} color="black" />
+                        </View>
+                        <View>
+                            <Text style={styles.greeting}>BUENOS DÍAS,</Text>
+                            <Text style={styles.name}>Valentín Elizalde</Text>
+                        </View>
+                    </View>
+                    <TouchableOpacity 
+                        style={styles.logoutButton} 
+                        onPress={() => setShowLogoutModal(true)}
+                    >
+                        <Feather name="log-out" size={22} color="#FF4D4D" />
+                    </TouchableOpacity>
                 </View>
+
+                <Text style={styles.headerTitle}>Nueva Orden de Servicio</Text>
 
                 <ScrollView 
                     showsVerticalScrollIndicator={false}
@@ -547,17 +561,7 @@ const CreateOrderScreen = ({ navigation }) => {
                                     </TouchableOpacity>
                                 )}
                             />
-                            <TouchableOpacity 
-                                style={styles.addNewButton}
-                                onPress={() => {
-                                    setShowClientModal(false);
-                                    alert("Próximamente: Crear nuevo cliente");
-                                }}
-                            >
-                                <Feather name="plus" size={20} color="#FFD43B" />
-                                <Text style={styles.addNewButtonText}>Crear nuevo dueño</Text>
-                            </TouchableOpacity>
-                        </View>
+                            </View>
                     </View>
                 </Modal>
 
@@ -590,17 +594,7 @@ const CreateOrderScreen = ({ navigation }) => {
                                     </TouchableOpacity>
                                 )}
                             />
-                            <TouchableOpacity 
-                                style={styles.addNewButton}
-                                onPress={() => {
-                                    setShowVehicleModal(false);
-                                    alert("Próximamente: Crear nuevo vehículo");
-                                }}
-                            >
-                                <Feather name="plus" size={20} color="#FFD43B" />
-                                <Text style={styles.addNewButtonText}>Crear nuevo vehículo</Text>
-                            </TouchableOpacity>
-                        </View>
+                            </View>
                     </View>
                 </Modal>
 
@@ -678,6 +672,42 @@ const CreateOrderScreen = ({ navigation }) => {
                         </View>
                     </View>
                 </Modal>
+
+                <Modal
+                    visible={showLogoutModal}
+                    transparent={true}
+                    animationType="fade"
+                    onRequestClose={() => setShowLogoutModal(false)}
+                >
+                    <View style={styles.modalOverlay}>
+                        <View style={styles.modalContent}>
+                            <Text style={styles.modalTitle}>Cerrar Sesión</Text>
+                            <Text style={styles.modalText}>¿Estás seguro de que deseas cerrar sesión?</Text>
+                            <View style={styles.modalButtons}>
+                                <TouchableOpacity 
+                                    style={styles.modalCancelButton}
+                                    onPress={() => setShowLogoutModal(false)}
+                                >
+                                    <Text style={styles.modalCancelText}>Cancelar</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity 
+                                    style={styles.modalAcceptButton}
+                                    onPress={() => {
+                                        setShowLogoutModal(false);
+                                        navigation.reset({
+                                            index: 0,
+                                            routes: [{ name: 'Login' }],
+                                        });
+                                    }}
+                                >
+                                    <Text style={styles.modalAcceptText}>Aceptar</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </View>
+                </Modal>
+
+                <BottomNavReceptionist active="HomeReceptionist" />
             </SafeAreaView>
         </SafeAreaProvider>
     );
@@ -790,7 +820,7 @@ const styles = StyleSheet.create({
     },
     footer: {
         position: "absolute",
-        bottom: 0,
+        bottom: 110,
         left: 0,
         right: 0,
         padding: 18,
@@ -819,8 +849,7 @@ const styles = StyleSheet.create({
     },
     modalContent: {
         backgroundColor: "#1A1D23",
-        borderTopLeftRadius: 24,
-        borderTopRightRadius: 24,
+        borderRadius: 24,
         paddingBottom: 30,
         maxHeight: "60%",
     },
@@ -1027,6 +1056,75 @@ const styles = StyleSheet.create({
     confirmButtonText: {
         color: "#000",
         fontSize: 16,
+        fontWeight: "600",
+    },
+    profileRow: {
+        flexDirection: "row",
+        alignItems: "center",
+    },
+    avatar: {
+        width: 48,
+        height: 48,
+        borderRadius: 24,
+        backgroundColor: "#FFD43B",
+        marginRight: 12,
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    greeting: {
+        color: "#888",
+        fontSize: 12,
+    },
+    name: {
+        color: "#fff",
+        fontSize: 20,
+        fontWeight: "bold",
+    },
+    logoutButton: {
+        padding: 8,
+    },
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: "rgba(0, 0, 0, 0.7)",
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    modalTitle: {
+        color: "#fff",
+        fontSize: 20,
+        fontWeight: "bold",
+        marginBottom: 12,
+    },
+    modalText: {
+        color: "#888",
+        fontSize: 14,
+        textAlign: "center",
+        marginBottom: 24,
+    },
+    modalButtons: {
+        flexDirection: "row",
+        gap: 12,
+    },
+    modalCancelButton: {
+        backgroundColor: "#333",
+        paddingVertical: 12,
+        paddingHorizontal: 24,
+        borderRadius: 12,
+    },
+    modalCancelText: {
+        color: "#fff",
+        fontSize: 14,
+        fontWeight: "600",
+    },
+    modalAcceptButton: {
+        backgroundColor: "#FF4D4D",
+        paddingVertical: 12,
+        paddingHorizontal: 24,
+        borderRadius: 12,
+    },
+    modalAcceptText: {
+        color: "#fff",
+        fontSize: 14,
         fontWeight: "600",
     },
 });
