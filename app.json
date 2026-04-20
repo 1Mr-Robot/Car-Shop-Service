@@ -22,7 +22,7 @@
         "backgroundColor": "#ffffff",
         "softwareKeyboardLayoutMode": "resize"
       },
-      "edgeToEdgeEnabled": true,
+      "edgeToEdgeEnabled": false,
       "package": "com.tallerautomotriz.proyectomoviles"
     },
     "web": {

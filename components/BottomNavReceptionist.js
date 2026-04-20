@@ -27,14 +27,6 @@ export default function BottomNavReceptionist({ active }) {
                     color={active === "CartScreen" ? activeColor : inactiveColor}
                 />
             </Pressable>
-
-            <Pressable onPress={() => navigation.navigate("Inventario")}>
-                <Feather
-                    name="package"
-                    size={24}
-                    color={active === "Inventario" ? activeColor : inactiveColor}
-                />
-            </Pressable>
         </View>
     );
 }
