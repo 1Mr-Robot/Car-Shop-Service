@@ -680,7 +680,7 @@ const CreateOrderScreen = ({ navigation }) => {
                     onRequestClose={() => setShowLogoutModal(false)}
                 >
                     <View style={styles.modalOverlay}>
-                        <View style={styles.modalContent}>
+                        <View style={styles.modalContentLogout}>
                             <Text style={styles.modalTitle}>Cerrar Sesión</Text>
                             <Text style={styles.modalText}>¿Estás seguro de que deseas cerrar sesión?</Text>
                             <View style={styles.modalButtons}>
@@ -853,6 +853,14 @@ const styles = StyleSheet.create({
         paddingBottom: 30,
         maxHeight: "60%",
     },
+
+    modalContentLogout: {
+        backgroundColor: "#1A1D23",
+        borderRadius: 24,
+        padding: 30,
+        maxHeight: "60%",
+    },
+
     modalHeader: {
         flexDirection: "row",
         alignItems: "center",
@@ -1104,6 +1112,7 @@ const styles = StyleSheet.create({
     modalButtons: {
         flexDirection: "row",
         gap: 12,
+        justifyContent: "center",
     },
     modalCancelButton: {
         backgroundColor: "#333",
