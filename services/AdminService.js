@@ -14,6 +14,14 @@ class AdminService {
     static async createMasterOrder(orderData) {
         return await ApiClient.post('/ordenes', orderData);
     }
+
+    /**
+     * Registra una nueva venta directa de mostrador.
+     * @param {Object} saleData - Objeto con la lista de productos: { productos: [{ id_producto, cantidad }] }
+     */
+    static async createSale(saleData) {
+        return await ApiClient.post('/ventas', saleData);
+    }
 }
 
 export default AdminService;
