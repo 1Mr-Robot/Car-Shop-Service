@@ -37,7 +37,7 @@ export default function App() {
 
     return (
         <NavigationContainer>
-            <Stack.Navigator initialRouteName="HomeReceptionist">{/*Login. Para trabajar con las de recepcionista cambiar a "HomeReceptionist"*/}
+            <Stack.Navigator initialRouteName="Login">{/*Login. Para trabajar con las de recepcionista cambiar a "HomeReceptionist"*/}
                 <Stack.Screen
                     name="Login"
                     component={LoginScreen}

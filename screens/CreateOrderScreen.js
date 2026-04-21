@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
     View,
     Text,
@@ -9,6 +9,7 @@ import {
     Modal,
     FlatList,
     Pressable,
+    ActivityIndicator,
 } from "react-native";
 import {
     SafeAreaProvider,
@@ -18,35 +19,14 @@ import {
 import { MaterialCommunityIcons, Feather } from "@expo/vector-icons";
 import BottomNavReceptionist from "../components/BottomNavReceptionist";
 import { StatusBar } from "expo-status-bar";
+// NO TOCAR ESTOS IMPORTS -- SERVICIOS RESTful
+import AdminService from "../services/AdminService";
+import CatalogService from "../services/CatalogService";
 
-const INITIAL_CLIENTS = [
-    { id: "c1", name: "Juan Pérez", phone: "555-123-4567" },
-    { id: "c2", name: "María López", phone: "555-234-5678" },
-    { id: "c3", name: "Roberto García", phone: "555-345-6789" },
-    { id: "c4", name: "Luis Hernández", phone: "555-456-7890" },
-    { id: "c5", name: "Sofia Ramírez", phone: "555-567-8901" },
-    { id: "c6", name: "Ana Torres", phone: "555-678-9012" },
-    { id: "c7", name: "Carlos Martínez", phone: "555-789-0123" },
-];
 
-const INITIAL_MECHANICS = [
-    { id: "m1", name: "Carlos Martínez", specialty: "General" },
-    { id: "m2", name: "Pedro Sánchez", specialty: "Motor" },
-    { id: "m3", name: "Ana Torres", specialty: "Eléctrico" },
-    { id: "m4", name: "Roberto Lima", specialty: "Frenos" },
-];
-
-const INITIAL_SERVICES = [
-    { id: "s1", name: "Alineación y balanceo" },
-    { id: "s2", name: "Cambio de aceite" },
-    { id: "s3", name: "Revisión de frenos" },
-    { id: "s4", name: "Diagnóstico con escáner" },
-    { id: "s5", name: "Cambio de batería" },
-    { id: "s6", name: "Cambio de filtros" },
-    { id: "s7", name: "Rotación de llantas" },
-    { id: "s8", name: "Lavado interior" },
-];
-
+// ==========================================
+// COMPONENTES AUXILIARES Y CALENDARIO (FUERA DEL COMPONENTE PRINCIPAL)
+// ==========================================
 const DAYS_OF_WEEK = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
 const MONTHS = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
 
@@ -264,10 +244,22 @@ const TimePickerModal = ({ visible, onClose, onSelect, initialTime }) => {
     );
 };
 
+
+// ==========================================
+// COMPONENTE PRINCIPAL
+// ==========================================
 const CreateOrderScreen = ({ navigation }) => {
     const insets = useSafeAreaInsets();
     const [showLogoutModal, setShowLogoutModal] = useState(false);
     
+    // ESTADO PARA DATOS DEL BACKEND
+    const [clients, setClients] = useState([]);
+    const [mechanics, setMechanics] = useState([]);
+    const [services, setServices] = useState([]);
+    const [isLoadingData, setIsLoadingData] = useState(true);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    // ESTADOS DEL FORMULARIO
     const [selectedClient, setSelectedClient] = useState(null);
     const [selectedVehicle, setSelectedVehicle] = useState(null);
     const [selectedMechanic, setSelectedMechanic] = useState(null);
@@ -286,10 +278,31 @@ const CreateOrderScreen = ({ navigation }) => {
 
     const [tempDate, setTempDate] = useState(new Date());
 
-    const clientVehicles = selectedClient ? [
-        { id: "v1", brand: "Toyota", model: "Corolla", year: "2020", plate: "ABC-1234" },
-        { id: "v2", brand: "Honda", model: "Civic", year: "2018", plate: "XYZ-5678" },
-    ] : [];
+    // Vehículos dinámicos basados en el cliente seleccionado
+    const clientVehicles = selectedClient ? selectedClient.vehicles : [];
+
+    // CARGA DE DATOS RESTful
+    useEffect(() => {
+        const loadInitialData = async () => {
+            try {
+                setIsLoadingData(true);
+                // Ejecución Secuencial -- UZUEL Paga el pche CleverCloud Premium!!!
+                const clientsData = await AdminService.getClientsWithVehicles();
+                const mechanicsData = await AdminService.getMechanics();
+                const servicesData = await CatalogService.getServices({ limit: 100 });
+                
+                setClients(clientsData);
+                setMechanics(mechanicsData);
+                setServices(servicesData);
+            } catch (error) {
+                console.error("Error cargando catálogos:", error);
+                alert("Hubo un error al conectar con la base de datos del taller.");
+            } finally {
+                setIsLoadingData(false);
+            }
+        };
+        loadInitialData();
+    }, []);
 
     const toggleService = (serviceId) => {
         setSelectedServices(prev => 
@@ -300,37 +313,52 @@ const CreateOrderScreen = ({ navigation }) => {
     };
 
     const isFormValid = () => {
-        return selectedClient && 
-               selectedVehicle && 
-               selectedMechanic && 
-               mileage.trim() && 
-               scheduledDate.trim() && 
-               startTime.trim() &&
+        return selectedClient && selectedVehicle && selectedMechanic && 
+               mileage.trim() && scheduledDate.trim() && startTime.trim() &&
                selectedServices.length > 0;
     };
 
-    const handleSubmit = () => {
+    // ENVÍO DE ORDEN AL BACKEND
+    const handleSubmit = async () => {
         if (!isFormValid()) {
             alert("Por favor completa todos los campos obligatorios");
             return;
         }
         
-        const orderData = {
-            client: selectedClient,
-            vehicle: selectedVehicle,
-            mileage,
-            scheduledDate,
-            startTime,
-            services: selectedServices,
-            notes,
-            mechanic: selectedMechanic
-        };
-        
-        console.log("Nueva orden creada:", orderData);
-        alert("Orden creada exitosamente");
-        navigation.goBack();
+        setIsSubmitting(true);
+        try {
+            // Unir la fecha y hora seleccionada en un solo objeto Date
+            const [hours, minutes] = startTime.split(":");
+            const dateObj = new Date(scheduledDate);
+            const year = dateObj.getFullYear();
+            const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+            const day = String(dateObj.getDate()).padStart(2, '0');
+            
+            const fechaLocalExacta = `${year}-${month}-${day} ${hours}:${minutes}:00`;
+            
+            const payload = {
+                id_vehiculo: selectedVehicle.id,
+                id_mecanico: selectedMechanic.id,
+                kilometraje: mileage,
+                fecha_inicio: fechaLocalExacta,
+                notas_cliente: notes,
+                servicios: selectedServices
+            };
+            
+            await AdminService.createMasterOrder(payload);
+            
+            alert("¡Orden creada exitosamente!");
+            navigation.goBack(); // Regresa al Home
+            
+        } catch (error) {
+            console.error("Error al crear la orden:", error);
+            alert("No se pudo crear la orden. Intenta de nuevo.");
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
+    // FUNCIONES DE UI
     const formatDateDisplay = (dateString) => {
         if (!dateString) return "";
         const date = new Date(dateString);
@@ -372,6 +400,17 @@ const CreateOrderScreen = ({ navigation }) => {
             </TouchableOpacity>
         </View>
     );
+
+    if (isLoadingData) {
+        return (
+            <SafeAreaProvider>
+                <SafeAreaView style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+                    <ActivityIndicator size="large" color="#FFD43B" />
+                    <Text style={{ color: "#888", marginTop: 15 }}>Sincronizando catálogos...</Text>
+                </SafeAreaView>
+            </SafeAreaProvider>
+        );
+    }
 
     return (
         <SafeAreaProvider>
@@ -477,7 +516,7 @@ const CreateOrderScreen = ({ navigation }) => {
                     {selectedServices.length > 0 && (
                         <View style={styles.selectedServicesContainer}>
                             {selectedServices.map(serviceId => {
-                                const service = INITIAL_SERVICES.find(s => s.id === serviceId);
+                                const service = services.find(s => s.id === serviceId);
                                 return (
                                     <View key={serviceId} style={styles.serviceChip}>
                                         <Text style={styles.serviceChipText}>{service?.name}</Text>
@@ -511,11 +550,15 @@ const CreateOrderScreen = ({ navigation }) => {
 
                 <View style={styles.footer}>
                     <TouchableOpacity 
-                        style={[styles.submitButton, !isFormValid() && styles.submitButtonDisabled]}
+                        style={[styles.submitButton, (!isFormValid() || isSubmitting) && styles.submitButtonDisabled]}
                         onPress={handleSubmit}
-                        disabled={!isFormValid()}
+                        disabled={!isFormValid() || isSubmitting}
                     >
-                        <Text style={styles.submitButtonText}>Crear Orden</Text>
+                        {isSubmitting ? (
+                            <ActivityIndicator color="#000" />
+                        ) : (
+                            <Text style={styles.submitButtonText}>Crear Orden</Text>
+                        )}
                     </TouchableOpacity>
                 </View>
 
@@ -543,8 +586,8 @@ const CreateOrderScreen = ({ navigation }) => {
                                 </Pressable>
                             </View>
                             <FlatList
-                                data={INITIAL_CLIENTS}
-                                keyExtractor={item => item.id}
+                                data={clients}
+                                keyExtractor={item => item.id.toString()}
                                 renderItem={({ item }) => (
                                     <TouchableOpacity 
                                         style={styles.modalItem}
@@ -576,7 +619,7 @@ const CreateOrderScreen = ({ navigation }) => {
                             </View>
                             <FlatList
                                 data={clientVehicles}
-                                keyExtractor={item => item.id}
+                                keyExtractor={item => item.id.toString()}
                                 renderItem={({ item }) => (
                                     <TouchableOpacity 
                                         style={styles.modalItem}
@@ -608,8 +651,8 @@ const CreateOrderScreen = ({ navigation }) => {
                                 </Pressable>
                             </View>
                             <FlatList
-                                data={INITIAL_MECHANICS}
-                                keyExtractor={item => item.id}
+                                data={mechanics} 
+                                keyExtractor={item => item.id.toString()}
                                 renderItem={({ item }) => (
                                     <TouchableOpacity 
                                         style={styles.modalItem}
@@ -639,8 +682,8 @@ const CreateOrderScreen = ({ navigation }) => {
                                 </Pressable>
                             </View>
                             <FlatList
-                                data={INITIAL_SERVICES}
-                                keyExtractor={item => item.id}
+                                data={services} 
+                                keyExtractor={item => item.id.toString()}
                                 renderItem={({ item }) => (
                                     <TouchableOpacity 
                                         style={[

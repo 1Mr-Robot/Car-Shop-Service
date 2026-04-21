@@ -18,7 +18,6 @@ import { Ionicons, MaterialCommunityIcons, Feather } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
 import BottomNav from "../components/BottomNav";
 import { useNavigation, useRoute } from "@react-navigation/native"; //NAVEGACION
-import { descending } from "firebase/firestore/pipelines";
 import { Checkbox } from 'expo-checkbox';
 
 // No Modificar: servicesData -> INITIAL_SERVICES - paginacion API: (GET /api/v1/servicios?page=1&limit=7 - 15)

@@ -16,6 +16,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import Feather from "@expo/vector-icons/Feather"; // <--- AGREGAR ESTA LÍNEA
 
 //Importaciones de Firebase
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
@@ -80,10 +81,20 @@ export default function LoginScreen({ navigation }) {
             }
 
             console.log("Datos desde PostgreSQL:", data.user);
-            
-            // Si todo sale bien, pasamos al Home
-            navigation.replace("Home", { userData: data.user });
 
+            // ==================================================================
+            // ENRUTAMIENTO BASADO EN RBAC
+            // =================================================================
+            if (data.user.rol === 'Recepcionista') {
+                // Enrutamos a la nueva pantalla base del Recepcionista
+                navigation.replace("CreateOrder", { userData: data.user });
+            } else if (data.user.rol === 'Mecánico') {
+                // Enrutamos al Home clásico del Mecánico
+                navigation.replace("Home", { userData: data.user });
+            } else {
+                showModal("Error", "Tu rol no es válido. Contacta a soporte.");
+            }
+            
         } catch (error) {
             console.error("Error de Firebase:", error.code);
             // Manejo de errores en español para el usuario
@@ -245,6 +256,22 @@ export default function LoginScreen({ navigation }) {
                                 </Text>
                             )}
                         </TouchableOpacity>
+
+                        {/* ========================================== */}
+                        {/* RUTA TEMPORAL (DEV MODE)                   */}
+                        {/* ========================================== */}
+                        {/* TODO: REMOVE BEFORE PRODUCTION */}
+                        <TouchableOpacity
+                            style={styles.devButton}
+                            onPress={() => navigation.replace("HomeReceptionist")}
+                            activeOpacity={0.85}
+                            disabled={isLoading}
+                        >
+                            <Feather name="tool" size={18} color="#fff" style={{ marginRight: 8 }} />
+                            <Text style={styles.devButtonText}>Entrar como Recepcionista (Prueba)</Text>
+                        </TouchableOpacity>
+                        {/* ========================================== */}
+
                         <Text style={styles.alertText}>
                             Si olvidaste la contraseña, contacta con tu jefe
                             para que te proporcione una nueva.
