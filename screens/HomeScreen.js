@@ -169,7 +169,7 @@ const HomeScreen = ({ navigation }) => {
 
                     <View style={styles.sectionRow}>
                         <Text style={styles.sectionTitle}>
-                            Ordenes de hoy
+                            Ordenes próximas
                         </Text>
                         <TouchableOpacity onPress={() => navigation.navigate('Agenda')}>
                             <Text style={styles.link}>Ver Calendario</Text>
@@ -177,7 +177,7 @@ const HomeScreen = ({ navigation }) => {
                     </View>
 
                     {upcomingOrders.length > 0 ? (
-                        upcomingOrders.map((order) => (
+                        upcomingOrders.slice(0, 5).map((order) => (
                             <OrderCard
                                 key={order.id}
                                 id={order.id}

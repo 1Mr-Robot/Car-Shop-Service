@@ -245,10 +245,7 @@ export default function AddServiceScreen(){
                             <Text style={{ color: '#FFD43B' }}>Cargar más servicios...</Text>
                         </TouchableOpacity>                        
                     )}
-                />                                  
-                <Pressable style={styles.productButton}>               
-                    <Text style={styles.productButtonText}>Servicio Personalizado</Text>
-                </Pressable>
+                />
 
                 <View style={{flexDirection:"row", gap:15, marginTop: 15, marginBottom: 20}}>
                     <View style={[styles.card, styles.half]}>
