@@ -7,6 +7,7 @@ import {
     TouchableOpacity,
     Pressable,
     FlatList,
+    Modal,
 } from "react-native";
 import {
     SafeAreaProvider,
@@ -72,6 +73,19 @@ const OrderDetailsScreen = ({ navigation, route }) => {
 
     // 2. Inicializamos el estado con los datos reales de la BD
     const [orderServices, setOrderServices] = useState(servicesList || []);
+    const [showFinishModal, setShowFinishModal] = useState(false);
+    const [pendingServices, setPendingServices] = useState([]);
+
+    const handleFinishPress = () => {
+        const allFinalized = orderServices.every(s => s.status === "Finalizado");
+        if (allFinalized) {
+            navigation.navigate("Home");
+        } else {
+            const pending = orderServices.filter(s => s.status !== "Finalizado").map(s => s.title);
+            setPendingServices(pending);
+            setShowFinishModal(true);
+        }
+    };
 
     // 3. Lógica de cambio de estatus (UI y preparación para Backend)
     const toggleServiceStatus = async (serviceId) => {
@@ -239,9 +253,37 @@ const OrderDetailsScreen = ({ navigation, route }) => {
                         </TouchableOpacity>
                     </View>
 
-                    <TouchableOpacity style={[styles.primaryButton]}>
+                    <TouchableOpacity style={[styles.primaryButton]} onPress={handleFinishPress}>
                         <Text style={styles.primaryButtonText}>Finalizar</Text>
                     </TouchableOpacity>
+
+                    <Modal
+                        visible={showFinishModal}
+                        transparent={true}
+                        animationType="fade"
+                        onRequestClose={() => setShowFinishModal(false)}
+                    >
+                        <View style={styles.modalOverlay}>
+                            <View style={styles.modalContent}>
+                                <Text style={styles.modalTitle}>Servicios Pendientes</Text>
+                                <Text style={styles.modalText}>
+                                    Antes de finalizar, marca los siguientes servicios como completados:
+                                </Text>
+                                {pendingServices.map((service, index) => (
+                                    <View key={index} style={styles.pendingItem}>
+                                        <Feather name="circle" size={12} color="#FFD43B" />
+                                        <Text style={styles.pendingText}>{service}</Text>
+                                    </View>
+                                ))}
+                                <TouchableOpacity
+                                    style={styles.modalAcceptButton}
+                                    onPress={() => setShowFinishModal(false)}
+                                >
+                                    <Text style={styles.modalAcceptText}>Entendido</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </Modal>
                 </ScrollView>
             </View>
         </SafeAreaProvider>
@@ -464,5 +506,51 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         justifyContent: "center",
         gap: 8,
+    },
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: "rgba(0, 0, 0, 0.7)",
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    modalContent: {
+        backgroundColor: "#1A1D23",
+        borderRadius: 20,
+        padding: 24,
+        width: "85%",
+    },
+    modalTitle: {
+        color: "#fff",
+        fontSize: 20,
+        fontWeight: "bold",
+        marginBottom: 12,
+    },
+    modalText: {
+        color: "#888",
+        fontSize: 14,
+        marginBottom: 16,
+    },
+    pendingItem: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 8,
+        marginBottom: 8,
+    },
+    pendingText: {
+        color: "#fff",
+        fontSize: 14,
+    },
+    modalAcceptButton: {
+        backgroundColor: "#FFD43B",
+        paddingVertical: 12,
+        paddingHorizontal: 24,
+        borderRadius: 12,
+        alignItems: "center",
+        marginTop: 16,
+    },
+    modalAcceptText: {
+        color: "#000",
+        fontSize: 14,
+        fontWeight: "700",
     },
 });
