@@ -28,13 +28,16 @@ const LastServiceScreen = ({ navigation, route }) => {
         mileage,
         notes,
         servicesList,
+        startDate,
+        startTime,
     } = route.params || {};
     const insets = useSafeAreaInsets();
 
-    const startDate = "10/01/2026";
-    const startTime = "09:00 AM";
     const endDate = "10/01/2026";
     const endTime = "02:30 PM";
+
+    const displayStartDate = startDate || "---";
+    const displayStartTime = startTime || "---";
 
     const productsList = [
         {
@@ -129,11 +132,11 @@ const LastServiceScreen = ({ navigation, route }) => {
                             <Text style={styles.dataLabel}>
                                 Fecha de Inicio
                             </Text>
-                            <Text style={styles.dataValue}>{startDate}</Text>
+                            <Text style={styles.dataValue}>{displayStartDate}</Text>
                         </View>
                         <View style={styles.dataRow}>
                             <Text style={styles.dataLabel}>Hora de Inicio</Text>
-                            <Text style={styles.dataValue}>{startTime}</Text>
+                            <Text style={styles.dataValue}>{displayStartTime}</Text>
                         </View>
                         <View style={styles.dataRow}>
                             <Text style={styles.dataLabel}>

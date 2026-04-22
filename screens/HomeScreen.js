@@ -221,6 +221,7 @@ const HomeScreen = ({ navigation }) => {
                                 vehicleModel={order.vehicleModel}
                                 vehiclePlate={order.vehiclePlate}
                                 vehicleColor={order.vehicleColor}
+                                vehicleVIN={order.vehicleVIN}
                                 ownerName={order.ownerName}
                                 services={order.services}
                                 time={order.time}
@@ -228,6 +229,8 @@ const HomeScreen = ({ navigation }) => {
                                 navigation={navigation}
                                 expandedId={expandedId}
                                 setExpandedId={setExpandedId}
+                                orderStartDate={order.startDate}
+                                orderStartTime={order.startTime}
                             />
                         ))
                     ) : (
