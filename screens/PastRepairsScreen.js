@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
     View,
     Text,
     StyleSheet,
     ScrollView,
     TextInput,
+    ActivityIndicator
 } from "react-native";
 import {
     SafeAreaProvider,
@@ -16,11 +17,132 @@ import { StatusBar } from "expo-status-bar";
 import BottomNav from "../components/BottomNav";
 import OrderCard from "../components/OrderCard";
 
+// Conexión al Backend y Firebase
+import OrderService from "../services/OrderService";
+import { getAuth } from "firebase/auth";
+import { app } from "../firebaseConfig";
+
+const auth = getAuth(app);
+
+// Helper para procesar fechas (HOY, AYER o DD/MM/YYYY)
+const processCompletedOrders = (orders) => {
+    const today = new Date();
+    const yesterday = new Date();
+    yesterday.setDate(today.getDate() - 1);
+
+    const formatD = (d) => {
+        const day = String(d.getDate()).padStart(2, '0');
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const year = d.getFullYear();
+        return `${day}/${month}/${year}`;
+    };
+
+    const todayStr = formatD(today);
+    const yesterdayStr = formatD(yesterday);
+
+    return orders.map(order => {
+        let dayKey = 'SIN FECHA';
+        let displayTime = order.time;
+
+        if (order.time) {
+            // El backend retorna 'DD/MM/YYYY, HH12:MI AM'
+            const parts = order.time.split(', ');
+            if (parts.length === 2) {
+                const datePart = parts[0];
+                const timePart = parts[1];
+                
+                if (datePart === todayStr) {
+                    dayKey = 'HOY';
+                    displayTime = `HOY, ${timePart}`;
+                } else if (datePart === yesterdayStr) {
+                    dayKey = 'AYER';
+                    displayTime = `AYER, ${timePart}`;
+                } else {
+                    dayKey = datePart;
+                }
+            }
+        }
+        return { ...order, dayKey, displayTime };
+    });
+};
+
+// Helper de agrupación
+const groupOrdersByDay = (orders) => {
+    const groups = {};
+    orders.forEach((order) => {
+        const day = order.dayKey;
+        if (!groups[day]) {
+            groups[day] = [];
+        }
+        groups[day].push(order);
+    });
+    return groups;
+};
+
 export default function PastRepairsScreen({ navigation }) {
     const [expandedId, setExpandedId] = useState(null);
     const insets = useSafeAreaInsets();
 
-    const groupedOrders = groupOrdersByDay(COMPLETED_ORDERS);
+    const [completedOrders, setCompletedOrders] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [searchQuery, setSearchQuery] = useState("");
+
+    const fetchOrders = async (uid) => {
+        if (!uid) return;
+        try {
+            setIsLoading(true);
+            const rawOrders = await OrderService.getCompletedOrders(uid);
+            setCompletedOrders(processCompletedOrders(rawOrders));
+        } catch (err) {
+            console.error("Error al cargar historial:", err);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        const unsubscribeAuth = auth.onAuthStateChanged((user) => {
+            if (user) {
+                fetchOrders(user.uid);
+            } else {
+                setIsLoading(false);
+            }
+        });
+
+        const unsubscribeFocus = navigation.addListener('focus', () => {
+            const currentUser = auth.currentUser;
+            if (currentUser) fetchOrders(currentUser.uid);
+        });
+
+        return () => {
+            unsubscribeAuth();
+            unsubscribeFocus();
+        };
+    }, [navigation]);
+
+    // Filtrado en tiempo real basado en la barra de búsqueda (Placa o Cliente)
+    const filteredOrders = completedOrders.filter(order => {
+        const query = searchQuery.toLowerCase();
+        const plateMatch = order.vehiclePlate?.toLowerCase().includes(query);
+        const ownerMatch = order.ownerName?.toLowerCase().includes(query);
+        return plateMatch || ownerMatch;
+    });
+
+    const groupedOrders = groupOrdersByDay(filteredOrders);
+    
+    // Calcular cuántas reparaciones se hicieron HOY
+    const todayRepairsCount = completedOrders.filter(o => o.dayKey === 'HOY').length;
+
+    if (isLoading) {
+        return (
+            <SafeAreaProvider>
+                <SafeAreaView style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+                    <ActivityIndicator size="large" color="#FFD43B" />
+                    <Text style={{ color: "#888", marginTop: 15 }}>Cargando historial...</Text>
+                </SafeAreaView>
+            </SafeAreaProvider>
+        );
+    }
 
     return (
         <SafeAreaProvider>
@@ -35,36 +157,38 @@ export default function PastRepairsScreen({ navigation }) {
                         Historial de Reparaciones
                     </Text>
 
-                    {/* SUMMARY SIN EFICIENCIA */}
+                    {/* SUMMARY DINÁMICO */}
                     <View style={styles.summaryCard}>
                         <View>
                             <Text style={styles.smallLabel}>
                                 COMPLETADAS HOY
                             </Text>
                             <Text style={styles.bigNumber}>
-                                {COMPLETED_ORDERS.length} Reparaciones
+                                {todayRepairsCount} Reparaciones
                             </Text>
                         </View>
                     </View>
 
-                    {/* SEARCH BAR ORIGINAL */}
+                    {/* SEARCH BAR */}
                     <View style={styles.searchContainer}>
-                        <Feather
-                            name="search"
-                            size={18}
-                            color="#8B90A0"
-                        />
+                        <Feather name="search" size={18} color="#8B90A0" />
                         <TextInput
                             placeholder="Buscar por placa o cliente..."
                             placeholderTextColor="#8B90A0"
                             style={styles.searchInput}
                             caretColor="#FFD43B"
+                            value={searchQuery}
+                            onChangeText={setSearchQuery}
                         />
                     </View>
 
-                    {/* LISTADO AGRUPADO */}
-                    {dayOrder.map((day) => (
-                        groupedOrders[day] && (
+                    {/* LISTADO AGRUPADO DINÁMICO */}
+                    {Object.keys(groupedOrders).length === 0 ? (
+                         <View style={{ alignItems: "center", marginTop: 40 }}>
+                             <Text style={{ color: "#777", fontSize: 16 }}>No se encontraron reparaciones.</Text>
+                         </View>
+                    ) : (
+                        Object.keys(groupedOrders).map((day) => (
                             <View key={day}>
                                 <Text style={styles.sectionLabel}>
                                     {day.toUpperCase()}
@@ -73,14 +197,16 @@ export default function PastRepairsScreen({ navigation }) {
                                 {groupedOrders[day].map((order) => (
                                     <OrderCard
                                         key={order.id}
+                                        id={order.id}
                                         type="completed"
                                         vehicleYear={order.vehicleYear}
                                         vehicleBrand={order.vehicleBrand}
                                         vehicleModel={order.vehicleModel}
                                         vehiclePlate={order.vehiclePlate}
+                                        ownerName={order.ownerName}
                                         services={order.services}
                                         notes={order.notes}
-                                        time={order.time}
+                                        time={order.displayTime || order.time}
                                         mileage={order.vehicleMileage}
                                         navigation={navigation}
                                         expandedId={expandedId}
@@ -88,8 +214,8 @@ export default function PastRepairsScreen({ navigation }) {
                                     />
                                 ))}
                             </View>
-                        )
-                    ))}
+                        ))
+                    )}
 
                     <View style={{ height: 120 }} />
                 </ScrollView>
@@ -99,55 +225,6 @@ export default function PastRepairsScreen({ navigation }) {
         </SafeAreaProvider>
     );
 }
-
-/* ---------- AGRUPACIÓN ---------- */
-
-const groupOrdersByDay = (orders) => {
-    const groups = {};
-    orders.forEach((order) => {
-        const day = order.dayKey;
-        if (!groups[day]) {
-            groups[day] = [];
-        }
-        groups[day].push(order);
-    });
-    return groups;
-};
-
-const dayOrder = ["HOY", "AYER", "20/03/2026"];
-
-/* ---------- MOCK DATA ---------- */
-
-const COMPLETED_ORDERS = [
-    {
-        id: "1",
-        vehicleYear: "2020",
-        vehicleBrand: "Toyota",
-        vehicleModel: "Hilux",
-        vehiclePlate: "ABC-1234",
-        vehicleMileage: "65,000 km",
-        time: "HOY, 10:00 AM",
-        dayKey: "HOY",
-        notes: "Revisión completa del sistema de frenado.",
-        services: [
-            { id: "1", title: "Cambio de balatas", status: "Finalizado" }
-        ]
-    },
-    {
-        id: "2",
-        vehicleYear: "2019",
-        vehicleBrand: "Volkswagen",
-        vehicleModel: "Golf GTI",
-        vehiclePlate: "GTI-0909",
-        vehicleMileage: "70,000 km",
-        time: "AYER, 02:00 PM",
-        dayKey: "AYER",
-        notes: "Cambio de aceite sintético.",
-        services: [
-            { id: "1", title: "Cambio de aceite", status: "Finalizado" }
-        ]
-    }
-];
 
 const styles = StyleSheet.create({
     container: {
