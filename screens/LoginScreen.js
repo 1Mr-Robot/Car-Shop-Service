@@ -257,21 +257,6 @@ export default function LoginScreen({ navigation }) {
                             )}
                         </TouchableOpacity>
 
-                        {/* ========================================== */}
-                        {/* RUTA TEMPORAL (DEV MODE)                   */}
-                        {/* ========================================== */}
-                        {/* TODO: REMOVE BEFORE PRODUCTION */}
-                        <TouchableOpacity
-                            style={styles.devButton}
-                            onPress={() => navigation.replace("HomeReceptionist")}
-                            activeOpacity={0.85}
-                            disabled={isLoading}
-                        >
-                            <Feather name="tool" size={18} color="#fff" style={{ marginRight: 8 }} />
-                            <Text style={styles.devButtonText}>Entrar como Recepcionista (Prueba)</Text>
-                        </TouchableOpacity>
-                        {/* ========================================== */}
-
                         <Text style={styles.alertText}>
                             Si olvidaste la contraseña, contacta con tu jefe
                             para que te proporcione una nueva.
