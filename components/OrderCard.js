@@ -140,9 +140,8 @@ const OrderCard = ({ id, type, vehicleYear, vehicleBrand, vehicleModel, vehicleP
                                             servicesList: services,
                                             mileage: mileage,
                                             notes: notes || '',
-                                            startDate: orderStartDate,
-                                            startTime: orderStartTime,
-                                            productsList: products || []
+                                            productsList: products || [],
+                                            time: time
                                         });
                                         break;
                                     case 'upcoming':
@@ -157,8 +156,7 @@ const OrderCard = ({ id, type, vehicleYear, vehicleBrand, vehicleModel, vehicleP
                                             servicesList: services,
                                             mileage: mileage,
                                             notes: notes || '',
-                                            scheduledDate: orderStartDate,
-                                            scheduledTime: orderStartTime
+                                            time: time
                                         });
                                         break;
                                     case 'active':
@@ -173,7 +171,8 @@ const OrderCard = ({ id, type, vehicleYear, vehicleBrand, vehicleModel, vehicleP
                                             servicesList: services,
                                             mileage: mileage,
                                             notes: notes || '',
-                                            productsList: products || []
+                                            productsList: products || [],
+                                            time:time
                                         });
                                         break;
                                 }

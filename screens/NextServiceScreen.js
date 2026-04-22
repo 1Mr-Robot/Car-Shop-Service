@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
     View,
     Text,
@@ -6,6 +6,8 @@ import {
     TouchableOpacity,
     ScrollView,
     Pressable,
+    ActivityIndicator,
+    Alert
 } from "react-native";
 import {
     SafeAreaProvider,
@@ -16,7 +18,11 @@ import { StatusBar } from "expo-status-bar";
 import Service from "../components/Service";
 import VehicleCard from "../components/VehicleCard";
 
+// servicio para la logica del botón: "Comenzar"
+import OrderService from "../services/OrderService"
+
 const NextServiceScreen = ({ navigation, route }) => {
+    // 1. Recibo de parametros de OrderCard
     const {
         orderId,
         vehicle,
@@ -24,17 +30,56 @@ const NextServiceScreen = ({ navigation, route }) => {
         vehicleColor,
         vehicleVIN,
         ownerName,
-        service,
+        servicesList,
         mileage,
         notes,
-        servicesList,
-        scheduledDate,
-        scheduledTime,
+        time,
     } = route.params || {};
-    const insets = useSafeAreaInsets();
 
-    const displayScheduledDate = scheduledDate || "---";
-    const displayScheduledTime = scheduledTime || "---";
+    const insets = useSafeAreaInsets();
+    const [isStarting, setIsStarting] = useState(false);
+
+    // 2. Extraemos Fecha y Hora de la variable 'time' del backend
+    let scheduledDate = "---";
+    let scheduledTime = "---";
+
+    if (time) {
+        const parts = time.split(", ");
+        if (parts.length === 2) {
+            scheduledDate = parts[0];
+            scheduledTime = parts[1];
+        } else {
+            scheduledDate = time;
+        }
+    }
+
+    // ==========================================
+    // LÓGICA DEL BOTÓN "COMENZAR"
+    // ==========================================
+    const handleStartOrder = async () => {
+        if (!servicesList || servicesList.length === 0) {
+            Alert.alert("Error", "No hay servicios asociados a esta orden.");
+            return;
+        }
+
+        setIsStarting(true);
+        try {
+            // Tomamos el ID del primer servicio de la lista (Nivel 3 en nuestra BD)
+            const firstServiceId = servicesList[0].id;
+            
+            // Usamos nuestro endpoint PATCH protegido por RBAC
+            await OrderService.updateServiceStatus(orderId, firstServiceId, 'En Progreso');
+            
+            // Redirigimos al Home. El listener "focus" recargará el backend 
+            // y la orden se mostrará mágicamente como Activa.
+            navigation.navigate("Home");
+        } catch (error) {
+            console.error("Error al iniciar la orden:", error);
+            Alert.alert("Error", "No se pudo iniciar la orden. Verifica tu conexión.");
+        } finally {
+            setIsStarting(false);
+        }
+    };
 
     return (
         <SafeAreaProvider>
@@ -49,6 +94,7 @@ const NextServiceScreen = ({ navigation, route }) => {
                         paddingBottom: insets.bottom + 20,
                     }}
                 >
+                    {/* FIX 1: Header restaurado a su estructura visual en línea (idéntico a LastServiceScreen) */}
                     <View
                         style={{
                             flexDirection: "row",
@@ -56,6 +102,7 @@ const NextServiceScreen = ({ navigation, route }) => {
                             paddingHorizontal: 15,
                             paddingVertical: 10,
                             backgroundColor: "#0F1115",
+                            marginBottom: 10
                         }}
                     >
                         <Pressable
@@ -85,14 +132,12 @@ const NextServiceScreen = ({ navigation, route }) => {
                         status="upcoming"
                         vehicleYear={vehicle ? vehicle.split(" ")[0] : ""}
                         vehicleBrand={vehicle ? vehicle.split(" ")[1] : ""}
-                        vehicleModel={
-                            vehicle ? vehicle.split(" ").slice(2).join(" ") : ""
-                        }
+                        vehicleModel={vehicle ? vehicle.split(" ").slice(2).join(" ") : ""}
                         owner={ownerName || "Cliente"}
-                        color={vehicleColor || "Blanco Perlado"}
-                        plate={plate || "ABC-1234"}
-                        mileage={mileage || "50,000 km"}
-                        vin={vehicleVIN || "Sin NIV"}
+                        color={vehicleColor || "No especificado"}
+                        plate={plate || "---"}
+                        mileage={mileage || "---"}
+                        vin={vehicleVIN || "No registrado"}
                     />
 
                     <View style={styles.card}>
@@ -114,7 +159,7 @@ const NextServiceScreen = ({ navigation, route }) => {
                                 Fecha Programada
                             </Text>
                             <Text style={styles.dataValue}>
-                                {displayScheduledDate}
+                                {scheduledDate}
                             </Text>
                         </View>
                         <View style={styles.dataRow}>
@@ -122,7 +167,7 @@ const NextServiceScreen = ({ navigation, route }) => {
                                 Hora Programada
                             </Text>
                             <Text style={styles.dataValue}>
-                                {displayScheduledTime}
+                                {scheduledTime}
                             </Text>
                         </View>
                     </View>
@@ -143,9 +188,20 @@ const NextServiceScreen = ({ navigation, route }) => {
                         </View>
                     )}
 
-                    <TouchableOpacity style={styles.primaryButton}>
-                        <Text style={styles.primaryButtonText}>Comenzar</Text>
-                        <Feather name="arrow-right" size={20} color="black" />
+                    {/* FIX 2: Botón Comenzar con Lógica y Loader */}
+                    <TouchableOpacity 
+                        style={[styles.primaryButton, isStarting && { opacity: 0.7 }]}
+                        onPress={handleStartOrder}
+                        disabled={isStarting}
+                    >
+                        {isStarting ? (
+                            <ActivityIndicator color="black" />
+                        ) : (
+                            <>
+                                <Text style={styles.primaryButtonText}>Comenzar</Text>
+                                <Feather name="arrow-right" size={20} color="black" />
+                            </>
+                        )}
                     </TouchableOpacity>
                 </ScrollView>
             </View>
