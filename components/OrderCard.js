@@ -150,11 +150,14 @@ const OrderCard = ({ id, type, vehicleYear, vehicleBrand, vehicleModel, vehicleP
                                             vehicle: `${vehicleYear} ${vehicleBrand} ${vehicleModel}`,
                                             plate: vehiclePlate,
                                             vehicleColor: vehicleColor,
+                                            vehicleVIN: vehicleVIN || '',
                                             ownerName: ownerName,
                                             service: serviceInfo,
                                             servicesList: services,
                                             mileage: mileage,
-                                            notes: notes || ''
+                                            notes: notes || '',
+                                            scheduledDate: orderStartDate,
+                                            scheduledTime: orderStartTime
                                         });
                                         break;
                                     case 'active':

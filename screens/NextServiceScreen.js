@@ -23,15 +23,18 @@ const NextServiceScreen = ({ navigation, route }) => {
         plate,
         vehicleColor,
         vehicleVIN,
+        ownerName,
         service,
         mileage,
         notes,
         servicesList,
+        scheduledDate,
+        scheduledTime,
     } = route.params || {};
     const insets = useSafeAreaInsets();
 
-    const scheduledDate = "15/02/2026";
-    const scheduledTime = "09:00 AM";
+    const displayScheduledDate = scheduledDate || "---";
+    const displayScheduledTime = scheduledTime || "---";
 
     return (
         <SafeAreaProvider>
@@ -85,7 +88,7 @@ const NextServiceScreen = ({ navigation, route }) => {
                         vehicleModel={
                             vehicle ? vehicle.split(" ").slice(2).join(" ") : ""
                         }
-                        owner="Juan Pérez"
+                        owner={ownerName || "Cliente"}
                         color={vehicleColor || "Blanco Perlado"}
                         plate={plate || "ABC-1234"}
                         mileage={mileage || "50,000 km"}
@@ -111,7 +114,7 @@ const NextServiceScreen = ({ navigation, route }) => {
                                 Fecha Programada
                             </Text>
                             <Text style={styles.dataValue}>
-                                {scheduledDate}
+                                {displayScheduledDate}
                             </Text>
                         </View>
                         <View style={styles.dataRow}>
@@ -119,7 +122,7 @@ const NextServiceScreen = ({ navigation, route }) => {
                                 Hora Programada
                             </Text>
                             <Text style={styles.dataValue}>
-                                {scheduledTime}
+                                {displayScheduledTime}
                             </Text>
                         </View>
                     </View>
