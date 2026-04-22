@@ -92,7 +92,7 @@ const NextServiceScreen = ({ navigation, route }) => {
                         color={vehicleColor || "Blanco Perlado"}
                         plate={plate || "ABC-1234"}
                         mileage={mileage || "50,000 km"}
-                        vin={vehicleVIN || "1HGBH456789012345"}
+                        vin={vehicleVIN || "Sin NIV"}
                     />
 
                     <View style={styles.card}>

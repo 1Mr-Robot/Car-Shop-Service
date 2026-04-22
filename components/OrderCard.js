@@ -5,7 +5,7 @@ import { Ionicons, Feather } from "@expo/vector-icons";
 import Service from "./Service";
 
 // id -> No Modificar
-const OrderCard = ({ id, type, vehicleYear, vehicleBrand, vehicleModel, vehiclePlate, vehicleColor, vehicleVIN, ownerName, services, notes, time, mileage, navigation, expandedId, setExpandedId, mechanicName, showDetailsButton = true, orderStartDate, orderStartTime }) => {
+const OrderCard = ({ id, type, vehicleYear, vehicleBrand, vehicleModel, vehiclePlate, vehicleColor, vehicleVIN, ownerName, services, notes, time, mileage, navigation, expandedId, setExpandedId, mechanicName, showDetailsButton = true, orderStartDate, orderStartTime, products }) => {
     const isExpanded = expandedId === `${type}-${vehiclePlate}`;
     
     const handlePress = () => {
@@ -141,7 +141,8 @@ const OrderCard = ({ id, type, vehicleYear, vehicleBrand, vehicleModel, vehicleP
                                             mileage: mileage,
                                             notes: notes || '',
                                             startDate: orderStartDate,
-                                            startTime: orderStartTime
+                                            startTime: orderStartTime,
+                                            productsList: products || []
                                         });
                                         break;
                                     case 'upcoming':
@@ -166,11 +167,13 @@ const OrderCard = ({ id, type, vehicleYear, vehicleBrand, vehicleModel, vehicleP
                                             vehicle: `${vehicleYear} ${vehicleBrand} ${vehicleModel}`,
                                             plate: vehiclePlate,
                                             vehicleColor: vehicleColor,
+                                            vehicleVIN: vehicleVIN || '',
                                             ownerName: ownerName,
                                             service: serviceInfo,
                                             servicesList: services,
                                             mileage: mileage,
-                                            notes: notes || ''
+                                            notes: notes || '',
+                                            productsList: products || []
                                         });
                                         break;
                                 }

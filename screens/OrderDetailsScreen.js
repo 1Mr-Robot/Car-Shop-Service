@@ -62,11 +62,13 @@ const OrderDetailsScreen = ({ navigation, route }) => {
         vehicle,
         plate,
         vehicleColor,
+        vehicleVIN,
         ownerName,
         service,
-        servicesList, // <-- ¡Aquí vienen los servicios reales de la base de datos!
+        servicesList,
         mileage,
         notes,
+        productsList,
     } = route.params || {}; 
     
     const insets = useSafeAreaInsets();
@@ -144,7 +146,7 @@ const OrderDetailsScreen = ({ navigation, route }) => {
                         }}
                     >
                         <Pressable
-                            onPress={() => navigation.navigate("Orders")}
+                            onPress={() => navigation.navigate("Home")}
                             hitSlop={12}
                             style={{ padding: 1 }}
                         >
@@ -177,6 +179,7 @@ const OrderDetailsScreen = ({ navigation, route }) => {
                         color={vehicleColor || "Sin color"}
                         plate={plate || "ABC-1234"}
                         mileage={mileage}
+                        vin={vehicleVIN || "Sin NIV"}
                     />
 
                     <View style={[styles.card]}>
@@ -219,6 +222,35 @@ const OrderDetailsScreen = ({ navigation, route }) => {
                             {notes || "Sin notas adicionales."}
                         </Text>
                     </View>
+
+                    <Text style={styles.sectionTitle}>
+                        PRODUCTOS UTILIZADOS
+                    </Text>
+
+                    {(!productsList || productsList.length === 0) ? (
+                        <Text style={styles.noProductsText}>
+                            Aún no se han utilizado productos en esta orden
+                        </Text>
+                    ) : (
+                        productsList.map((product) => (
+                            <View key={product.id} style={styles.productCard}>
+                                <View style={styles.productInfo}>
+                                    <Text style={styles.productBrand}>
+                                        {product.brand}
+                                    </Text>
+                                    <Text style={styles.productName}>
+                                        {product.name}
+                                    </Text>
+                                </View>
+                                <View style={styles.productQuantity}>
+                                    <Text style={styles.quantityLabel}>Cant.</Text>
+                                    <Text style={styles.quantityValue}>
+                                        {product.quantity}
+                                    </Text>
+                                </View>
+                            </View>
+                        ))
+                    )}
                     <View
                         style={{
                             flexDirection: "row",
@@ -551,6 +583,59 @@ const styles = StyleSheet.create({
     modalAcceptText: {
         color: "#000",
         fontSize: 14,
+        fontWeight: "700",
+    },
+    sectionTitle: {
+        color: "#8B90A0",
+        fontSize: 14,
+        fontWeight: "600",
+        letterSpacing: 1,
+        marginBottom: 16,
+        marginTop: 10,
+    },
+    noProductsText: {
+        color: "#888",
+        fontSize: 15,
+        fontStyle: "italic",
+        textAlign: "center",
+        paddingVertical: 20,
+    },
+    productCard: {
+        backgroundColor: "#1A1D24",
+        borderRadius: 20,
+        padding: 20,
+        marginBottom: 14,
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+    },
+    productInfo: {
+        flex: 1,
+    },
+    productBrand: {
+        color: "#FFD43B",
+        fontSize: 14,
+        fontWeight: "600",
+    },
+    productName: {
+        color: "#fff",
+        fontSize: 16,
+        marginTop: 4,
+    },
+    productQuantity: {
+        alignItems: "center",
+        backgroundColor: "#2A2D35",
+        paddingHorizontal: 12,
+        paddingVertical: 8,
+        borderRadius: 10,
+    },
+    quantityLabel: {
+        color: "#8B90A0",
+        fontSize: 10,
+    },
+    quantityValue: {
+        color: "#fff",
+        fontSize: 16,
         fontWeight: "700",
     },
 });

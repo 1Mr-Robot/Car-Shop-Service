@@ -30,6 +30,7 @@ const LastServiceScreen = ({ navigation, route }) => {
         servicesList,
         startDate,
         startTime,
+        productsList,
     } = route.params || {};
     const insets = useSafeAreaInsets();
 
@@ -38,22 +39,6 @@ const LastServiceScreen = ({ navigation, route }) => {
 
     const displayStartDate = startDate || "---";
     const displayStartTime = startTime || "---";
-
-    const productsList = [
-        {
-            id: "1",
-            name: "Aceite Sintético 5W-30",
-            brand: "Mobil 1",
-            quantity: 1,
-        },
-        {
-            id: "2",
-            name: "Filtro de Aceite",
-            brand: "Toyota Genuine",
-            quantity: 1,
-        },
-        { id: "3", name: "Filtro de Aire", brand: "Bosch", quantity: 1 },
-    ];
 
     return (
         <SafeAreaProvider>
@@ -111,7 +96,7 @@ const LastServiceScreen = ({ navigation, route }) => {
                         color={vehicleColor || "Silver"}
                         plate={plate || "ABC-1234"}
                         mileage={mileage || "45,000 km"}
-                        vin={vehicleVIN || "1B3HB48M2X8D12345"}
+                        vin={vehicleVIN || "Sin NIV"}
                     />
 
                     <View style={styles.card}>
@@ -172,24 +157,30 @@ const LastServiceScreen = ({ navigation, route }) => {
                         PRODUCTOS UTILIZADOS
                     </Text>
 
-                    {productsList.map((product) => (
-                        <View key={product.id} style={styles.productCard}>
-                            <View style={styles.productInfo}>
-                                <Text style={styles.productBrand}>
-                                    {product.brand}
-                                </Text>
-                                <Text style={styles.productName}>
-                                    {product.name}
-                                </Text>
+                    {(!productsList || productsList.length === 0) ? (
+                        <Text style={styles.noProductsText}>
+                            No se utilizaron productos en esta orden
+                        </Text>
+                    ) : (
+                        productsList.map((product) => (
+                            <View key={product.id} style={styles.productCard}>
+                                <View style={styles.productInfo}>
+                                    <Text style={styles.productBrand}>
+                                        {product.brand}
+                                    </Text>
+                                    <Text style={styles.productName}>
+                                        {product.name}
+                                    </Text>
+                                </View>
+                                <View style={styles.productQuantity}>
+                                    <Text style={styles.quantityLabel}>Cant.</Text>
+                                    <Text style={styles.quantityValue}>
+                                        {product.quantity}
+                                    </Text>
+                                </View>
                             </View>
-                            <View style={styles.productQuantity}>
-                                <Text style={styles.quantityLabel}>Cant.</Text>
-                                <Text style={styles.quantityValue}>
-                                    {product.quantity}
-                                </Text>
-                            </View>
-                        </View>
-                    ))}
+                        ))
+                    )}
                 </ScrollView>
             </View>
         </SafeAreaProvider>
@@ -291,5 +282,12 @@ const styles = StyleSheet.create({
         color: "#fff",
         fontSize: 16,
         fontWeight: "700",
+    },
+    noProductsText: {
+        color: "#888",
+        fontSize: 15,
+        fontStyle: "italic",
+        textAlign: "center",
+        paddingVertical: 20,
     },
 });
