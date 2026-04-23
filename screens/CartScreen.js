@@ -125,6 +125,9 @@ const PurchaseMerchScreen = ({ navigation }) => {
                             <Feather name="arrow-left" size={24} color="white" />
                         </TouchableOpacity>
                         <Text style={styles.headerTitle}>Nueva venta</Text>
+                        <TouchableOpacity onPress={() => navigation.navigate("SalesHistory")}>
+                            <Feather name="clock" size={24} color="#FFD43B" />
+                        </TouchableOpacity>
                     </View>
 
                     <View style={styles.sectionTitle}>
@@ -178,7 +181,7 @@ const PurchaseMerchScreen = ({ navigation }) => {
                     </View>
                     <View style={{ height: 120 }} />
                 </ScrollView>
-                <BottomNavReceptionist active="PurchaseMerchScreen" />
+                <BottomNavReceptionist active="CartScreen" />
 
                 {/* Modal de Éxito */}
                 <Modal visible={showCheckoutModal} transparent animationType="fade">
@@ -479,5 +482,6 @@ const styles = StyleSheet.create({
         color: "black",
         fontSize: 16,
         fontWeight: "600",
+        paddingHorizontal: 20,
     },
 });

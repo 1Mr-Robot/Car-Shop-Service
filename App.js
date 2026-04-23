@@ -16,6 +16,7 @@ import LastServiceScreen from "./screens/LastServiceScreen";
 import AddProductScreen  from "./screens/AddProductScreen";
 import CreateOrderScreen from "./screens/CreateOrderScreen";
 import CartScreen from "./screens/CartScreen";
+import SalesHistoryScreen from "./screens/SalesHistoryScreen";
 import { app } from "./firebaseConfig";
 
 
@@ -102,6 +103,11 @@ export default function App() {
                 <Stack.Screen
                     name="CartScreen"
                     component={CartScreen}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                    name="SalesHistory"
+                    component={SalesHistoryScreen}
                     options={{ headerShown: false }}
                 />
             </Stack.Navigator>

@@ -415,7 +415,7 @@ const CreateOrderScreen = ({ navigation }) => {
     return (
         <SafeAreaProvider>
             <StatusBar style="light" />
-            <SafeAreaView style={[styles.container, { paddingBottom: insets.bottom }]}>
+            <SafeAreaView style={[styles.container, { paddingBottom: insets.bottom }]} edges={["top", "bottom"]}>
                 <View style={styles.header}>
                     <View style={styles.profileRow}>
                         <View style={styles.avatar}>
