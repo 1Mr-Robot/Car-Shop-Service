@@ -93,6 +93,13 @@ class OrderService {
             productos: productIdsArray
         });
     }
+
+    /**
+     * Sello de la orden maestra como finalizada.
+     */
+    static async finalizeOrder(orderId) {
+        return await ApiClient.patch(`/ordenes/${orderId}/finalizar`, {});
+    }
 }
 
 export default OrderService;

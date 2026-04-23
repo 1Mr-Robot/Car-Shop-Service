@@ -203,6 +203,7 @@ export default function PastRepairsScreen({ navigation }) {
                                         vehicleBrand={order.vehicleBrand}
                                         vehicleModel={order.vehicleModel}
                                         vehiclePlate={order.vehiclePlate}
+                                        vehicleColor={order.vehicleColor}
                                         ownerName={order.ownerName}
                                         services={order.services}
                                         notes={order.notes}
@@ -211,6 +212,11 @@ export default function PastRepairsScreen({ navigation }) {
                                         navigation={navigation}
                                         expandedId={expandedId}
                                         setExpandedId={setExpandedId}
+                                        startDate={order.startDate}
+                                        startTime={order.startTime}
+                                        endDate={order.endDate}
+                                        endTime={order.endTime}
+                                        products={order.products}
                                     />
                                 ))}
                             </View>

@@ -24,21 +24,24 @@ const LastServiceScreen = ({ navigation, route }) => {
         vehicleColor,
         vehicleVIN,
         ownerName,
-        service,
         mileage,
         notes,
         servicesList,
         startDate,
         startTime,
+        endDate,
+        endTime,
         productsList,
     } = route.params || {};
+
     const insets = useSafeAreaInsets();
 
-    const endDate = "10/01/2026";
-    const endTime = "02:30 PM";
-
+    // 2. Fallbacks de seguridad por si algún campo viene nulo desde la DB
     const displayStartDate = startDate || "---";
     const displayStartTime = startTime || "---";
+    const displayEndDate = endDate || "---";
+    const displayEndTime = endTime || "---";
+    const safeProductsList = productsList || [];
 
     return (
         <SafeAreaProvider>
@@ -93,10 +96,10 @@ const LastServiceScreen = ({ navigation, route }) => {
                             vehicle ? vehicle.split(" ").slice(2).join(" ") : ""
                         }
                         owner={ownerName || "Cliente"}
-                        color={vehicleColor || "Silver"}
-                        plate={plate || "ABC-1234"}
-                        mileage={mileage || "45,000 km"}
-                        vin={vehicleVIN || "Sin NIV"}
+                        color={vehicleColor || "No especificado"}
+                        plate={plate || "---"}
+                        mileage={mileage || "---"}
+                        vin={vehicleVIN || "No registrado"}
                     />
 
                     <View style={styles.card}>
@@ -127,13 +130,13 @@ const LastServiceScreen = ({ navigation, route }) => {
                             <Text style={styles.dataLabel}>
                                 Fecha de Finalización
                             </Text>
-                            <Text style={styles.dataValue}>{endDate}</Text>
+                            <Text style={styles.dataValue}>{displayEndDate}</Text>
                         </View>
                         <View style={styles.dataRow}>
                             <Text style={styles.dataLabel}>
                                 Hora de Finalización
                             </Text>
-                            <Text style={styles.dataValue}>{endTime}</Text>
+                            <Text style={styles.dataValue}>{displayEndTime}</Text>
                         </View>
                     </View>
 
@@ -152,34 +155,26 @@ const LastServiceScreen = ({ navigation, route }) => {
                             <Text style={styles.notesText}>{notes}</Text>
                         </View>
                     )}
-
-                    <Text style={styles.sectionTitle}>
-                        PRODUCTOS UTILIZADOS
-                    </Text>
-
-                    {(!productsList || productsList.length === 0) ? (
-                        <Text style={styles.noProductsText}>
+                    {safeProductsList.length > 0 ? (
+                        <>
+                            <Text style={styles.sectionTitle}>PRODUCTOS UTILIZADOS</Text>
+                            {safeProductsList.map((product) => (
+                                <View key={product.id} style={styles.productCard}>
+                                    <View style={styles.productInfo}>
+                                        <Text style={styles.productBrand}>{product.brand}</Text>
+                                        <Text style={styles.productName}>{product.name}</Text>
+                                    </View>
+                                    <View style={styles.productQuantity}>
+                                        <Text style={styles.quantityLabel}>Cant.</Text>
+                                        <Text style={styles.quantityValue}>{product.quantity}</Text>
+                                    </View>
+                                </View>
+                            ))}
+                        </>
+                    ) : (
+                        <Text style={[styles.sectionTitle, { color: '#555', textAlign: 'center', marginTop: 10 }]}>
                             No se utilizaron productos en esta orden
                         </Text>
-                    ) : (
-                        productsList.map((product) => (
-                            <View key={product.id} style={styles.productCard}>
-                                <View style={styles.productInfo}>
-                                    <Text style={styles.productBrand}>
-                                        {product.brand}
-                                    </Text>
-                                    <Text style={styles.productName}>
-                                        {product.name}
-                                    </Text>
-                                </View>
-                                <View style={styles.productQuantity}>
-                                    <Text style={styles.quantityLabel}>Cant.</Text>
-                                    <Text style={styles.quantityValue}>
-                                        {product.quantity}
-                                    </Text>
-                                </View>
-                            </View>
-                        ))
                     )}
                 </ScrollView>
             </View>

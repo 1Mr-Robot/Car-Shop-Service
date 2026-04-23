@@ -8,6 +8,8 @@ import {
     Pressable,
     FlatList,
     Modal,
+    ActivityIndicator,
+    Alert
 } from "react-native";
 import {
     SafeAreaProvider,
@@ -64,7 +66,6 @@ const OrderDetailsScreen = ({ navigation, route }) => {
         vehicleColor,
         vehicleVIN,
         ownerName,
-        service,
         servicesList,
         mileage,
         notes,
@@ -77,21 +78,10 @@ const OrderDetailsScreen = ({ navigation, route }) => {
     const [orderServices, setOrderServices] = useState(servicesList || []);
     const [showFinishModal, setShowFinishModal] = useState(false);
     const [pendingServices, setPendingServices] = useState([]);
+    const [isFinishing, setIsFinishing] = useState(false);
 
-    const handleFinishPress = () => {
-        const allFinalized = orderServices.every(s => s.status === "Finalizado");
-        if (allFinalized) {
-            navigation.navigate("Home");
-        } else {
-            const pending = orderServices.filter(s => s.status !== "Finalizado").map(s => s.title);
-            setPendingServices(pending);
-            setShowFinishModal(true);
-        }
-    };
-
-    // 3. Lógica de cambio de estatus (UI y preparación para Backend)
+    // Lógica para cambiar estatus de los servicios (REAL)
     const toggleServiceStatus = async (serviceId) => {
-        // Encontramos el servicio actual
         const servicioActual = orderServices.find(s => s.id === serviceId);
         if (!servicioActual) return;
 
@@ -100,28 +90,40 @@ const OrderDetailsScreen = ({ navigation, route }) => {
         else if (servicioActual.status === "En Progreso") nextStatus = "Finalizado";
         else nextStatus = "Pendiente";
 
-        // Actualización "Optimista": Cambiamos la UI al instante para que sea veloz
-        setOrderServices((prevServices) =>
-            prevServices.map((item) =>
-                item.id === serviceId ? { ...item, status: nextStatus } : item
-            )
-        );
+        // Actualización Optimista (UI Inmediata)
+        setOrderServices(prev => prev.map(item => item.id === serviceId ? { ...item, status: nextStatus } : item));
 
-        /* * ==========================================
-         * CONEXIÓN RESTful (PATCH) - APARCADA
-         * ==========================================
-         * Descomenta el siguiente bloque cuando estés listo 
-         * para que los cambios se guarden en PostgreSQL.
-         */
-        /*
         try {
+            // Guardamos el estatus en Postgres
             await OrderService.updateServiceStatus(orderId, serviceId, nextStatus);
         } catch (error) {
             console.error("Error al actualizar estatus:", error);
-            alert("No se pudo guardar el cambio en la base de datos.");
-            // Si falla en el backend, podríamos revertir la UI aquí
+            Alert.alert("Error de conexión", "No se pudo guardar el estatus. Verifica tu red.");
+            // Revertir UI en caso de error
+            setOrderServices(prev => prev.map(item => item.id === serviceId ? { ...item, status: servicioActual.status } : item));
         }
-        */
+    };
+
+    // Lógica del Botón Principal "Finalizar"
+    const handleFinishPress = async () => {
+        const allFinalized = orderServices.every(s => s.status === "Finalizado");
+        if (allFinalized) {
+            setIsFinishing(true);
+            try {
+                // 1. Cerramos la orden maestra en la BD (fecha_fin = NOW())
+                await OrderService.finalizeOrder(orderId);
+                // 2. Navegamos al Historial. El listener "focus" recargará los datos y sumará 1 al contador
+                navigation.navigate("PastRepairs"); 
+            } catch (error) {
+                console.error("Error al finalizar orden:", error);
+                Alert.alert("Error", "No se pudo finalizar la orden maestra.");
+                setIsFinishing(false);
+            }
+        } else {
+            const pending = orderServices.filter(s => s.status !== "Finalizado").map(s => s.title);
+            setPendingServices(pending);
+            setShowFinishModal(true);
+        }
     };
 
     return (
@@ -179,7 +181,7 @@ const OrderDetailsScreen = ({ navigation, route }) => {
                         color={vehicleColor || "Sin color"}
                         plate={plate || "ABC-1234"}
                         mileage={mileage}
-                        vin={vehicleVIN || "Sin NIV"}
+                        vin={vehicleVIN || "No registrado"}
                     />
 
                     <View style={[styles.card]}>

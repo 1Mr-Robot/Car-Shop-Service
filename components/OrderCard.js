@@ -5,7 +5,7 @@ import { Ionicons, Feather } from "@expo/vector-icons";
 import Service from "./Service";
 
 // id -> No Modificar
-const OrderCard = ({ id, type, vehicleYear, vehicleBrand, vehicleModel, vehiclePlate, vehicleColor, vehicleVIN, ownerName, services, notes, time, mileage, navigation, expandedId, setExpandedId, mechanicName, showDetailsButton = true, orderStartDate, orderStartTime, products }) => {
+const OrderCard = ({ id, type, vehicleYear, vehicleBrand, vehicleModel, vehiclePlate, vehicleColor, vehicleVIN, ownerName, services, notes, time, mileage, navigation, expandedId, setExpandedId, mechanicName, showDetailsButton = true, startDate, startTime, endDate, endTime, products }) => {
     const isExpanded = expandedId === `${type}-${vehiclePlate}`;
     
     const handlePress = () => {
@@ -140,8 +140,11 @@ const OrderCard = ({ id, type, vehicleYear, vehicleBrand, vehicleModel, vehicleP
                                             servicesList: services,
                                             mileage: mileage,
                                             notes: notes || '',
+                                            startDate: startDate,
+                                            startTime: startTime,
+                                            endDate: endDate,
+                                            endTime: endTime,
                                             productsList: products || [],
-                                            time: time
                                         });
                                         break;
                                     case 'upcoming':
@@ -171,8 +174,8 @@ const OrderCard = ({ id, type, vehicleYear, vehicleBrand, vehicleModel, vehicleP
                                             servicesList: services,
                                             mileage: mileage,
                                             notes: notes || '',
+                                            time:time,
                                             productsList: products || [],
-                                            time:time
                                         });
                                         break;
                                 }
