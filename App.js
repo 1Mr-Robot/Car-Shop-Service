@@ -6,7 +6,6 @@ import * as NavigationBar from "expo-navigation-bar";
 import LoginScreen from "./screens/LoginScreen";
 import HomeScreen from "./screens/HomeScreen";
 import OrdersScreen from "./screens/OrdersScreen";
-import AgendaScreen from "./screens/AgendaScreen";
 import AddServiceScreen from "./screens/AddServiceScreen";
 
 import PastRepairsScreen from "./screens/PastRepairsScreen";
@@ -57,11 +56,6 @@ export default function App() {
                 <Stack.Screen
                     name="Orders"
                     component={OrdersScreen}
-                    options={{ headerShown: false }}
-                />
-                <Stack.Screen
-                    name="Agenda"
-                    component={AgendaScreen}
                     options={{ headerShown: false }}
                 />
                 <Stack.Screen

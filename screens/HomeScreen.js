@@ -171,8 +171,8 @@ const HomeScreen = ({ navigation }) => {
                         <Text style={styles.sectionTitle}>
                             Ordenes próximas
                         </Text>
-                        <TouchableOpacity onPress={() => navigation.navigate('Agenda')}>
-                            <Text style={styles.link}>Ver Calendario</Text>
+                        <TouchableOpacity onPress={() => navigation.navigate('Orders')}>
+                            <Text style={styles.link}>Ver Todas</Text>
                         </TouchableOpacity>
                     </View>
 
