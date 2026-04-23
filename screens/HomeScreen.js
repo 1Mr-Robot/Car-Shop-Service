@@ -210,11 +210,13 @@ const HomeScreen = ({ navigation }) => {
                         <Text style={styles.sectionTitle}>
                             Ordenes Completadas
                         </Text>
-                        <Text style={styles.subtle}>Ultimas 24h</Text>
+                        <TouchableOpacity onPress={() => navigation.navigate('PastRepairs')}>
+                            <Text style={styles.link}>Ver archivo</Text>
+                        </TouchableOpacity>
                     </View>
 
                     {completedOrders.length > 0 ? (
-                        completedOrders.map((order) => (
+                        completedOrders.slice(0, 5).map((order) => (
                             <OrderCard
                                 key={order.id}
                                 id={order.id}

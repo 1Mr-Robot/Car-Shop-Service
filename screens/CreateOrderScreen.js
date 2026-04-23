@@ -251,6 +251,7 @@ const TimePickerModal = ({ visible, onClose, onSelect, initialTime }) => {
 const CreateOrderScreen = ({ navigation }) => {
     const insets = useSafeAreaInsets();
     const [showLogoutModal, setShowLogoutModal] = useState(false);
+    const [showNoClientModal, setShowNoClientModal] = useState(false);
     
     // ESTADO PARA DATOS DEL BACKEND
     const [clients, setClients] = useState([]);
@@ -446,7 +447,7 @@ const CreateOrderScreen = ({ navigation }) => {
                     
                     {renderSelectButton("Auto", selectedVehicle ? 
                         `${selectedVehicle.year} ${selectedVehicle.brand} ${selectedVehicle.model}` : null, 
-                        () => selectedClient ? setShowVehicleModal(true) : alert("Primero selecciona un dueño"),
+                        () => selectedClient ? setShowVehicleModal(true) : setShowNoClientModal(true),
                         true
                     )}
 
@@ -750,6 +751,27 @@ const CreateOrderScreen = ({ navigation }) => {
                     </View>
                 </Modal>
 
+                <Modal
+                    visible={showNoClientModal}
+                    transparent={true}
+                    animationType="fade"
+                    onRequestClose={() => setShowNoClientModal(false)}
+                >
+                    <View style={styles.modalOverlay}>
+                        <View style={styles.modalContentLogout}>
+                            <MaterialCommunityIcons name="alert-circle" size={60} color="#FFD43B" />
+                            <Text style={styles.modalTitle}>Selecciona un dueño</Text>
+                            <Text style={styles.modalText}>Debes seleccionar un dueño antes de elegir un vehículo.</Text>
+                            <TouchableOpacity 
+                                style={styles.modalAcceptButton}
+                                onPress={() => setShowNoClientModal(false)}
+                            >
+                                <Text style={styles.modalAcceptText}>Aceptar</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </Modal>
+
                 <BottomNavReceptionist active="HomeReceptionist" />
             </SafeAreaView>
         </SafeAreaProvider>
@@ -902,6 +924,8 @@ const styles = StyleSheet.create({
         borderRadius: 24,
         padding: 30,
         maxHeight: "60%",
+        alignItems: "center",
+        marginHorizontal: 20,
     },
 
     modalHeader: {
@@ -916,6 +940,7 @@ const styles = StyleSheet.create({
         color: "#fff",
         fontSize: 20,
         fontWeight: "600",
+        textAlign: "center",
     },
     modalItem: {
         paddingVertical: 16,
