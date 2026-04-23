@@ -168,7 +168,7 @@ const TimePickerModal = ({ visible, onClose, onSelect, initialTime }) => {
     return (
         <Modal visible={visible} transparent animationType="slide">
             <View style={styles.modalOverlay}>
-                <View style={[styles.pickerModalContent, { maxHeight: "50%" }]}>
+                <View style={[styles.pickerModalContent, { maxHeight: "90%" }, { paddingBottom: 0 }]}>
                     <View style={styles.pickerHeader}>
                         <Text style={styles.pickerTitle}>Seleccionar Hora</Text>
                         <Pressable onPress={onClose}>
@@ -230,7 +230,7 @@ const TimePickerModal = ({ visible, onClose, onSelect, initialTime }) => {
                         </Text>
                     </View>
 
-                    <View style={styles.pickerFooter}>
+                    <View style={styles.pickerFooterHour}>
                         <TouchableOpacity style={styles.cancelButton} onPress={onClose}>
                             <Text style={styles.cancelButtonText}>Cancelar</Text>
                         </TouchableOpacity>
@@ -708,7 +708,7 @@ const CreateOrderScreen = ({ navigation }) => {
                                 )}
                             />
                             <TouchableOpacity 
-                                style={styles.submitButton}
+                                style={[styles.submitButton, styles.servicesSubmitButton]}
                                 onPress={() => setShowServicesModal(false)}
                             >
                                 <Text style={styles.submitButtonText}>Aceptar</Text>
@@ -899,6 +899,10 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         alignItems: "center",
     },
+    servicesSubmitButton: {
+        marginHorizontal: 20,
+        marginTop: 16,
+    },
     submitButtonDisabled: {
         opacity: 0.5,
     },
@@ -917,6 +921,7 @@ const styles = StyleSheet.create({
         borderRadius: 24,
         paddingBottom: 30,
         maxHeight: "60%",
+        width: "90%",
     },
 
     modalContentLogout: {
@@ -989,9 +994,9 @@ const styles = StyleSheet.create({
     },
     pickerModalContent: {
         backgroundColor: "#1A1D23",
-        borderTopLeftRadius: 24,
-        borderTopRightRadius: 24,
+        borderRadius: 24,
         paddingBottom: 30,
+        width: "90%",
     },
     pickerHeader: {
         flexDirection: "row",
@@ -1062,6 +1067,7 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         paddingHorizontal: 20,
         height: 200,
+        gap: 16,
     },
     timeColumn: {
         flex: 1,
@@ -1107,7 +1113,20 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         justifyContent: "space-between",
         paddingHorizontal: 20,
-        paddingTop: 16,
+        paddingTop: 5,
+        paddingBottom: 20,
+        gap: 12,
+        position: "absolute",
+        bottom: 0,
+        left: 0,
+        right: 0,
+    },
+    pickerFooterHour: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        paddingHorizontal: 20,
+        paddingTop: 5,
+        paddingBottom: 20,
         gap: 12,
     },
     cancelButton: {
