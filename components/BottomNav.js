@@ -28,19 +28,19 @@ export default function BottomNav({ active }) {
                 />
             </Pressable>
 
-<Pressable onPress={() => navigation.navigate("PastRepairs")}>
-    <Feather
-        name="archive"
-        size={24}
-        color={active === "PastRepairs" ? activeColor : inactiveColor}
-    />
-</Pressable>
+            <Pressable onPress={() => navigation.navigate("PastRepairs")}>
+                <Feather
+                    name="archive"
+                    size={24}
+                    color={active === "PastRepairs" ? activeColor : inactiveColor}
+                />
+            </Pressable>
         </View>
     );
 }
 
 const styles = StyleSheet.create({
-bottomBar: {
+    bottomBar: {
         position: "absolute",
         bottom: 0,
         left: 0,

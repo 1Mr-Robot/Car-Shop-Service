@@ -163,6 +163,19 @@ export default function PastRepairsScreen({ navigation }) {
                         </View>
                     </View>
 
+                    {/* SEARCH BAR */}
+                    <View style={styles.searchContainer}>
+                        <Feather name="search" size={18} color="#8B90A0" />
+                        <TextInput
+                            placeholder="Buscar por placa o cliente..."
+                            placeholderTextColor="#8B90A0"
+                            style={styles.searchInput}
+                            caretColor="#FFD43B"
+                            value={searchQuery}
+                            onChangeText={setSearchQuery}
+                        />
+                    </View>
+
                     {/* LISTADO AGRUPADO DINÁMICO */}
                     {Object.keys(groupedOrders).length === 0 ? (
                          <View style={{ alignItems: "center", marginTop: 40 }}>
