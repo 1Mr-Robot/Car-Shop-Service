@@ -7,7 +7,7 @@ import {
     TouchableOpacity,
 } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
+import { Feather } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
 import BottomNavReceptionist from "../components/BottomNavReceptionist";
 
@@ -107,13 +107,11 @@ const styles = StyleSheet.create({
         paddingTop: 20,
         paddingBottom: 0,
     },
-
     header: {
         flexDirection: "row",
         alignItems: "center",
         marginBottom: 24,
     },
-
     headerTitle: {
         color: "white",
         fontSize: 24,
@@ -122,82 +120,68 @@ const styles = StyleSheet.create({
         textAlign: "center",
         marginRight: 24,
     },
-
     sectionTitle: {
         marginBottom: 16,
     },
-
     sectionTitleText: {
         color: "#8B90A0",
         fontSize: 14,
         fontWeight: "600",
     },
-
     saleCard: {
         backgroundColor: "#1A1D24",
         borderRadius: 20,
         padding: 20,
         marginBottom: 14,
     },
-
     saleHeader: {
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
     },
-
     saleDate: {
         color: "white",
         fontSize: 16,
         fontWeight: "600",
     },
-
     saleTotal: {
         color: "#FFD43B",
         fontSize: 18,
         fontWeight: "700",
     },
-
     divider: {
         height: 1,
         backgroundColor: "#2A2E38",
         marginVertical: 14,
     },
-
     productRow: {
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
         paddingVertical: 8,
     },
-
     productInfo: {
         flex: 1,
     },
-
     productBrand: {
         color: "#FFD43B",
         fontSize: 12,
         fontWeight: "600",
         marginBottom: 2,
     },
-
     productName: {
         color: "white",
         fontSize: 14,
         fontWeight: "500",
     },
-
     productDetails: {
         alignItems: "flex-end",
     },
-
     productQuantity: {
         color: "#9CA3AF",
         fontSize: 14,
         fontWeight: "500",
     },
-
     productUnitPrice: {
         color: "#6B7280",
         fontSize: 12,

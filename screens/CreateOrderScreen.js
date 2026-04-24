@@ -23,7 +23,6 @@ import { StatusBar } from "expo-status-bar";
 import AdminService from "../services/AdminService";
 import CatalogService from "../services/CatalogService";
 
-
 // ==========================================
 // COMPONENTES AUXILIARES Y CALENDARIO (FUERA DEL COMPONENTE PRINCIPAL)
 // ==========================================
@@ -638,7 +637,7 @@ const CreateOrderScreen = ({ navigation }) => {
                                     </TouchableOpacity>
                                 )}
                             />
-                            </View>
+                        </View>
                     </View>
                 </Modal>
 
@@ -923,7 +922,6 @@ const styles = StyleSheet.create({
         maxHeight: "60%",
         width: "90%",
     },
-
     modalContentLogout: {
         backgroundColor: "#1A1D23",
         borderRadius: 24,
@@ -932,7 +930,6 @@ const styles = StyleSheet.create({
         alignItems: "center",
         marginHorizontal: 20,
     },
-
     modalHeader: {
         flexDirection: "row",
         alignItems: "center",

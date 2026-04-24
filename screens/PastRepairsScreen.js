@@ -232,14 +232,12 @@ const styles = StyleSheet.create({
         backgroundColor: "#0F1115",
         paddingHorizontal: 18,
     },
-
     headerTitle: {
         fontSize: 24,
         fontWeight: "bold",
         color: "#fff",
         marginVertical: 16,
     },
-
     summaryCard: {
         backgroundColor: "#1A1D24",
         borderRadius: 20,
@@ -248,20 +246,17 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: "rgba(255,212,59,0.3)",
     },
-
     smallLabel: {
         color: "#8B90A0",
         fontSize: 11,
         letterSpacing: 1,
     },
-
     bigNumber: {
         color: "#FFD43B",
         fontSize: 26,
         fontWeight: "bold",
         marginTop: 4,
     },
-
     searchContainer: {
         flexDirection: "row",
         alignItems: "center",
@@ -271,13 +266,11 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
         marginBottom: 20,
     },
-
     searchInput: {
         flex: 1,
         marginLeft: 10,
         color: "#fff",
     },
-
     sectionLabel: {
         color: "#8B90A0",
         fontSize: 13,

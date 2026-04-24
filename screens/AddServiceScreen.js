@@ -3,20 +3,15 @@ import {
     View,
     Text,
     StyleSheet,
-    ScrollView,
     TouchableOpacity,
-    Image,
     Pressable,
     FlatList,
 } from "react-native";
 import {
     SafeAreaProvider,
     SafeAreaView,
-    useSafeAreaInsets,
 } from "react-native-safe-area-context";
-import { Ionicons, MaterialCommunityIcons, Feather } from "@expo/vector-icons";
-import { StatusBar } from "expo-status-bar";
-import BottomNav from "../components/BottomNav";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useNavigation, useRoute } from "@react-navigation/native"; //NAVEGACION
 import { Checkbox } from 'expo-checkbox';
 
@@ -136,7 +131,6 @@ const SelectableService = ({ id, name, description, isSelected, onToggle }) => (
 export default function AddServiceScreen(){
     const navigation = useNavigation();
     const route = useRoute(); // No modificar
-    const insets = useSafeAreaInsets();
 
     const { orderId } = route.params || {}; // No modificar
 

@@ -331,19 +331,16 @@ const styles = StyleSheet.create({
         backgroundColor: "#0F1115",
         paddingHorizontal: 18,
     },
-
     header: {
         flexDirection: "row",
         justifyContent: "space-between",
         marginTop: 20,
         marginBottom: 20,
     },
-
     profileRow: {
         flexDirection: "row",
         alignItems: "center",
     },
-
     avatar: {
         width: 48,
         height: 48,
@@ -353,22 +350,18 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
     },
-
     greeting: {
         color: "#888",
         fontSize: 12,
     },
-
     name: {
         color: "#fff",
         fontSize: 20,
         fontWeight: "bold",
     },
-
     bell: {
         position: "relative",
     },
-
     dot: {
         width: 8,
         height: 8,
@@ -378,14 +371,12 @@ const styles = StyleSheet.create({
         right: 0,
         top: 0,
     },
-
     sectionTitle: {
         color: "#fff",
         fontSize: 18,
         fontWeight: "600",
         marginBottom: 12,
     },
-
     sectionRow: {
         flexDirection: "row",
         justifyContent: "space-between",
@@ -393,15 +384,12 @@ const styles = StyleSheet.create({
         marginTop: 20,
         marginBottom: 10,
     },
-
     link: {
         color: "#FFD43B",
     },
-
     subtle: {
         color: "#777",
     },
-
     servicesRow: {
         flexDirection: "row",
         alignItems: "center",
@@ -409,7 +397,6 @@ const styles = StyleSheet.create({
         gap: 8,
         width: "100%",
     },
-
     servicesText: {
         color: "#888",
         fontSize: 13,
@@ -417,7 +404,6 @@ const styles = StyleSheet.create({
         flexWrap: "wrap",
         lineHeight: 20,
     },
-
     orderCard: {
         flexDirection: "row",
         backgroundColor: "#1A1D23",
@@ -425,14 +411,12 @@ const styles = StyleSheet.create({
         padding: 18,
         marginBottom: 20,
     },
-
     yellowStrip: {
         width: 4,
         backgroundColor: "#FFD43B",
         borderRadius: 4,
         marginRight: 12,
     },
-
     iconContainer: {
         width: 40,
         height: 40,
@@ -441,57 +425,47 @@ const styles = StyleSheet.create({
         alignItems: "center",
         marginRight: 12,
     },
-
     inProgress: {
         color: "#FFD43B",
         fontSize: 12,
         fontWeight: "bold",
     },
-
     scheduled: {
         color: "#3B82F6",
         fontSize: 12,
         fontWeight: "bold",
     },
-
     completed: {
         color: "#22C55E",
         fontSize: 12,
         fontWeight: "bold",
     },
-
     since: {
         color: "#777",
         fontSize: 12,
     },
-
     timeRow: {
         flexDirection: "row",
         alignItems: "center",
     },
-
     expandedContent: {
         marginTop: 12,
     },
-
     jobTitle: {
         color: "#fff",
         fontSize: 16,
         fontWeight: "600",
         marginTop: 8,
     },
-
     jobSub: {
         color: "#888",
         marginTop: 4,
     },
-
     progressRow: {
         flexDirection: "row",
         alignItems: "center",
         marginTop: 12,
     },
-
     progressBar: {
         flex: 1,
         height: 6,
@@ -499,30 +473,25 @@ const styles = StyleSheet.create({
         borderRadius: 4,
         marginRight: 8,
     },
-
     progressFill: {
         width: "65%",
         height: "100%",
         backgroundColor: "#FFD43B",
         borderRadius: 4,
     },
-
     percent: {
         color: "#fff",
     },
-
     badge: {
         backgroundColor: "#3A1F1F",
         paddingHorizontal: 10,
         paddingVertical: 4,
         borderRadius: 10,
     },
-
     badgeText: {
         color: "#FF4D4D",
         fontSize: 12,
     },
-
     assignmentCard: {
         flexDirection: "row",
         alignItems: "center",
@@ -530,28 +499,23 @@ const styles = StyleSheet.create({
         padding: 16,
         borderRadius: 16,
     },
-
     assignmentTitle: {
         color: "#fff",
         fontWeight: "600",
     },
-
     assignmentSub: {
         color: "#888",
         fontSize: 13,
     },
-
     startBtn: {
         backgroundColor: "#FFD43B",
         paddingHorizontal: 16,
         paddingVertical: 8,
         borderRadius: 12,
     },
-
     startText: {
         fontWeight: "bold",
     },
-
     taskCard: {
         flexDirection: "row",
         alignItems: "center",
@@ -560,53 +524,44 @@ const styles = StyleSheet.create({
         borderRadius: 16,
         marginBottom: 12,
     },
-
     taskTitle: {
         color: "#fff",
         fontWeight: "600",
     },
-
     taskSub: {
         color: "#888",
         fontSize: 13,
     },
-
     time: {
         color: "#888",
         fontSize: 12,
     },
-
     rowBetween: {
         flexDirection: "row",
         justifyContent: "space-between",
     },
-
     notesSection: {
         marginTop: 16,
         paddingTop: 12,
         borderTopWidth: 1,
         borderTopColor: "#2A2D35",
     },
-
     notesHeader: {
         flexDirection: "row",
         alignItems: "center",
         marginBottom: 6,
         gap: 6,
     },
-
     notesLabel: {
         color: "#FFD43B",
         fontSize: 12,
         fontWeight: "600",
     },
-
     notesText: {
         color: "#888",
         fontSize: 13,
         lineHeight: 18,
     },
-
     detailsButton: {
         flexDirection: "row",
         alignItems: "center",
@@ -618,25 +573,21 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: "#FFD43B",
     },
-
     detailsButtonText: {
         color: "#FFD43B",
         fontSize: 13,
         fontWeight: "600",
         marginRight: 4,
     },
-
     logoutButton: {
         padding: 8,
     },
-
     modalOverlay: {
         flex: 1,
         backgroundColor: "rgba(0, 0, 0, 0.7)",
         justifyContent: "center",
         alignItems: "center",
     },
-
     modalContent: {
         backgroundColor: "#1A1D23",
         borderRadius: 20,
@@ -644,52 +595,44 @@ const styles = StyleSheet.create({
         width: "85%",
         alignItems: "center",
     },
-
     modalTitle: {
         color: "#fff",
         fontSize: 20,
         fontWeight: "bold",
         marginBottom: 12,
     },
-
     modalText: {
         color: "#888",
         fontSize: 14,
         textAlign: "center",
         marginBottom: 24,
     },
-
     modalButtons: {
         flexDirection: "row",
         gap: 12,
     },
-
     modalCancelButton: {
         backgroundColor: "#333",
         paddingVertical: 12,
         paddingHorizontal: 24,
         borderRadius: 12,
     },
-
     modalCancelText: {
         color: "#fff",
         fontSize: 14,
         fontWeight: "600",
     },
-
     modalAcceptButton: {
         backgroundColor: "#FF4D4D",
         paddingVertical: 12,
         paddingHorizontal: 24,
         borderRadius: 12,
     },
-
     modalAcceptText: {
         color: "#fff",
         fontSize: 14,
         fontWeight: "600",
     },
-
     emptyState: {
         backgroundColor: "#1A1D23",
         borderRadius: 20,
@@ -698,7 +641,6 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         marginBottom: 20,
     },
-
     emptyText: {
         color: "#777",
         fontSize: 14,

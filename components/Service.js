@@ -1,6 +1,6 @@
 import React from "react";
-import { View, Text, TouchableOpacity } from "react-native";
-import { Ionicons, Feather } from "@expo/vector-icons";
+import { View, Text } from "react-native";
+import { Feather } from "@expo/vector-icons";
 
 const Service = ({ title, status }) => {
     const renderIcon = () => {
@@ -36,7 +36,6 @@ const styles = {
         gap: 8,
         width: "100%",
     },
-
     servicesText: {
         color: "#888",
         fontSize: 13,

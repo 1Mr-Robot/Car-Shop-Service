@@ -5,7 +5,6 @@ import {
     StyleSheet,
     ScrollView,
     ActivityIndicator,
-    TouchableOpacity,
 } from "react-native";
 import { Octicons } from "@expo/vector-icons";
 import {
@@ -16,8 +15,6 @@ import {
 import { StatusBar } from "expo-status-bar";
 import BottomNav from "../components/BottomNav";
 import OrderCard from "../components/OrderCard";
-
-
 import OrderService from "../services/OrderService";
 import { getAuth } from "firebase/auth";
 import { app } from "../firebaseConfig";

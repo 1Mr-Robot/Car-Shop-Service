@@ -20,7 +20,6 @@ import { StatusBar } from "expo-status-bar";
 import VehicleCard from "../components/VehicleCard";
 import OrderService from "../services/OrderService"; // POR NADA DEL MUNDO TOCAR ESTE IMPORT
 
-
 const Item = ({ id, title, status, onToggle }) => {
     const renderIcon = () => {
         switch (status) {

@@ -214,14 +214,12 @@ const styles = StyleSheet.create({
         paddingTop: 20,
         paddingBottom: 0,
     },
-
     header: {
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
         marginBottom: 24,
     },
-
     headerTitle: {
         color: "white",
         fontSize: 24,
@@ -229,23 +227,19 @@ const styles = StyleSheet.create({
         flex: 1,
         textAlign: "center",
     },
-
     sectionTitle: {
         marginBottom: 16,
     },
-
     sectionTitleText: {
         color: "#8B90A0",
         fontSize: 14,
         fontWeight: "600",
     },
-
     emptyCart: {
         alignItems: "center",
         justifyContent: "center",
         paddingVertical: 80,
     },
-
     emptyTitle: {
         color: "white",
         fontSize: 22,
@@ -253,13 +247,11 @@ const styles = StyleSheet.create({
         marginTop: 20,
         marginBottom: 8,
     },
-
     emptySubtitle: {
         color: "#8B90A0",
         fontSize: 14,
         marginBottom: 30,
     },
-
     addButton: {
         backgroundColor: "#FFD43B",
         flexDirection: "row",
@@ -269,13 +261,11 @@ const styles = StyleSheet.create({
         borderRadius: 14,
         gap: 8,
     },
-
     addButtonText: {
         color: "black",
         fontSize: 16,
         fontWeight: "700",
     },
-
     cartItem: {
         backgroundColor: "#1A1D24",
         borderRadius: 20,
@@ -284,7 +274,6 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
     },
-
     itemImageContainer: {
         width: 70,
         height: 70,
@@ -294,42 +283,35 @@ const styles = StyleSheet.create({
         alignItems: "center",
         marginRight: 16,
     },
-
     itemDetails: {
         flex: 1,
     },
-
     itemBrand: {
         color: "#FFD43B",
         fontSize: 12,
         fontWeight: "600",
         marginBottom: 4,
     },
-
     itemName: {
         color: "white",
         fontSize: 16,
         fontWeight: "600",
         marginBottom: 2,
     },
-
     itemSku: {
         color: "#6B7280",
         fontSize: 11,
         marginBottom: 4,
     },
-
     itemPrice: {
         color: "#9CA3AF",
         fontSize: 14,
     },
-
     itemActions: {
         alignItems: "flex-end",
         justifyContent: "space-between",
         height: 70,
     },
-
     quantityControl: {
         flexDirection: "row",
         alignItems: "center",
@@ -337,28 +319,23 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         paddingHorizontal: 4,
     },
-
     qtyButton: {
         padding: 8,
     },
-
     qtyText: {
         color: "white",
         fontSize: 18,
         fontWeight: "600",
         paddingHorizontal: 12,
     },
-
     removeButton: {
         padding: 6,
     },
-
     itemTotal: {
         color: "white",
         fontSize: 18,
         fontWeight: "700",
     },
-
     summaryCard: {
         backgroundColor: "#1A1D24",
         borderRadius: 20,
@@ -366,48 +343,40 @@ const styles = StyleSheet.create({
         marginTop: 10,
         marginBottom: 0,
     },
-
     summaryTitle: {
         color: "#FFD43B",
         fontSize: 14,
         fontWeight: "600",
         marginBottom: 20,
     },
-
     summaryRow: {
         flexDirection: "row",
         justifyContent: "space-between",
         marginBottom: 14,
     },
-
     summaryLabel: {
         color: "#9CA3AF",
         fontSize: 15,
     },
-
     summaryValue: {
         color: "white",
         fontSize: 15,
     },
-
     divider: {
         height: 1,
         backgroundColor: "#2A2E38",
         marginVertical: 14,
     },
-
     totalLabel: {
         color: "white",
         fontSize: 20,
         fontWeight: "700",
     },
-
     totalValue: {
         color: "#FFD43B",
         fontSize: 24,
         fontWeight: "700",
     },
-
     checkoutButton: {
         backgroundColor: "#FFD43B",
         flexDirection: "row",
@@ -417,32 +386,27 @@ const styles = StyleSheet.create({
         borderRadius: 16,
         marginTop: 24,
     },
-
     checkoutButtonText: {
         color: "black",
         fontSize: 18,
         fontWeight: "700",
     },
-
     clearButton: {
         alignItems: "center",
         paddingVertical: 14,
         marginTop: 12,
     },
-
     clearButtonText: {
         color: "#FF4D4D",
         fontSize: 14,
         fontWeight: "600",
     },
-
     modalOverlay: {
         flex: 1,
         backgroundColor: "rgba(0, 0, 0, 0.8)",
         justifyContent: "center",
         alignItems: "center",
     },
-
     modalContent: {
         backgroundColor: "#1A1D24",
         borderRadius: 24,
@@ -450,7 +414,6 @@ const styles = StyleSheet.create({
         width: "85%",
         alignItems: "center",
     },
-
     modalTitle: {
         color: "white",
         fontSize: 24,
@@ -458,7 +421,6 @@ const styles = StyleSheet.create({
         marginTop: 16,
         marginBottom: 10,
     },
-
     modalText: {
         color: "#9CA3AF",
         fontSize: 15,
@@ -466,18 +428,15 @@ const styles = StyleSheet.create({
         marginBottom: 24,
         lineHeight: 22,
     },
-
     modalButtons: {
         width: "100%",
     },
-
     modalAcceptButton: {
         backgroundColor: "#FFD43B",
         paddingVertical: 16,
         borderRadius: 14,
         alignItems: "center",
     },
-
     modalAcceptText: {
         color: "black",
         fontSize: 16,

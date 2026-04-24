@@ -16,7 +16,6 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import Feather from "@expo/vector-icons/Feather"; // <--- AGREGAR ESTA LÍNEA
 
 //Importaciones de Firebase
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
@@ -323,8 +322,7 @@ const styles = StyleSheet.create({
         paddingBottom: 32,
         alignItems: "center",
     },
-
-    // ── Header ──────────────────────────────────────
+    // ───── Header ─────
     header: {
         alignItems: "center",
         marginBottom: 32,
@@ -390,8 +388,7 @@ const styles = StyleSheet.create({
         letterSpacing: 3,
         marginTop: 4,
     },
-
-    // ── Card ─────────────────────────────────────────
+    // ───── Card ─────
     card: {
         width: "100%",
         backgroundColor: CARD_BG,
@@ -415,8 +412,7 @@ const styles = StyleSheet.create({
         color: TEXT_MUTED,
         marginBottom: 28,
     },
-
-    // ── Fields ───────────────────────────────────────
+    // ───── Fields ─────
     fieldGroup: {
         marginBottom: 20,
     },
@@ -458,8 +454,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: TEXT_MUTED,
     },
-
-    // ── Options Row ──────────────────────────────────
+    // ───── Options Row ─────
     optionsRow: {
         flexDirection: "row",
         alignItems: "center",
@@ -500,8 +495,7 @@ const styles = StyleSheet.create({
         color: TEXT_MUTED,
         marginTop: 12,
     },
-
-    // ── Sign In Button ────────────────────────────────
+    // ───── Sign In Button ─────
     signInButton: {
         backgroundColor: YELLOW,
         borderRadius: 16,
@@ -520,8 +514,7 @@ const styles = StyleSheet.create({
         color: "#1a1a1a",
         letterSpacing: 0.5,
     },
-
-    // ── Register Row ─────────────────────────────────
+    // ───── Register Row ─────
     registerRow: {
         flexDirection: "row",
         alignItems: "center",
@@ -535,8 +528,7 @@ const styles = StyleSheet.create({
         fontWeight: "800",
         color: YELLOW,
     },
-
-    // ── Modal ─────────────────────────────────
+    // ───── Modal ─────
     modalOverlay: {
         flex: 1,
         backgroundColor: "rgba(0, 0, 0, 0.8)",

@@ -202,14 +202,12 @@ const styles = {
         padding: 18,
         marginBottom: 20,
     },
-
     yellowStrip: {
         width: 4,
         backgroundColor: "#FFD43B",
         borderRadius: 4,
         marginRight: 12,
     },
-
     iconContainer: {
         width: 40,
         height: 40,
@@ -218,89 +216,74 @@ const styles = {
         alignItems: "center",
         marginRight: 12,
     },
-
     inProgress: {
         color: "#FFD43B",
         fontSize: 12,
         fontWeight: "bold",
     },
-
     scheduled: {
         color: "#3B82F6",
         fontSize: 12,
         fontWeight: "bold",
     },
-
     completed: {
         color: "#22C55E",
         fontSize: 12,
         fontWeight: "bold",
     },
-
     since: {
         color: "#777",
         fontSize: 12,
     },
-
     timeRow: {
         flexDirection: "row",
         alignItems: "center",
     },
-
     expandedContent: {
         marginTop: 12,
     },
-
     jobTitle: {
         color: "#fff",
         fontSize: 16,
         fontWeight: "600",
         marginTop: 8,
     },
-
     mechanicRow: {
         flexDirection: "row",
         alignItems: "center",
         marginTop: 4,
         gap: 4,
     },
-
     mechanicText: {
         color: "#888",
         fontSize: 12,
     },
-
     rowBetween: {
         flexDirection: "row",
         justifyContent: "space-between",
     },
-
     notesSection: {
         marginTop: 16,
         paddingTop: 12,
         borderTopWidth: 1,
         borderTopColor: "#2A2D35",
     },
-
     notesHeader: {
         flexDirection: "row",
         alignItems: "center",
         marginBottom: 6,
         gap: 6,
     },
-
     notesLabel: {
         color: "#FFD43B",
         fontSize: 12,
         fontWeight: "600",
     },
-
     notesText: {
         color: "#888",
         fontSize: 13,
         lineHeight: 18,
     },
-
     detailsButton: {
         flexDirection: "row",
         alignItems: "center",
@@ -312,7 +295,6 @@ const styles = {
         borderWidth: 1,
         borderColor: "#FFD43B",
     },
-
     detailsButtonActive: {
         flexDirection: "row",
         alignItems: "center",
@@ -323,14 +305,12 @@ const styles = {
         borderRadius: 15,
         backgroundColor: "#FFD43B",
     },
-
     detailsButtonText: {
         color: "#FFD43B",
         fontSize: 13,
         fontWeight: "600",
         marginRight: 4,
     },
-
     detailsButtonTextActive: {
         color: "#000",
         fontSize: 14,

@@ -2,12 +2,10 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useEffect } from "react";
 import * as NavigationBar from "expo-navigation-bar";
-
 import LoginScreen from "./screens/LoginScreen";
 import HomeScreen from "./screens/HomeScreen";
 import OrdersScreen from "./screens/OrdersScreen";
 import AddServiceScreen from "./screens/AddServiceScreen";
-
 import PastRepairsScreen from "./screens/PastRepairsScreen";
 import OrderDetailsScreen from "./screens/OrderDetailsScreen";
 import NextServiceScreen from "./screens/NextServiceScreen";
@@ -17,7 +15,6 @@ import CreateOrderScreen from "./screens/CreateOrderScreen";
 import CartScreen from "./screens/CartScreen";
 import SalesHistoryScreen from "./screens/SalesHistoryScreen";
 import { app } from "./firebaseConfig";
-
 
 const Stack = createNativeStackNavigator();
 
@@ -59,7 +56,6 @@ export default function App() {
                     options={{ headerShown: false }}
                 />
                 <Stack.Screen
-
                      name="PastRepairs"
                      component={PastRepairsScreen}
                      options={{ headerShown: false }}

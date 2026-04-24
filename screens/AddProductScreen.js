@@ -3,9 +3,7 @@ import {
     View,
     Text,
     StyleSheet,
-    ScrollView,
     TouchableOpacity,
-    Image,
     Pressable,
     FlatList,
 } from "react-native";
@@ -14,10 +12,7 @@ import {
     SafeAreaView,
     useSafeAreaInsets,
 } from "react-native-safe-area-context";
-import { Ionicons, MaterialCommunityIcons, Feather } from "@expo/vector-icons";
-import { StatusBar } from "expo-status-bar";
-import BottomNav from "../components/BottomNav";
-import { useNavigation } from "@react-navigation/native"; //NAVEGACION
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import Checkbox from "expo-checkbox";
 
 // No Modificar: productsData -> INITIAL_PRODUCTS - paginacion API: (GET /api/v1/productos?page=1&limit=10)
@@ -115,14 +110,14 @@ const AddProductScreen= ({navigation, route}) => {
                         />           
                     </Pressable>
                     <Text
-                    style={{
-                        color: "#ffff",
-                        fontSize: 18,
-                        fontWeight: "bold",
-                        marginLeft: 0,
-                        flex: 1,
-                        textAlign: "center"
-                    }}                           
+                        style={{
+                            color: "#ffff",
+                            fontSize: 18,
+                            fontWeight: "bold",
+                            marginLeft: 0,
+                            flex: 1,
+                            textAlign: "center"
+                        }}                           
                     >
                         Orden #{orderId || '---'} {/* Confirmamos que tenemos el ID */}
                     </Text>    
