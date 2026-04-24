@@ -154,7 +154,7 @@ export default function PastRepairsScreen({ navigation }) {
                 <ScrollView showsVerticalScrollIndicator={false}>
 
                     <Text style={styles.headerTitle}>
-                        Historial de Reparaciones
+                        Historial de Ordenes
                     </Text>
 
                     {/* SUMMARY DINÁMICO */}
@@ -164,28 +164,15 @@ export default function PastRepairsScreen({ navigation }) {
                                 COMPLETADAS HOY
                             </Text>
                             <Text style={styles.bigNumber}>
-                                {todayRepairsCount} Reparaciones
+                                {todayRepairsCount} Ordenes
                             </Text>
                         </View>
-                    </View>
-
-                    {/* SEARCH BAR */}
-                    <View style={styles.searchContainer}>
-                        <Feather name="search" size={18} color="#8B90A0" />
-                        <TextInput
-                            placeholder="Buscar por placa o cliente..."
-                            placeholderTextColor="#8B90A0"
-                            style={styles.searchInput}
-                            caretColor="#FFD43B"
-                            value={searchQuery}
-                            onChangeText={setSearchQuery}
-                        />
                     </View>
 
                     {/* LISTADO AGRUPADO DINÁMICO */}
                     {Object.keys(groupedOrders).length === 0 ? (
                          <View style={{ alignItems: "center", marginTop: 40 }}>
-                             <Text style={{ color: "#777", fontSize: 16 }}>No se encontraron reparaciones.</Text>
+                             <Text style={{ color: "#777", fontSize: 16 }}>No se encontraron ordenes.</Text>
                          </View>
                     ) : (
                         Object.keys(groupedOrders).map((day) => (

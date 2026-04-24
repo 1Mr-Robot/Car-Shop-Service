@@ -28,14 +28,6 @@ export default function BottomNav({ active }) {
                 />
             </Pressable>
 
-            <Pressable onPress={() => navigation.navigate("Agenda")}>
-                <Feather
-                    name="calendar"
-                    size={24}
-                    color={active === "Agenda" ? activeColor : inactiveColor}
-                />
-            </Pressable>
-
 <Pressable onPress={() => navigation.navigate("PastRepairs")}>
     <Feather
         name="archive"

@@ -168,7 +168,7 @@ const TimePickerModal = ({ visible, onClose, onSelect, initialTime }) => {
     return (
         <Modal visible={visible} transparent animationType="slide">
             <View style={styles.modalOverlay}>
-                <View style={[styles.pickerModalContent, { maxHeight: "50%" }]}>
+                <View style={[styles.pickerModalContent, { maxHeight: "90%" }, { paddingBottom: 0 }]}>
                     <View style={styles.pickerHeader}>
                         <Text style={styles.pickerTitle}>Seleccionar Hora</Text>
                         <Pressable onPress={onClose}>
@@ -230,7 +230,7 @@ const TimePickerModal = ({ visible, onClose, onSelect, initialTime }) => {
                         </Text>
                     </View>
 
-                    <View style={styles.pickerFooter}>
+                    <View style={styles.pickerFooterHour}>
                         <TouchableOpacity style={styles.cancelButton} onPress={onClose}>
                             <Text style={styles.cancelButtonText}>Cancelar</Text>
                         </TouchableOpacity>
@@ -251,6 +251,7 @@ const TimePickerModal = ({ visible, onClose, onSelect, initialTime }) => {
 const CreateOrderScreen = ({ navigation }) => {
     const insets = useSafeAreaInsets();
     const [showLogoutModal, setShowLogoutModal] = useState(false);
+    const [showNoClientModal, setShowNoClientModal] = useState(false);
     
     // ESTADO PARA DATOS DEL BACKEND
     const [clients, setClients] = useState([]);
@@ -446,7 +447,7 @@ const CreateOrderScreen = ({ navigation }) => {
                     
                     {renderSelectButton("Auto", selectedVehicle ? 
                         `${selectedVehicle.year} ${selectedVehicle.brand} ${selectedVehicle.model}` : null, 
-                        () => selectedClient ? setShowVehicleModal(true) : alert("Primero selecciona un dueño"),
+                        () => selectedClient ? setShowVehicleModal(true) : setShowNoClientModal(true),
                         true
                     )}
 
@@ -707,7 +708,7 @@ const CreateOrderScreen = ({ navigation }) => {
                                 )}
                             />
                             <TouchableOpacity 
-                                style={styles.submitButton}
+                                style={[styles.submitButton, styles.servicesSubmitButton]}
                                 onPress={() => setShowServicesModal(false)}
                             >
                                 <Text style={styles.submitButtonText}>Aceptar</Text>
@@ -746,6 +747,27 @@ const CreateOrderScreen = ({ navigation }) => {
                                     <Text style={styles.modalAcceptText}>Aceptar</Text>
                                 </TouchableOpacity>
                             </View>
+                        </View>
+                    </View>
+                </Modal>
+
+                <Modal
+                    visible={showNoClientModal}
+                    transparent={true}
+                    animationType="fade"
+                    onRequestClose={() => setShowNoClientModal(false)}
+                >
+                    <View style={styles.modalOverlay}>
+                        <View style={styles.modalContentLogout}>
+                            <MaterialCommunityIcons name="alert-circle" size={60} color="#FFD43B" />
+                            <Text style={styles.modalTitle}>Selecciona un dueño</Text>
+                            <Text style={styles.modalText}>Debes seleccionar un dueño antes de elegir un vehículo.</Text>
+                            <TouchableOpacity 
+                                style={styles.modalAcceptButton}
+                                onPress={() => setShowNoClientModal(false)}
+                            >
+                                <Text style={styles.modalAcceptText}>Aceptar</Text>
+                            </TouchableOpacity>
                         </View>
                     </View>
                 </Modal>
@@ -877,6 +899,10 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         alignItems: "center",
     },
+    servicesSubmitButton: {
+        marginHorizontal: 20,
+        marginTop: 16,
+    },
     submitButtonDisabled: {
         opacity: 0.5,
     },
@@ -895,6 +921,7 @@ const styles = StyleSheet.create({
         borderRadius: 24,
         paddingBottom: 30,
         maxHeight: "60%",
+        width: "90%",
     },
 
     modalContentLogout: {
@@ -902,6 +929,8 @@ const styles = StyleSheet.create({
         borderRadius: 24,
         padding: 30,
         maxHeight: "60%",
+        alignItems: "center",
+        marginHorizontal: 20,
     },
 
     modalHeader: {
@@ -916,6 +945,7 @@ const styles = StyleSheet.create({
         color: "#fff",
         fontSize: 20,
         fontWeight: "600",
+        textAlign: "center",
     },
     modalItem: {
         paddingVertical: 16,
@@ -964,9 +994,9 @@ const styles = StyleSheet.create({
     },
     pickerModalContent: {
         backgroundColor: "#1A1D23",
-        borderTopLeftRadius: 24,
-        borderTopRightRadius: 24,
+        borderRadius: 24,
         paddingBottom: 30,
+        width: "90%",
     },
     pickerHeader: {
         flexDirection: "row",
@@ -1037,6 +1067,7 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         paddingHorizontal: 20,
         height: 200,
+        gap: 16,
     },
     timeColumn: {
         flex: 1,
@@ -1082,7 +1113,20 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         justifyContent: "space-between",
         paddingHorizontal: 20,
-        paddingTop: 16,
+        paddingTop: 5,
+        paddingBottom: 20,
+        gap: 12,
+        position: "absolute",
+        bottom: 0,
+        left: 0,
+        right: 0,
+    },
+    pickerFooterHour: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        paddingHorizontal: 20,
+        paddingTop: 5,
+        paddingBottom: 20,
         gap: 12,
     },
     cancelButton: {
