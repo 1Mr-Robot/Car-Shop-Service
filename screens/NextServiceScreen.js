@@ -7,7 +7,8 @@ import {
     ScrollView,
     Pressable,
     ActivityIndicator,
-    Alert
+    Alert,
+    Modal
 } from "react-native";
 import {
     SafeAreaProvider,
@@ -20,6 +21,10 @@ import VehicleCard from "../components/VehicleCard";
 
 // servicio para la logica del botón: "Comenzar"
 import OrderService from "../services/OrderService"
+import { getAuth } from "firebase/auth";
+import { app } from "../firebaseConfig";
+
+const auth = getAuth(app);
 
 const NextServiceScreen = ({ navigation, route }) => {
     // 1. Recibo de parametros de OrderCard
@@ -37,8 +42,8 @@ const NextServiceScreen = ({ navigation, route }) => {
     } = route.params || {};
 
     const insets = useSafeAreaInsets();
-    const [isStarting, setIsStarting] = useState(false);
-
+    const [showActiveOrderModal,  setShowActiveOrderModal] = useState(false);
+    const [isStartingLoading, setIsStartingLoading] = useState(false);
     // 2. Extraemos Fecha y Hora de la variable 'time' del backend
     let scheduledDate = "---";
     let scheduledTime = "---";
@@ -62,22 +67,33 @@ const NextServiceScreen = ({ navigation, route }) => {
             return;
         }
 
-        setIsStarting(true);
+        const uid = auth.currentUser?.uid;
+        if (!uid) {
+            Alert.alert("Error", "No se pudo verificar la sesión.");
+            return;
+            }
+        
         try {
-            // Tomamos el ID del primer servicio de la lista (Nivel 3 en nuestra BD)
-            const firstServiceId = servicesList[0].id;
-            
-            // Usamos nuestro endpoint PATCH protegido por RBAC
-            await OrderService.updateServiceStatus(orderId, firstServiceId, 'En Progreso');
-            
-            // Redirigimos al Home. El listener "focus" recargará el backend 
-            // y la orden se mostrará mágicamente como Activa.
+            // 1. REGLA DE NEGOCIO: Comprobar si hay una orden activa existente
+            const currentActiveOrder = await OrderService.getActiveOrder(uid);
+                if (currentActiveOrder) {
+                    setShowActiveOrderModal(true);
+                    return;
+            }
+
+            // 2. Si no hay orden activa, mostramos el modal de carga e iniciamos la petición
+            setIsStartingLoading(true);
+            await OrderService.startAllServices(orderId);
+            // 3. Ocultamos el modal y navegamos al Home. El estado ya está garantizado en la BD.
+            setIsStartingLoading(false);
             navigation.navigate("Home");
-        } catch (error) {
+            
+        } 
+
+        catch (error) {
+            setIsStartingLoading(false);
             console.error("Error al iniciar la orden:", error);
             Alert.alert("Error", "No se pudo iniciar la orden. Verifica tu conexión.");
-        } finally {
-            setIsStarting(false);
         }
     };
 
@@ -91,7 +107,7 @@ const NextServiceScreen = ({ navigation, route }) => {
                 <ScrollView
                     showsVerticalScrollIndicator={false}
                     contentContainerStyle={{
-                        paddingBottom: insets.bottom + 20,
+                        paddingBottom: insets.bottom + 20
                     }}
                 >
                     {/* FIX 1: Header restaurado a su estructura visual en línea (idéntico a LastServiceScreen) */}
@@ -190,20 +206,48 @@ const NextServiceScreen = ({ navigation, route }) => {
 
                     {/* FIX 2: Botón Comenzar con Lógica y Loader */}
                     <TouchableOpacity 
-                        style={[styles.primaryButton, isStarting && { opacity: 0.7 }]}
+                        style={styles.primaryButton}
                         onPress={handleStartOrder}
-                        disabled={isStarting}
                     >
-                        {isStarting ? (
-                            <ActivityIndicator color="black" />
-                        ) : (
-                            <>
-                                <Text style={styles.primaryButtonText}>Comenzar</Text>
-                                <Feather name="arrow-right" size={20} color="black" />
-                            </>
-                        )}
+                        <Text style={styles.primaryButtonText}>Comenzar</Text>
+                        <Feather name="arrow-right" size={20} color="black" />
                     </TouchableOpacity>
                 </ScrollView>
+                {/* MODAL DE BLOQUEO DE ORDEN ACTIVA */}
+                <Modal
+                    visible={showActiveOrderModal}
+                    transparent={true}
+                    animationType="fade"
+                    onRequestClose={() => setShowActiveOrderModal(false)}
+                >
+                    <View style={styles.modalOverlay}>
+                        <View style={styles.modalContent}>
+                            <Feather name="alert-circle" size={50} color="#FF4D4D" style={{ marginBottom: 15 }} />
+                            <Text style={styles.modalTitle}>Acción Bloqueada</Text>
+                            <Text style={styles.modalText}>
+                                No fue posible comenzar la orden. Ya tienes una orden en progreso existente. 
+                                Finalízala antes de comenzar una nueva.
+                            </Text>
+                            <TouchableOpacity
+                                style={[styles.primaryButton, { width: "100%", marginTop: 10 }]}
+                                onPress={() => setShowActiveOrderModal(false)}
+                            >
+                                <Text style={styles.primaryButtonText}>Entendido</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </Modal>
+
+                {/* MODAL 2: CARGANDO NUEVA ORDEN (ESPERA DE CONTRATO) */}
+                <Modal visible={isStartingLoading} transparent={true} animationType="fade">
+                    <View style={styles.modalOverlay}>
+                        <View style={[styles.modalContent, { paddingVertical: 40 }]}>
+                            <ActivityIndicator size="large" color="#FFD43B" style={{ marginBottom: 20 }} />
+                            <Text style={styles.modalTitle}>Iniciando Orden...</Text>
+                            <Text style={styles.modalText}>Sincronizando servicios con el taller.</Text>
+                        </View>
+                    </View>
+                </Modal>
             </View>
         </SafeAreaProvider>
     );
@@ -273,5 +317,31 @@ const styles = StyleSheet.create({
         color: "#000",
         fontWeight: "700",
         fontSize: 17,
+    },
+    modalOverlay: { 
+        flex: 1, 
+        backgroundColor: "rgba(0, 0, 0, 0.7)", 
+        justifyContent: "center", 
+        alignItems: "center" 
+    },
+    modalContent: { 
+        backgroundColor: "#1A1D23", 
+        borderRadius: 20, 
+        padding: 24, 
+        width: "85%", 
+        alignItems: "center" 
+    },
+    modalTitle: { 
+        color: "#fff", 
+        fontSize: 20, 
+        fontWeight: "bold", 
+        marginBottom: 12 
+    },
+    modalText: { 
+        color: "#888", 
+        fontSize: 14, 
+        textAlign: "center", 
+        marginBottom: 20, 
+        lineHeight: 20 
     },
 });

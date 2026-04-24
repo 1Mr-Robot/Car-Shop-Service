@@ -96,8 +96,11 @@ export default function OrdersScreen({ navigation }) {
             const active = await OrderService.getActiveOrder(uid);
             const upcomingRaw = await OrderService.getUpcomingOrders(uid);
 
+            // Filtramos la orden activa para que no se duplique en la lista de próximas
+            const filteredUpcoming = upcomingRaw.filter(o => !active || o.id !== active.id);
+
             setActiveOrder(active);
-            setUpcomingOrders(processUpcomingOrders(upcomingRaw));
+            setUpcomingOrders(processUpcomingOrders(filteredUpcoming));
 
         } catch (err) {
             console.error("Error al cargar la agenda:", err);
@@ -200,6 +203,11 @@ export default function OrdersScreen({ navigation }) {
                             navigation={navigation}
                             expandedId={expandedId}
                             setExpandedId={setExpandedId}
+                            startDate={activeOrder.startDate}
+                            startTime={activeOrder.startTime}
+                            endDate={activeOrder.endDate}
+                            endTime={activeOrder.endTime}
+                            products={activeOrder.products}
                         />
                     ) : (
                         <View style={styles.emptyState}>
@@ -235,6 +243,11 @@ export default function OrdersScreen({ navigation }) {
                                     navigation={navigation}
                                     expandedId={expandedId}
                                     setExpandedId={setExpandedId}
+                                    startDate={order.startDate}
+                                    startTime={order.startTime}
+                                    endDate={order.endDate}
+                                    endTime={order.endTime}
+                                    products={order.products}
                                 />
                             ))}
                         </View>

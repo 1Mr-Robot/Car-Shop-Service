@@ -19,11 +19,19 @@ import BottomNav from "../components/BottomNav";
 import OrderCard from "../components/OrderCard";
 import OrderService from "../services/OrderService";
 
-// POR NADA DEL MUNDO TOCAR ESTE IMPORT!!!!
+// POR NADA DEL MUNDO TOCAR ESTOS IMPORT!!!!
 import { getAuth } from "firebase/auth";
 import { app } from "../firebaseConfig";
 
 const auth = getAuth(app);
+
+// Helper para Saludo Dinámico
+const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "BUENOS DÍAS,";
+    if (hour < 18) return "BUENAS TARDES,";
+    return "BUENAS NOCHES,";
+};
 
 const HomeScreen = ({ navigation }) => {
     const [expandedId, setExpandedId] = useState(null);
@@ -35,6 +43,9 @@ const HomeScreen = ({ navigation }) => {
     const [completedOrders, setCompletedOrders] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
+
+    const [userName, setUserName] = useState("Mecánico");
+    const greeting = getGreeting();
 
     const fetchOrders = async (uid) => {
         // Guarda de seguridad: Si no hay UID, no disparamos nada a la base de datos
@@ -50,8 +61,16 @@ const HomeScreen = ({ navigation }) => {
             const upcoming = await OrderService.getUpcomingOrders(uid);
             const completed = await OrderService.getCompletedOrders(uid);
 
+            // Filtramos las 'upcoming' para quitar la que ya está como 'active'.
+            const filteredUpcoming = upcoming.filter(o => !active || o.id !== active.id);
+
+            const anyOrder = active || filteredUpcoming[0] || completed[0];
+            if (anyOrder && anyOrder.mechanicName) {
+                setUserName(anyOrder.mechanicName);
+            }
+
             setActiveOrder(active);
-            setUpcomingOrders(upcoming);
+            setUpcomingOrders(filteredUpcoming);
             setCompletedOrders(completed);
 
         } catch (err) {
@@ -128,9 +147,9 @@ const HomeScreen = ({ navigation }) => {
                             </View>
                             <View>
                                 <Text style={styles.greeting}>
-                                    BUENOS DÍAS,
+                                    {greeting}
                                 </Text>
-                                <Text style={styles.name}>Chalino Sánchez</Text>
+                                <Text style={styles.name}>{userName}</Text>
                             </View>
                         </View>
                         <TouchableOpacity 
@@ -160,6 +179,11 @@ const HomeScreen = ({ navigation }) => {
                             navigation={navigation}
                             expandedId={expandedId}
                             setExpandedId={setExpandedId}
+                            startDate={activeOrder.startDate}
+                            startTime={activeOrder.startTime}
+                            endDate={activeOrder.endDate}
+                            endTime={activeOrder.endTime}
+                            products={activeOrder.products}
                         />
                     ) : (
                         <View style={styles.emptyState}>
@@ -196,8 +220,11 @@ const HomeScreen = ({ navigation }) => {
                                 navigation={navigation}
                                 expandedId={expandedId}
                                 setExpandedId={setExpandedId}
-                                orderStartDate={order.startDate}
-                                orderStartTime={order.startTime}
+                                startDate={order.startDate}
+                                startTime={order.startTime}
+                                endDate={order.endDate}
+                                endTime={order.endTime}
+                                products={order.products}
                             />
                         ))
                     ) : (
@@ -211,7 +238,7 @@ const HomeScreen = ({ navigation }) => {
                             Ordenes Completadas
                         </Text>
                         <TouchableOpacity onPress={() => navigation.navigate('PastRepairs')}>
-                            <Text style={styles.link}>Ver archivo</Text>
+                            <Text style={styles.link}>Ver Historial Completo</Text>
                         </TouchableOpacity>
                     </View>
 
@@ -229,13 +256,16 @@ const HomeScreen = ({ navigation }) => {
                                 vehicleVIN={order.vehicleVIN}
                                 ownerName={order.ownerName}
                                 services={order.services}
-                                time={order.time}
+                                time={order.endDate ? `${order.endDate}, ${order.endTime}` : order.time}
                                 mileage={order.vehicleMileage}
                                 navigation={navigation}
                                 expandedId={expandedId}
                                 setExpandedId={setExpandedId}
-                                orderStartDate={order.startDate}
-                                orderStartTime={order.startTime}
+                                startDate={order.startDate}
+                                startTime={order.startTime}
+                                endDate={order.endDate}
+                                endTime={order.endTime}
+                                products={order.products}
                             />
                         ))
                     ) : (

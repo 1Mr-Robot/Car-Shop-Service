@@ -13,12 +13,10 @@ import {
 } from "react-native";
 import {
     SafeAreaProvider,
-    SafeAreaView,
     useSafeAreaInsets,
 } from "react-native-safe-area-context";
 import { Ionicons, MaterialCommunityIcons, Feather } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
-import { useNavigation } from "@react-navigation/native"; //NAVEGACION
 import VehicleCard from "../components/VehicleCard";
 import OrderService from "../services/OrderService"; // POR NADA DEL MUNDO TOCAR ESTE IMPORT
 
@@ -39,17 +37,13 @@ const Item = ({ id, title, status, onToggle }) => {
         }
     };
 
+    const isCompleted = status === "Finalizado";
+
     return (
         <TouchableOpacity
-            activeOpacity={0.7}
-            onPress={() => onToggle(id)}
-            style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
-                marginTop: 15,
-                paddingVertical: 5,
-            }}
+            activeOpacity={isCompleted ? 1 : 0.7}
+            onPress={() => !isCompleted && onToggle(id, title)}
+            style={styles.serviceItem}
         >
             <Text style={{ color: "#fff", fontWeight: "bold" }}>{title}</Text>
             {renderIcon()}
@@ -76,48 +70,69 @@ const OrderDetailsScreen = ({ navigation, route }) => {
 
     // 2. Inicializamos el estado con los datos reales de la BD
     const [orderServices, setOrderServices] = useState(servicesList || []);
-    const [showFinishModal, setShowFinishModal] = useState(false);
     const [pendingServices, setPendingServices] = useState([]);
-    const [isFinishing, setIsFinishing] = useState(false);
 
-    // Lógica para cambiar estatus de los servicios (REAL)
-    const toggleServiceStatus = async (serviceId) => {
-        const servicioActual = orderServices.find(s => s.id === serviceId);
-        if (!servicioActual) return;
+    const [showFinishModal, setShowFinishModal] = useState(false);
+    const [isFinishingMaster, setIsFinishingMaster] = useState(false);
 
-        let nextStatus;
-        if (servicioActual.status === "Pendiente") nextStatus = "En Progreso";
-        else if (servicioActual.status === "En Progreso") nextStatus = "Finalizado";
-        else nextStatus = "Pendiente";
+    const [serviceToFinish, setServiceToFinish] = useState(null);
+    const [isUpdatingService, setIsUpdatingService] = useState(false);
+    const [showSuccessServiceModal, setShowSuccessServiceModal] = useState(false);
 
-        // Actualización Optimista (UI Inmediata)
-        setOrderServices(prev => prev.map(item => item.id === serviceId ? { ...item, status: nextStatus } : item));
+
+    // ==========================================
+    // LÓGICA DE TRANSICIÓN UNIDIRECCIONAL DE SERVICIOS
+    // ==========================================
+    const requestServiceToggle = (serviceId, title) => {
+        // Al tocar un servicio 'En Progreso', abrimos el modal de confirmación
+        setServiceToFinish({ id: serviceId, title });
+    };
+
+    const confirmFinishService = async () => {
+        if (!serviceToFinish) return;
+
+        setIsUpdatingService(true); // Oculta botones, muestra loader en el modal
 
         try {
-            // Guardamos el estatus en Postgres
-            await OrderService.updateServiceStatus(orderId, serviceId, nextStatus);
+            // Petición al Backend con ESPERA DE CONTRATO (await)
+            await OrderService.updateServiceStatus(orderId, serviceToFinish.id, "Finalizado");
+            
+            // Si el backend responde 200 OK, actualizamos el estado local
+            setOrderServices(prev => prev.map(item => 
+                item.id === serviceToFinish.id ? { ...item, status: "Finalizado" } : item
+            ));
+
+            setIsUpdatingService(false);
+            setServiceToFinish(null); // Cerramos modal de confirmación
+            
+            // Mostramos modal de éxito por 1.5 segundos
+            setShowSuccessServiceModal(true);
+            setTimeout(() => {
+                setShowSuccessServiceModal(false);
+            }, 1500);
+
         } catch (error) {
             console.error("Error al actualizar estatus:", error);
-            Alert.alert("Error de conexión", "No se pudo guardar el estatus. Verifica tu red.");
-            // Revertir UI en caso de error
-            setOrderServices(prev => prev.map(item => item.id === serviceId ? { ...item, status: servicioActual.status } : item));
+            setIsUpdatingService(false);
+            setServiceToFinish(null);
+            Alert.alert("Error", "No se pudo actualizar el servicio. Verifica tu conexión.");
         }
     };
 
-    // Lógica del Botón Principal "Finalizar"
-    const handleFinishPress = async () => {
+    // ==========================================
+    // LÓGICA "FINALIZAR ORDEN"
+    // ==========================================
+    const handleFinishMasterOrder = async () => {
         const allFinalized = orderServices.every(s => s.status === "Finalizado");
         if (allFinalized) {
-            setIsFinishing(true);
+            setIsFinishingMaster(true);
             try {
-                // 1. Cerramos la orden maestra en la BD (fecha_fin = NOW())
                 await OrderService.finalizeOrder(orderId);
-                // 2. Navegamos al Historial. El listener "focus" recargará los datos y sumará 1 al contador
                 navigation.navigate("PastRepairs"); 
             } catch (error) {
                 console.error("Error al finalizar orden:", error);
                 Alert.alert("Error", "No se pudo finalizar la orden maestra.");
-                setIsFinishing(false);
+                setIsFinishingMaster(false);
             }
         } else {
             const pending = orderServices.filter(s => s.status !== "Finalizado").map(s => s.title);
@@ -139,16 +154,10 @@ const OrderDetailsScreen = ({ navigation, route }) => {
                     }}
                 >
                     <View
-                        style={{
-                            flexDirection: "row",
-                            alignItems: "center",
-                            paddingHorizontal: 15,
-                            paddingVertical: 10,
-                            backgroundColor: "#0F1115",
-                        }}
+                        style={styles.navHeader}
                     >
                         <Pressable
-                            onPress={() => navigation.navigate("Home")}
+                            onPress={() => navigation.goBack()}
                             hitSlop={12}
                             style={{ padding: 1 }}
                         >
@@ -159,12 +168,7 @@ const OrderDetailsScreen = ({ navigation, route }) => {
                             />
                         </Pressable>
                         <Text
-                            style={{
-                                color: "#ffff",
-                                fontSize: 24,
-                                fontWeight: "bold",
-                                marginLeft: 20,
-                            }}
+                            style={styles.navTitle}
                         >
                             Orden #{orderId || "---"}
                         </Text>
@@ -174,13 +178,11 @@ const OrderDetailsScreen = ({ navigation, route }) => {
                         status="active"
                         vehicleYear={vehicle ? vehicle.split(" ")[0] : ""}
                         vehicleBrand={vehicle ? vehicle.split(" ")[1] : ""}
-                        vehicleModel={
-                            vehicle ? vehicle.split(" ").slice(2).join(" ") : ""
-                        }
-                        owner={ownerName || "Cliente sin nombre"} 
-                        color={vehicleColor || "Sin color"}
-                        plate={plate || "ABC-1234"}
-                        mileage={mileage}
+                        vehicleModel={vehicle ? vehicle.split(" ").slice(2).join(" ") : ""}
+                        owner={ownerName || "Cliente"} 
+                        color={vehicleColor || "No especificado"}
+                        plate={plate || "---"}
+                        mileage={mileage || "---"}
                         vin={vehicleVIN || "No registrado"}
                     />
 
@@ -195,7 +197,7 @@ const OrderDetailsScreen = ({ navigation, route }) => {
                                     id={item.id}
                                     title={item.title}
                                     status={item.status}
-                                    onToggle={toggleServiceStatus}
+                                    onToggle={requestServiceToggle}
                                 />
                             )}
                             ListEmptyComponent={
@@ -203,6 +205,7 @@ const OrderDetailsScreen = ({ navigation, route }) => {
                             }
                         />
                     </View>
+
                     <View style={[styles.card, { borderWidth: 1 }]}>
                         <View style={styles.notesHeader}>
                             <Ionicons
@@ -253,6 +256,7 @@ const OrderDetailsScreen = ({ navigation, route }) => {
                             </View>
                         ))
                     )}
+
                     <View
                         style={{
                             flexDirection: "row",
@@ -287,10 +291,15 @@ const OrderDetailsScreen = ({ navigation, route }) => {
                         </TouchableOpacity>
                     </View>
 
-                    <TouchableOpacity style={[styles.primaryButton]} onPress={handleFinishPress}>
-                        <Text style={styles.primaryButtonText}>Finalizar</Text>
+                    <TouchableOpacity 
+                        style={[styles.primaryButton, isFinishingMaster && { opacity: 0.7 }]} 
+                        onPress={handleFinishMasterOrder}
+                        disabled={isFinishingMaster}
+                    >
+                        {isFinishingMaster ? <ActivityIndicator color="black" /> : <Text style={styles.primaryButtonText}>Finalizar</Text>}
                     </TouchableOpacity>
 
+                    {/* MODAL MAESTRO: SERVICIOS PENDIENTE */}
                     <Modal
                         visible={showFinishModal}
                         transparent={true}
@@ -318,6 +327,47 @@ const OrderDetailsScreen = ({ navigation, route }) => {
                             </View>
                         </View>
                     </Modal>
+
+                    {/* MODAL 1 (SERVICIO): CONFIRMAR Y CARGAR */}
+                    <Modal visible={!!serviceToFinish} transparent={true} animationType="fade">
+                        <View style={styles.modalOverlay}>
+                            <View style={styles.modalContent}>
+                                {isUpdatingService ? (
+                                    <View style={{ alignItems: "center", paddingVertical: 20 }}>
+                                        <ActivityIndicator size="large" color="#FFD43B" style={{ marginBottom: 15 }} />
+                                        <Text style={styles.modalTitle}>Actualizando...</Text>
+                                    </View>
+                                ) : (
+                                    <>
+                                        <Text style={styles.modalTitle}>¿Deseas finalizar el servicio?</Text>
+                                        <Text style={styles.modalText}>
+                                            Estás a punto de marcar como finalizado:{"\n"}
+                                            <Text style={{ fontWeight: "bold", color: "#fff" }}>{serviceToFinish?.title}</Text>
+                                        </Text>
+                                        <View style={{ flexDirection: "row", gap: 10, marginTop: 10 }}>
+                                            <TouchableOpacity style={[styles.modalAcceptButton, { flex: 1, backgroundColor: "#333" }]} onPress={() => setServiceToFinish(null)}>
+                                                <Text style={[styles.modalAcceptText, { color: "#fff" }]}>Regresar</Text>
+                                            </TouchableOpacity>
+                                            <TouchableOpacity style={[styles.modalAcceptButton, { flex: 1 }]} onPress={confirmFinishService}>
+                                                <Text style={styles.modalAcceptText}>Sí, Finalizar</Text>
+                                            </TouchableOpacity>
+                                        </View>
+                                    </>
+                                )}
+                            </View>
+                        </View>
+                    </Modal>
+
+                    {/* MODAL 2 (SERVICIO): ÉXITO */}
+                    <Modal visible={showSuccessServiceModal} transparent={true} animationType="fade">
+                        <View style={styles.modalOverlay}>
+                            <View style={[styles.modalContent, { alignItems: "center", paddingVertical: 30 }]}>
+                                <Feather name="check-circle" size={60} color="#22C55E" style={{ marginBottom: 15 }} />
+                                <Text style={styles.modalTitle}>Servicio Finalizado</Text>
+                            </View>
+                        </View>
+                    </Modal>
+
                 </ScrollView>
             </View>
         </SafeAreaProvider>
@@ -333,21 +383,19 @@ const styles = StyleSheet.create({
         backgroundColor: "#0F1115",
         paddingHorizontal: 18,
     },
-    sectionLabel: {
-        color: "#8B90A0",
-        fontSize: 13,
-        letterSpacing: 1,
-        marginBottom: 15,
-        marginTop: 10,
+    navHeader: { 
+        flexDirection: "row", 
+        alignItems: "center", 
+        paddingHorizontal: 15, 
+        paddingVertical: 10, 
+        backgroundColor: "#0F1115", 
+        marginBottom: 10 
     },
-    label: {
-        color: "#8B90A0",
-        fontSize: 12,
-    },
-    value: {
-        color: "white",
-        fontSize: 14,
-        marginTop: 3,
+    navTitle: { 
+        color: "#ffff", 
+        fontSize: 24, 
+        fontWeight: "bold", 
+        marginLeft: 20 
     },
     card: {
         backgroundColor: "#1A1D24",
@@ -355,35 +403,28 @@ const styles = StyleSheet.create({
         padding: 20,
         marginBottom: 25,
     },
-    rowBetween: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
+    carTitle: { 
+        color: "#fff", 
+        fontSize: 20, 
+        fontWeight: "600" 
     },
-    row: {
-        flexDirection: "row",
-        alignItems: "center",
+    serviceItem: { 
+        flexDirection: "row", 
+        alignItems: "center", 
+        justifyContent: "space-between", 
+        marginTop: 15, 
+        paddingVertical: 5 
     },
-    carTitle: {
-        color: "#fff",
-        fontSize: 20,
-        fontWeight: "600",
+    notesHeader: { 
+        flexDirection: "row", 
+        alignItems: "center", 
+        marginBottom: 6, 
+        gap: 6 
     },
-    subText: {
-        color: "#8B90A0",
-        fontSize: 13,
-        marginTop: 4,
-    },
-    badge: {
-        backgroundColor: "rgba(255,212,59,0.15)",
-        paddingHorizontal: 12,
-        paddingVertical: 6,
-        borderRadius: 20,
-    },
-    badgeText: {
-        color: "#FFD43B",
-        fontSize: 12,
-        fontWeight: "600",
+    notesSectionTitle: { 
+        color: "#FFD43B", 
+        fontSize: 12, 
+        fontWeight: "600" 
     },
     primaryButton: {
         backgroundColor: "#FFD43B",
@@ -402,117 +443,6 @@ const styles = StyleSheet.create({
     secondaryButtonText: {
         color: "#ffff",
         fontWeight: "700",
-    },
-    assignmentCard: {
-        backgroundColor: "#14161C",
-        borderRadius: 18,
-        padding: 16,
-        flexDirection: "row",
-        alignItems: "center",
-        marginBottom: 25,
-        borderWidth: 1,
-        borderColor: "#2A2E38",
-    },
-    iconCircle: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        backgroundColor: "#1F222B",
-        justifyContent: "center",
-        alignItems: "center",
-        marginRight: 12,
-    },
-    smallButton: {
-        backgroundColor: "#FFD43B",
-        paddingHorizontal: 16,
-        paddingVertical: 8,
-        borderRadius: 12,
-    },
-    notesHeader: {
-        flexDirection: "row",
-        alignItems: "center",
-        marginBottom: 6,
-        gap: 6,
-    },
-    notesSectionTitle: {
-        color: "#FFD43B",
-        fontSize: 12,
-        fontWeight: "600",
-    },
-    smallButtonText: {
-        color: "#000",
-        fontWeight: "600",
-        fontSize: 12,
-    },
-    taskCard: {
-        backgroundColor: "#1A1D24",
-        borderRadius: 18,
-        padding: 16,
-        flexDirection: "row",
-        alignItems: "center",
-        marginBottom: 15,
-    },
-    iconCircleDark: {
-        width: 36,
-        height: 36,
-        borderRadius: 18,
-        backgroundColor: "#14161C",
-        justifyContent: "center",
-        alignItems: "center",
-        marginRight: 12,
-    },
-    completedCircle: {
-        width: 36,
-        height: 36,
-        borderRadius: 18,
-        backgroundColor: "#2ECC71",
-        justifyContent: "center",
-        alignItems: "center",
-        marginRight: 12,
-    },
-    timeText: {
-        color: "#8B90A0",
-        fontSize: 11,
-        marginBottom: 6,
-        textAlign: "right",
-    },
-    statusBadge: {
-        borderWidth: 1,
-        borderColor: "#FFD43B",
-        borderRadius: 10,
-        paddingHorizontal: 8,
-        paddingVertical: 2,
-    },
-    statusText: {
-        color: "#FFD43B",
-        fontSize: 10,
-    },
-    price: {
-        color: "#FFD43B",
-        fontWeight: "700",
-        fontSize: 16,
-    },
-    priorityBadge: {
-        backgroundColor: "#402225",
-        paddingHorizontal: 10,
-        paddingVertical: 4,
-        borderRadius: 10,
-    },
-    priorityText: {
-        color: "#FF4D4F",
-        fontSize: 11,
-    },
-    fab: {
-        position: "absolute",
-        bottom: 40,
-        alignSelf: "center",
-        backgroundColor: "#FFD43B",
-        width: 70,
-        height: 70,
-        borderRadius: 35,
-        justifyContent: "center",
-        alignItems: "center",
-        elevation: 8,
     },
     half: {
         flex: 1,

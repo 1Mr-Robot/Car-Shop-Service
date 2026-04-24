@@ -44,22 +44,16 @@ const processCompletedOrders = (orders) => {
         let dayKey = 'SIN FECHA';
         let displayTime = order.time;
 
-        if (order.time) {
-            // El backend retorna 'DD/MM/YYYY, HH12:MI AM'
-            const parts = order.time.split(', ');
-            if (parts.length === 2) {
-                const datePart = parts[0];
-                const timePart = parts[1];
-                
-                if (datePart === todayStr) {
-                    dayKey = 'HOY';
-                    displayTime = `HOY, ${timePart}`;
-                } else if (datePart === yesterdayStr) {
-                    dayKey = 'AYER';
-                    displayTime = `AYER, ${timePart}`;
-                } else {
-                    dayKey = datePart;
-                }
+        if (order.endDate) {
+            if (order.endDate === todayStr) {
+                dayKey = 'HOY';
+                displayTime = `HOY, ${order.endTime}`;
+            } else if (order.endDate === yesterdayStr) {
+                dayKey = 'AYER';
+                displayTime = `AYER, ${order.endTime}`;
+            } else {
+                dayKey = order.endDate;
+                displayTime = `${order.endDate}, ${order.endTime}`;
             }
         }
         return { ...order, dayKey, displayTime };

@@ -65,9 +65,17 @@ class OrderService {
         // PATCH /api/v1/ordenes/{orderId}/servicios/{serviceId}
         return await ApiClient.patch(`/ordenes/${orderId}/servicios/${serviceId}`, {
             estatus: nuevoEstatus // 'Pendiente', 'En Progreso', o 'Finalizado'
-        });
+        })
     }
 
+    /**
+     * Inicia todos los servicios pendientes de una orden pasándolos a "En Progreso".
+     */
+    static async startAllServices(orderId) {
+        return await ApiClient.put(`/ordenes/${orderId}/iniciar`, {});
+    }
+
+    
     // ==========================================
     // 3. CREACIÓN DE RECURSOS SUBORDINADOS (POST - Not Safe, Not Idempotent)
     // ==========================================
