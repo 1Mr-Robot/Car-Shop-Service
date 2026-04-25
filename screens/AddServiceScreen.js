@@ -1,124 +1,41 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
     View,
     Text,
     StyleSheet,
+    ScrollView,
     TouchableOpacity,
     Pressable,
     FlatList,
+    Modal,
+    ActivityIndicator,
+    TextInput, 
+    Alert
 } from "react-native";
 import {
     SafeAreaProvider,
     SafeAreaView,
+    useSafeAreaInsets
 } from "react-native-safe-area-context";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { useNavigation, useRoute } from "@react-navigation/native"; //NAVEGACION
+import { MaterialCommunityIcons, Feather } from "@expo/vector-icons";
+import { StatusBar } from "expo-status-bar";
 import { Checkbox } from 'expo-checkbox';
 
-// No Modificar: servicesData -> INITIAL_SERVICES - paginacion API: (GET /api/v1/servicios?page=1&limit=7 - 15)
-const INITIAL_SERVICES = [                                           //CREAR LISTA SOLO FRONT, BACKEND CONSULTA -> JSON
-    {
-        id: "1",
-        name: "Alineación y balanceo",
-    },
-    {
-        id: "2",
-        name: "Cambio de filtro de aire acondicionado",
-    },
-    {
-        id: "3",
-        name: "Lavado de motor",
-    },
-    {
-        id: "4",
-        name: "Cambio de aceite",
-    },
-    {
-        id: "5",
-        name: "Inflado de llantas con nitrogeno",
-    },
-    {
-        id: "6",
-        name: "Rotación de llantas",
-    },
-    {
-        id: "7",
-        name: "Balanceo de llantas",
-    },
-    {
-        id: "8",
-        name: "Cambio de balatas",
-    },
-    {
-        id: "9",
-        name: "Rectificación de discos",
-    },
-    {
-        id: "10",
-        name: "Revisión de frenos",
-    },
-    {
-        id: "11",
-        name: "Diagnóstico con escáner",
-    },
-    {
-        id: "12",
-        name: "Cambio de batería",
-    },
-    {
-        id: "13",
-        name: "Revisión de batería",
-    },
-    {
-        id: "14",
-        name: "Cambio de bujías",
-    },
-    {
-        id: "15",
-        name: "Cambio de filtro de aire",
-    },
-    {
-        id: "16",
-        name: "Cambio de filtro de gasolina",
-    },
-    {
-        id: "17",
-        name: "Cambio de anticongelante",
-    },
-    {
-        id: "18",
-        name: "Cambio de líquido de frenos",
-    },
-    {
-        id: "19",
-        name: "Cambio de aceite de transmisión",
-    },
-    {
-        id: "20",
-        name: "Afinación mayor",
-    },
-    {
-        id: "21",
-        name: "Afinación menor",
-    },
+import CatalogService from "../services/CatalogService";
+import OrderService from "../services/OrderService";
 
-];
 
-// No modificar: Service -> SelectableService
-const SelectableService = ({ id, name, description, isSelected, onToggle }) => (
+const formatPrice = (price) => `$${price.toLocaleString("es-MX", { minimumFractionDigits: 2 })}`;
+
+const SelectableService = ({ id, name, description, price, isSelected, onToggle }) => (
     <Pressable 
-        style={{
-            paddingVertical: 12,
-            paddingHorizontal: 15,
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between'
-        }}
+        style={styles.selectableItem}
         onPress={() => onToggle(id)}
     >
         <View style={{ flex: 1, paddingRight: 10 }}>
             <Text style={styles.serviceTitle}>{name}</Text>
-            <Text style={styles.subText}>{description}</Text>
+            {description ? <Text style={styles.subText}>{description}</Text> : null}
+            <Text style={styles.priceText}>{formatPrice(price)}</Text>
         </View>
         <Checkbox
             value={isSelected}
@@ -128,145 +45,225 @@ const SelectableService = ({ id, name, description, isSelected, onToggle }) => (
     </Pressable>
 );
 
-export default function AddServiceScreen(){
-    const navigation = useNavigation();
-    const route = useRoute(); // No modificar
+export default function AddServiceScreen({ navigation, route }){
+    const insets = useSafeAreaInsets();
+    const { orderId } = route.params || {}; 
 
-    const { orderId } = route.params || {}; // No modificar
-
-    // No modificar
-    const [availableServices, setAvailableServices] = useState(INITIAL_SERVICES);
+    // Estados Catálogo Regular
+    const [services, setServices] = useState([]);
     const [selectedServiceIds, setSelectedServiceIds] = useState([]);
+    const [isLoadingInit, setIsLoadingInit] = useState(true);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // No modificar: Función para manejar la selección de checkboxes
-    const toggleSelection = (serviceId) => {
-        setSelectedServiceIds((prevSelected) => {
-            if (prevSelected.includes(serviceId)) {
-                return prevSelected.filter(id => id !== serviceId); // Lo quita
-            } else {
-                return [...prevSelected, serviceId]; // Lo agrega
+    // Estados Servicio Personalizado
+    const [showCustomModal, setShowCustomModal] = useState(false);
+    const [customDesc, setCustomDesc] = useState("");
+    const [customPrice, setCustomPrice] = useState("");
+
+    useEffect(() => {
+        const fetchCatalog = async () => {
+            try {
+                const data = await CatalogService.getServices({ limit: 50 });
+                
+                // FIX: Normalizamos los datos (descripcion de BD a description de UI)
+                const formattedServices = data.map(s => ({
+                    id: s.id,
+                    name: s.name,
+                    description: s.descripcion, 
+                    price: parseFloat(s.precio_mano_obra || 0)
+                }));
+                
+                setServices(formattedServices);
+            } catch (error) {
+                console.error("Error al cargar servicios:", error);
+                Alert.alert("Error", "No se pudo cargar el catálogo de servicios.");
+            } finally {
+                setIsLoadingInit(false);
             }
-        });
+        };
+        fetchCatalog();
+    }, []);
+
+    const toggleSelection = (serviceId) => {
+        setSelectedServiceIds((prev) => 
+            prev.includes(serviceId) ? prev.filter(id => id !== serviceId) : [...prev, serviceId]
+        );
     };
 
-    // No modificar Función para manejar el botón "Continuar"
-    const handleAddServicesToOrder = () => {
-        if (selectedServiceIds.length === 0) {
-            alert("Por favor selecciona al menos un servicio.");
+    // Cálculos Financieros
+    const totalToAdd = services
+        .filter(s => selectedServiceIds.includes(s.id))
+        .reduce((sum, s) => sum + s.price, 0);
+
+    // POST: Servicios de Catálogo
+    const handleAddServicesToOrder = async () => {
+        if (selectedServiceIds.length === 0) return;
+        setIsSubmitting(true);
+        try {
+            await OrderService.addServicesToOrder(orderId, selectedServiceIds);
+            setIsSubmitting(false);
+            navigation.navigate("Home"); 
+        } catch (error) {
+            setIsSubmitting(false);
+            Alert.alert("Error", "No se pudieron agregar los servicios.");
+        }
+    };
+
+    // POST: Servicio Personalizado
+    const handleAddCustomService = async () => {
+        if (!customDesc.trim() || !customPrice.trim()) {
+            Alert.alert("Campos incompletos", "Define la descripción y el precio estimado.");
             return;
         }
 
-        console.log(`Listo para hacer POST /api/v1/ordenes/${orderId}/servicios`);
-        console.log("Servicios seleccionados (IDs):", selectedServiceIds);
-        
-        // fetch()
-        // ...
-        navigation.goBack();
+        setIsSubmitting(true);
+        try {
+            await OrderService.addCustomService(orderId, customDesc, customPrice);
+            setIsSubmitting(false);
+            setShowCustomModal(false);
+            navigation.navigate("Home");
+        } catch (error) {
+            setIsSubmitting(false);
+            Alert.alert("Error", "No se pudo crear el servicio personalizado.");
+        }
     };
+
+    if (isLoadingInit) {
+        return (
+            <SafeAreaProvider>
+                <SafeAreaView style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+                    <ActivityIndicator size="large" color="#FFD43B" />
+                    <Text style={{ color: "#888", marginTop: 15 }}>Cargando catálogo...</Text>
+                </SafeAreaView>
+            </SafeAreaProvider>
+        );
+    }
 
     return(
         <SafeAreaProvider>
-            <SafeAreaView
-                style={[styles.container, { }]}
-                edges={["top", "bottom"]}
-            >
-                <View style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    paddingHorizontal: 15,
-                    paddingVertical: 10,
-                }}>
-                    <Pressable 
-                        onPress={() => navigation.goBack()}  //IR ATRAS
-                        hitSlop={12}
-                        style={{ padding: 1}}
+            <StatusBar style="light" />
+            <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
+                
+                <View style={styles.navHeader}>
+                    <Pressable onPress={() => navigation.goBack()} hitSlop={12} style={{ padding: 1}}>
+                        <MaterialCommunityIcons name="arrow-left" size={24} color={"#ffff"} />           
+                    </Pressable>
+                    <Text style={styles.navTitle}>Orden #{orderId || '---'}</Text>    
+                </View>
+                <View style={styles.hr} />
+
+                <ScrollView showsVerticalScrollIndicator={false}>
+                    <View style={{ marginTop: 20, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                        <Text style={styles.sectionTitleText}>CATÁLOGO DE SERVICIOS</Text>                  
+                        <TouchableOpacity 
+                            style={styles.customServiceBtn} 
+                            onPress={() => setShowCustomModal(true)}
                         >
-                        <MaterialCommunityIcons
-                            name="arrow-left"
-                            size={24}
-                            color={"#ffff"}                       
-                        />           
-                    </Pressable>
-                    <Text
-                    style={{
-                        color: "#ffff",
-                        fontSize: 18,
-                        fontWeight: "bold",
-                        marginLeft: 0,
-                        flex: 1,
-                        textAlign: "center"
-                    }}                             
-                    > 
-                        Orden #{orderId || '---'} {/* No modificar */}
-                    </Text>    
-                </View>
-                <View style={{
-                    height: 1,
-                    backgroundColor: "#2A2F36",
-                    width: "100%"
-                }}>
-                </View>
-                <View style={{
-                    marginTop: 20
-                }}>
-                    <Text style={[styles.carTitle]}>Catálogo de Servicios</Text>                  
-                </View>
-                <View style={{
-                    marginTop: 1
-                }}>
-                    <Text style={[styles.subText]}>Selecciona uno o mas servicios requeridos para este vehiculo</Text>  
-                </View>
-
-                {/* No modificar */}
-                <FlatList 
-                    style={{marginTop: 25}}
-                    data={availableServices}
-                    keyExtractor={item => item.id}
-                    renderItem={({ item }) => (
-                        <SelectableService
-                            id={item.id} 
-                            name={item.name}
-                            description={item.description}
-                            isSelected={selectedServiceIds.includes(item.id)}
-                            onToggle={toggleSelection}
-                        />
-                    )}
-                    ItemSeparatorComponent={()=> <View style={styles.hr} />}
-                    showsVerticalScrollIndicator={false}
-                    // No Modificar: boton paginacion api
-                    ListFooterComponent={() => (
-                        <TouchableOpacity style={{ padding: 20, alignItems: 'center' }}>
-                            <Text style={{ color: '#FFD43B' }}>Cargar más servicios...</Text>
-                        </TouchableOpacity>                        
-                    )}
-                />
-
-                <View style={{flexDirection:"row", gap:15, marginTop: 15, marginBottom: 20}}>
-                    <View style={[styles.card, styles.half]}>
-                        <Text style={[styles.subText]}>Nuevos Servicios</Text>  
-                        <Text style={styles.carTitle}>{selectedServiceIds.length}</Text> {/* No modificar: Contador dinámico */}
+                            <Feather name="plus" size={14} color="#000" />
+                            <Text style={styles.customServiceBtnText}>Personalizado</Text>
+                        </TouchableOpacity>
                     </View>
-                    <Pressable 
-                        style={[
-                            styles.primaryButton,
-                            styles.half,
-                            { opacity: selectedServiceIds.length > 0 ? 1 : 0.5 }
-                            ]}
+                    <Text style={styles.subText}>Selecciona del catálogo base o crea uno al vuelo.</Text>
+
+                    <View style={styles.listContainer}>
+                        {services.map((item, index) => (
+                            <View key={item.id}>
+                                <SelectableService
+                                    id={item.id} 
+                                    name={item.name}
+                                    description={item.description}
+                                    price={item.price}
+                                    isSelected={selectedServiceIds.includes(item.id)}
+                                    onToggle={toggleSelection}
+                                />
+                                {index < services.length - 1 && <View style={styles.hrLight} />}
+                            </View>
+                        ))}
+                    </View>
+
+                    {/* RESUMEN DE VENTA / ORDEN (Consistencia con AddProductScreen) */}
+                    <View style={styles.summaryCard}>
+                        <Text style={styles.summaryTitle}>RESUMEN DE AGREGADO</Text>
+                        <View style={styles.summaryRow}>
+                            <Text style={styles.summaryLabel}>Servicios seleccionados</Text>
+                            <Text style={styles.summaryValue}>{selectedServiceIds.length}</Text>
+                        </View>
+                        <View style={styles.summaryRow}>
+                            <Text style={styles.summaryLabel}>Total estimado a sumar</Text>
+                            <Text style={styles.totalValue}>{formatPrice(totalToAdd)}</Text>
+                        </View>
+
+                        <TouchableOpacity
+                            style={[styles.checkoutButton, (isSubmitting || selectedServiceIds.length === 0) && { opacity: 0.5 }]}
                             onPress={handleAddServicesToOrder}
-                            disabled={selectedServiceIds.length === 0}
-                    >
-                        <Text style={styles.primaryButtonText}>Continuar</Text>
-                    </Pressable>
-                </View>
+                            disabled={isSubmitting || selectedServiceIds.length === 0}
+                        >
+                            {isSubmitting ? (
+                                <ActivityIndicator color="black" />
+                            ) : (
+                                <Text style={styles.checkoutButtonText}>Añadir a la Orden</Text>
+                            )}
+                        </TouchableOpacity>
+                    </View>
+
+                    <View style={{ height: 40 }} />
+                </ScrollView>
+
+                {/* MODAL 1: CREAR SERVICIO PERSONALIZADO */}
+                <Modal visible={showCustomModal} transparent={true} animationType="slide" onRequestClose={() => setShowCustomModal(false)}>
+                    <View style={styles.modalOverlay}>
+                        <View style={styles.modalContent}>
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '100%', marginBottom: 15 }}>
+                                <Text style={styles.modalTitle}>Servicio Extra / Imprevisto</Text>
+                                <TouchableOpacity onPress={() => setShowCustomModal(false)}>
+                                    <Feather name="x" size={24} color="#888" />
+                                </TouchableOpacity>
+                            </View>
+                            
+                            <Text style={styles.inputLabel}>Descripción del Trabajo</Text>
+                            <TextInput 
+                                style={styles.inputField}
+                                placeholder="Ej. Soldadura de mofle especial..."
+                                placeholderTextColor="#666"
+                                value={customDesc}
+                                onChangeText={setCustomDesc}
+                                multiline
+                            />
+
+                            <Text style={styles.inputLabel}>Precio / Costo Estimado ($)</Text>
+                            <TextInput 
+                                style={styles.inputField}
+                                placeholder="0.00"
+                                placeholderTextColor="#666"
+                                value={customPrice}
+                                onChangeText={setCustomPrice}
+                                keyboardType="numeric"
+                            />
+
+                            <TouchableOpacity 
+                                style={[styles.checkoutButton, { marginTop: 25 }]} 
+                                onPress={handleAddCustomService}
+                            >
+                                <Text style={styles.checkoutButtonText}>Guardar y Añadir a la Orden</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </Modal>
+
+                {/* MODAL 2: CARGANDO (MUTACIÓN) */}
+                <Modal visible={isSubmitting} transparent={true} animationType="fade">
+                    <View style={styles.modalOverlayDark}>
+                        <View style={styles.modalContentSmall}>
+                            <ActivityIndicator size="large" color="#FFD43B" style={{ marginBottom: 20 }} />
+                            <Text style={[styles.modalTitle, { textAlign: 'center' }]}>Actualizando Orden...</Text>
+                            <Text style={styles.modalText}>Registrando servicios en el taller.</Text>
+                        </View>
+                    </View>
+                </Modal>
  
             </SafeAreaView>
         </SafeAreaProvider>
-
     );
-//PRESSABLE 'SERVICIO PERSONALIZADO' OPCIONAL PERO ESTARIA PERRO QUE JALE
-//PRESSABLE 'AGREGAR' ACTUALIZAR ORDEN AGREGANDO LOS SERVICIOS SELECCIONADOS
-//NUEVOS SERVICIOS IGUAL OPCIONAL +1 CADA QUE SE SELECCIONA UN SERVICIO
-    
 }
 
 const styles = StyleSheet.create({
@@ -275,205 +272,176 @@ const styles = StyleSheet.create({
         backgroundColor: "#0F1115",
         paddingHorizontal: 18,
     },
+    navHeader: { 
+        flexDirection: 'row', 
+        alignItems: 'center', 
+        paddingHorizontal: 0, 
+        paddingVertical: 10 
+    },
+    navTitle: { 
+        color: "#ffff", 
+        fontSize: 20, 
+        fontWeight: "bold", 
+        flex: 1, 
+        textAlign: "center",
+        marginRight: 24 
+    },
     hr: {
         height: 1,
         backgroundColor: "#2A2F36",
         width: "100%",
     },
-    sectionLabel: {
+    hrLight: {
+        height: 1,
+        backgroundColor: "#2A2F36",
+        width: "100%",
+        opacity: 0.5
+    },
+    sectionTitleText: {
         color: "#8B90A0",
-        fontSize: 13,
-        letterSpacing: 1,
-        marginBottom: 15,
-        marginTop: 10,
-    },
-    card: {
-        backgroundColor: "#1A1D24",
-        borderRadius: 20,
-        padding: 10,
-        alignItems: "flex-start",
-        marginTop:10
-    },
-    rowBetween: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
-    },
-    carTitle: {
-        color: "#fff",
-        fontSize: 20,
+        fontSize: 14,
         fontWeight: "600",
     },
     subText: {
         color: "#8B90A0",
         fontSize: 13,
-        marginTop: 4,
+        marginBottom: 15
+    },
+    listContainer: {
+        backgroundColor: "#1A1D24",
+        borderRadius: 20,
+        paddingVertical: 5,
+        marginBottom: 15
+    },
+    selectableItem: { 
+        paddingVertical: 16, 
+        paddingHorizontal: 20, 
+        flexDirection: 'row', 
+        alignItems: 'center', 
+        justifyContent: 'space-between' 
     },
     serviceTitle: {
         color: "#ffff",
         fontSize: 16,
-        marginTop: 4,
-        maxWidth: 280
-    },
-    badge: {
-        backgroundColor: "rgba(255,212,59,0.15)",
-        paddingHorizontal: 12,
-        paddingVertical: 6,
-        borderRadius: 20,
-    },
-    badgeText: {
-        color: "#FFD43B",
-        fontSize: 12,
         fontWeight: "600",
+        marginBottom: 4
     },
-    primaryButton: {
-        backgroundColor: "#FFD43B",
-        paddingVertical: 20,
-        borderRadius: 15,
-        alignItems: "center",
-        marginTop:10,
-        flexDirection: "row",
-        justifyContent: "center",
-        gap: 8,
+    priceText: {
+        color: "#9CA3AF",
+        fontSize: 14,
+        marginTop: 6,
+        fontWeight: "600"
     },
-    primaryButtonText: {
-        color: "#000",
-        fontWeight: "700",
-        fontSize: 20
+    customServiceBtn: { 
+        backgroundColor: "#FFD43B", 
+        flexDirection: 'row', 
+        alignItems: 'center', 
+        paddingHorizontal: 14, 
+        paddingVertical: 8, 
+        borderRadius: 20, 
+        gap: 6 
     },
-    secondaryButtonText: {
-        color: "#ffff",
-        fontWeight: "700",
+    customServiceBtnText: { 
+        color: "#000", 
+        fontWeight: "bold", 
+        fontSize: 12 
     },
-    assignmentCard: {
-        backgroundColor: "#14161C",
-        borderRadius: 18,
-        padding: 16,
-        flexDirection: "row",
-        alignItems: "center",
-        marginBottom: 25,
-        borderWidth: 1,
-        borderColor: "#2A2E38",
-    },
-    iconCircle: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        backgroundColor: "#1F222B",
-        justifyContent: "center",
-        alignItems: "center",
-        marginRight: 12,
-    },
-    smallButton: {
-        backgroundColor: "#FFD43B",
-        paddingHorizontal: 16,
-        paddingVertical: 8,
-        borderRadius: 12,
-    },
-    smallButtonText: {
-        color: "#000",
-        fontWeight: "600",
-        fontSize: 12,
-    },
-    taskCard: {
+    summaryCard: {
         backgroundColor: "#1A1D24",
-        borderRadius: 18,
-        padding: 16,
+        borderRadius: 20,
+        padding: 24,
+        marginTop: 10,
+        marginBottom: 0,
+    },
+    summaryTitle: {
+        color: "#FFD43B",
+        fontSize: 14,
+        fontWeight: "600",
+        marginBottom: 20,
+    },
+    summaryRow: {
         flexDirection: "row",
-        alignItems: "center",
-        marginBottom: 15,
+        justifyContent: "space-between",
+        marginBottom: 14,
+        alignItems: "center"
     },
-    iconCircleDark: {
-        width: 36,
-        height: 36,
-        borderRadius: 18,
-        backgroundColor: "#14161C",
-        justifyContent: "center",
-        alignItems: "center",
-        marginRight: 12,
+    summaryLabel: {
+        color: "#9CA3AF",
+        fontSize: 15,
     },
-    completedCircle: {
-        width: 36,
-        height: 36,
-        borderRadius: 18,
-        backgroundColor: "#2ECC71",
-        justifyContent: "center",
-        alignItems: "center",
-        marginRight: 12,
-    },
-    timeText: {
-        color: "#8B90A0",
-        fontSize: 11,
-        marginBottom: 6,
-        textAlign: "right",
-    },
-    statusBadge: {
-        borderWidth: 1,
-        borderColor: "#FFD43B",
-        borderRadius: 10,
-        paddingHorizontal: 8,
-        paddingVertical: 2,
-    },
-    statusText: {
-        color: "#FFD43B",
-        fontSize: 10,
-    },
-    price: {
-        color: "#FFD43B",
-        fontWeight: "700",
+    summaryValue: {
+        color: "white",
         fontSize: 16,
+        fontWeight: "600"
     },
-    priorityBadge: {
-        backgroundColor: "#402225",
-        paddingHorizontal: 10,
-        paddingVertical: 4,
-        borderRadius: 10,
-    },
-    priorityText: {
-        color: "#FF4D4F",
-        fontSize: 11,
-    },
-    fab: {
-        position: "absolute",
-        bottom: 40,
-        alignSelf: "center",
-        backgroundColor: "#FFD43B",
-        width: 70,
-        height: 70,
-        borderRadius: 35,
-        justifyContent: "center",
-        alignItems: "center",
-        elevation: 8,
-    },
-    half: {
-        flex: 1
-    },
-    productButton: {
-        backgroundColor: "#111827",
-        paddingVertical: 14,
-        borderRadius: 15,
-        borderColor: "#FACC15",
-        borderWidth: 1.5,
-        alignItems: "center",
-        marginTop: 20,
-        flexDirection: "row",
-        justifyContent: "center",
-        gap: 8,
-    },
-    productButtonText: {
-        color: "#fff",
+    totalValue: {
+        color: "#FFD43B",
+        fontSize: 24,
         fontWeight: "700",
     },
-    serviceButton: {
-        backgroundColor: "#111827",
-        paddingVertical: 14,
-        borderRadius: 15,
-        borderColor: "#FACC15",
-        borderWidth: 1.5,
-        alignItems: "center",
-        marginTop: 20,
+    checkoutButton: {
+        backgroundColor: "#FFD43B",
         flexDirection: "row",
+        alignItems: "center",
         justifyContent: "center",
-        gap: 8,
-    }
+        paddingVertical: 18,
+        borderRadius: 16,
+        marginTop: 20,
+    },
+    checkoutButtonText: {
+        color: "black",
+        fontSize: 18,
+        fontWeight: "700",
+    },
+    modalOverlay: { 
+        flex: 1, 
+        backgroundColor: "rgba(0,0,0,0.7)", 
+        justifyContent: "flex-end" 
+    },
+    modalContent: { 
+        backgroundColor: "#1A1D24", 
+        borderTopLeftRadius: 30, 
+        borderTopRightRadius: 30, 
+        padding: 25, 
+        paddingBottom: 50 
+    },
+    modalTitle: { 
+        color: "#fff", 
+        fontSize: 20, 
+        fontWeight: "bold" 
+    },
+    inputLabel: { 
+        color: "#FFD43B", 
+        fontSize: 13, 
+        fontWeight: "600", 
+        marginBottom: 8, 
+        marginTop: 15 
+    },
+    inputField: { 
+        backgroundColor: "#0F1115", 
+        color: "#fff", 
+        borderRadius: 12, 
+        padding: 15, 
+        fontSize: 16, 
+        borderWidth: 1, 
+        borderColor: "#2A2F36" 
+    },
+    modalOverlayDark: { 
+        flex: 1, 
+        backgroundColor: "rgba(0,0,0,0.8)", 
+        justifyContent: "center", 
+        alignItems: "center" 
+    },
+    modalContentSmall: { 
+        backgroundColor: "#1A1D23", 
+        borderRadius: 20, 
+        padding: 30, 
+        width: "85%", 
+        alignItems: "center" 
+    },
+    modalText: { 
+        color: "#888", 
+        fontSize: 14, 
+        textAlign: "center" 
+    },
 });

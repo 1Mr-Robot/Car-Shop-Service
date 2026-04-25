@@ -103,6 +103,16 @@ class OrderService {
     }
 
     /**
+     * Agrega un servicio personalizado (al vuelo) definiendo descripción y precio.
+     */
+    static async addCustomService(orderId, descripcion_personalizada, precio_personalizado) {
+        return await ApiClient.post(`/ordenes/${orderId}/servicios-personalizados`, {
+            descripcion_personalizada,
+            precio_personalizado: parseFloat(precio_personalizado)
+        });
+    }
+
+    /**
      * Sello de la orden maestra como finalizada.
      */
     static async finalizeOrder(orderId) {

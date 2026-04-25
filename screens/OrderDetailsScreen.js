@@ -236,8 +236,8 @@ const OrderDetailsScreen = ({ navigation, route }) => {
                             Aún no se han utilizado productos en esta orden
                         </Text>
                     ) : (
-                        productsList.map((product) => (
-                            <View key={product.id} style={styles.productCard}>
+                        productsList.map((product, index) => (
+                            <View key={`${product.id}-${index}`} style={styles.productCard}>
                                 <View style={styles.productInfo}>
                                     <Text style={styles.productBrand}>
                                         {product.brand}

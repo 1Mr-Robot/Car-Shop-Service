@@ -2,37 +2,31 @@
 
 // 1. Importamos las herramientas de Firebase
 import { getAuth } from 'firebase/auth';
-import { app } from '../firebaseConfig'; // <-- Sube un nivel para encontrar el archivo en la raíz
+import { app } from '../firebaseConfig'; 
 
-// Inicializamos auth usando tu app configurada
 const auth = getAuth(app);
-
-// 2. Leemos la URL automáticamente de tu archivo .env
 const BASE_URL = `${process.env.EXPO_PUBLIC_API_URL}/api/v1`; 
 
 class ApiClient {
-    // Método privado para obtener el token fresco de Firebase
     static async _getToken() {
         const user = auth.currentUser;
         if (user) {
-            return await user.getIdToken(true); // true fuerza la actualización si expiró
+            // FIX CRÍTICO: 'false' permite usar el token en caché. Firebase lo refresca solo si va a expirar.
+            return await user.getIdToken(false); 
         }
         return null;
     }
 
-    // El motor central que procesa todas las llamadas
     static async request(endpoint, options = {}) {
         const url = `${BASE_URL}${endpoint}`;
         const token = await this._getToken();
 
-        // Configuramos los Headers por defecto
         const headers = {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
             ...options.headers,
         };
 
-        // Si hay un usuario logueado en Firebase, inyectamos el Token
         if (token) {
             headers['Authorization'] = `Bearer ${token}`;
         }
@@ -44,25 +38,29 @@ class ApiClient {
 
         try {
             const response = await fetch(url, config);
+            const textData = await response.text();
             
-            // Intentamos parsear el JSON
-            const data = await response.text();
-            const parsedData = data ? JSON.parse(data) : {};
-
-            // MANEJO DE ERRORES RESTful (400, 404, 500, etc.)
-            if (!response.ok) {
-                throw {
-                    status: response.status,
-                    message: parsedData.message || `Error HTTP: ${response.status}`,
-                    details: parsedData
-                };
+            let parsedData = {};
+            try {
+                // Intentamos parsear. Si el servidor crashea y devuelve HTML, esto nos salva.
+                parsedData = textData ? JSON.parse(textData) : {};
+            } catch (e) {
+                parsedData = { error: "Respuesta no válida del servidor." };
+                console.error("[API JSON Parse Error]", textData);
             }
 
-            // Si es un 200 OK o 201 Created, devolvemos los datos limpios
+            // MANEJO DE ERRORES RESTful
+            if (!response.ok) {
+                // FIX CRÍTICO: Leemos 'error' primero, que es la variable que usa nuestro backend
+                const errorMessage = parsedData.error || parsedData.message || `Error HTTP: ${response.status}`;
+                // Lanzamos un Error real de JavaScript para que el catch(error) en la UI pueda leer error.message
+                throw new Error(errorMessage);
+            }
+
             return parsedData;
 
         } catch (error) {
-            console.error(`[API Error] ${options.method || 'GET'} ${endpoint}:`, error);
+            console.error(`[API Error] ${options.method || 'GET'} ${endpoint}:`, error.message);
             throw error;
         }
     }
@@ -70,37 +68,22 @@ class ApiClient {
     // ==========================================
     // MÉTODOS HTTP RESTful
     // ==========================================
-
-    // SAFE & IDEMPOTENT: Lectura y filtrado
     static get(endpoint) {
         return this.request(endpoint, { method: 'GET' });
     }
 
-    // NOT SAFE & NOT IDEMPOTENT: Creación de recursos
     static post(endpoint, body) {
-        return this.request(endpoint, { 
-            method: 'POST', 
-            body: JSON.stringify(body) 
-        });
+        return this.request(endpoint, { method: 'POST', body: JSON.stringify(body) });
     }
 
-    // NOT SAFE & IDEMPOTENT: Reemplazo completo
     static put(endpoint, body) {
-        return this.request(endpoint, { 
-            method: 'PUT', 
-            body: JSON.stringify(body) 
-        });
+        return this.request(endpoint, { method: 'PUT', body: JSON.stringify(body) });
     }
 
-    // NOT SAFE & NOT IDEMPOTENT: Actualizaciones parciales
     static patch(endpoint, body) {
-        return this.request(endpoint, { 
-            method: 'PATCH', 
-            body: JSON.stringify(body) 
-        });
+        return this.request(endpoint, { method: 'PATCH', body: JSON.stringify(body) });
     }
 
-    // NOT SAFE & IDEMPOTENT: Eliminación
     static delete(endpoint) {
         return this.request(endpoint, { method: 'DELETE' });
     }
