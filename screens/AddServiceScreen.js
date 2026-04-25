@@ -182,32 +182,30 @@ export default function AddServiceScreen({ navigation, route }){
                     </View>
 
                     {/* RESUMEN DE VENTA / ORDEN (Consistencia con AddProductScreen) */}
-                    <View style={styles.summaryCard}>
-                        <Text style={styles.summaryTitle}>RESUMEN DE AGREGADO</Text>
-                        <View style={styles.summaryRow}>
-                            <Text style={styles.summaryLabel}>Servicios seleccionados</Text>
-                            <Text style={styles.summaryValue}>{selectedServiceIds.length}</Text>
-                        </View>
-                        <View style={styles.summaryRow}>
-                            <Text style={styles.summaryLabel}>Total estimado a sumar</Text>
-                            <Text style={styles.totalValue}>{formatPrice(totalToAdd)}</Text>
-                        </View>
 
-                        <TouchableOpacity
-                            style={[styles.checkoutButton, (isSubmitting || selectedServiceIds.length === 0) && { opacity: 0.5 }]}
-                            onPress={handleAddServicesToOrder}
-                            disabled={isSubmitting || selectedServiceIds.length === 0}
-                        >
-                            {isSubmitting ? (
-                                <ActivityIndicator color="black" />
-                            ) : (
-                                <Text style={styles.checkoutButtonText}>Añadir a la Orden</Text>
-                            )}
-                        </TouchableOpacity>
-                    </View>
-
-                    <View style={{ height: 40 }} />
                 </ScrollView>
+                <View>
+                    <Text style={styles.summaryTitle}>Resumen de agregado</Text>
+                    <View style={styles.summaryRow}>
+                        <Text style={styles.summaryLabel}>Servicios Seleccionados</Text>
+                        <Text style={styles.summaryValue}>{selectedServiceIds.length}</Text>
+                    </View>
+                    <View style={styles.summaryRow}>
+                        <Text style={styles.summaryLabel}>Total agregado</Text>
+                        <Text style={styles.totalValue}>{formatPrice(totalToAdd)}</Text>
+                    </View>
+                    <TouchableOpacity
+                        style={[styles.checkoutButton, (isSubmitting || selectedServiceIds.length === 0) && { opacity: 0.5 }]}
+                        onPress={handleAddServicesToOrder}
+                        disabled={isSubmitting || selectedServiceIds.length === 0}
+                    >
+                        {isSubmitting ? (
+                            <ActivityIndicator color="black" />
+                        ) : (
+                            <Text style={styles.checkoutButtonText}>Añadir a la Orden</Text>
+                        )}
+                    </TouchableOpacity>
+                </View>
 
                 {/* MODAL 1: CREAR SERVICIO PERSONALIZADO */}
                 <Modal visible={showCustomModal} transparent={true} animationType="slide" onRequestClose={() => setShowCustomModal(false)}>
@@ -357,12 +355,13 @@ const styles = StyleSheet.create({
         color: "#FFD43B",
         fontSize: 14,
         fontWeight: "600",
-        marginBottom: 20,
+        marginBottom: 15,
+        marginTop: 10
     },
     summaryRow: {
         flexDirection: "row",
         justifyContent: "space-between",
-        marginBottom: 14,
+        marginBottom: 5,
         alignItems: "center"
     },
     summaryLabel: {
@@ -384,9 +383,9 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "center",
-        paddingVertical: 18,
+        paddingVertical: 15,
         borderRadius: 16,
-        marginTop: 20,
+        marginTop: 10,
     },
     checkoutButtonText: {
         color: "black",

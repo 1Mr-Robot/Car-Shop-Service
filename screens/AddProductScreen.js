@@ -162,12 +162,18 @@ const AddProductScreen = ({ navigation, route }) => {
                     )}
 
                     {/* RESUMEN DE VENTA / ORDEN */}
-                    <View style={styles.summaryCard}>
-                        <Text style={styles.summaryTitle}>RESUMEN DE AGREGADO</Text>
-                        <View style={styles.summaryRow}>
+
+                </ScrollView>
+                
+                <View style={styles.hr}/>
+                <View style={{flexDirection: "row", gap: 25}}>
+                    <View style={{flexDirection: 1, marginTop: 1}}>
+                        <Text style={styles.summaryTitle}>Resumen de agregado</Text>
+                        <View styles={[styles.summaryRow]}>
                             <Text style={styles.summaryLabel}>Total a sumar a la orden</Text>
                             <Text style={styles.totalValue}>{formatPrice(totalToAdd)}</Text>
-                        </View>
+                        </View>                       
+                    </View>
                         <TouchableOpacity
                             style={[styles.checkoutButton, (isSubmitting || itemsSelectedCount === 0) && { opacity: 0.5 }]}
                             onPress={handleAddProductsToOrder}
@@ -176,12 +182,11 @@ const AddProductScreen = ({ navigation, route }) => {
                             {isSubmitting ? (
                                 <ActivityIndicator color="black" />
                             ) : (
-                                <Text style={styles.checkoutButtonText}>Añadir a la Orden</Text>
+                                <Text style={styles.checkoutButtonText}>Añadir</Text>
                             )}
-                        </TouchableOpacity>
-                    </View>
-                    <View style={{ height: 40 }} />
-                </ScrollView>
+                        </TouchableOpacity>                   
+
+                </View>
 
                 {/* MODAL DE TRANSICIÓN (CARGA) */}
                 <Modal visible={isSubmitting} transparent={true} animationType="fade">
@@ -318,6 +323,7 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         justifyContent: "space-between",
         marginBottom: 14,
+        flex: 1
     },
     summaryLabel: {
         color: "#9CA3AF",
@@ -336,6 +342,7 @@ const styles = StyleSheet.create({
         paddingVertical: 18,
         borderRadius: 16,
         marginTop: 24,
+        flex: 1
     },
     checkoutButtonText: {
         color: "black",
