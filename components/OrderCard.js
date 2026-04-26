@@ -6,10 +6,10 @@ import Service from "./Service";
 
 // id -> No Modificar
 const OrderCard = ({ id, type, vehicleYear, vehicleBrand, vehicleModel, vehiclePlate, vehicleColor, vehicleVIN, ownerName, services, notes, time, mileage, navigation, expandedId, setExpandedId, mechanicName, showDetailsButton = true, startDate, startTime, endDate, endTime, products }) => {
-    const isExpanded = expandedId === `${type}-${vehiclePlate}`;
+    const isExpanded = expandedId === id;
     
     const handlePress = () => {
-        setExpandedId(isExpanded ? null : `${type}-${vehiclePlate}`);
+        setExpandedId(isExpanded ? null : id);
     };
 
     const getIconConfig = () => {
