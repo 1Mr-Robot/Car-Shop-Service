@@ -7,7 +7,8 @@ import {
     TouchableOpacity,
     Modal,
     ActivityIndicator,
-    Alert
+    Alert,
+    TextInput
 } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
@@ -24,6 +25,7 @@ const PurchaseMerchScreen = ({ navigation }) => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showCheckoutModal, setShowCheckoutModal] = useState(false);
     const [showEmptyCartModal, setShowEmptyCartModal] = useState(false);
+    const [searchQuery, setSearchQuery] = useState("");
 
     // 1. Carga de productos reales del catálogo
     useEffect(() => {
@@ -82,6 +84,13 @@ const PurchaseMerchScreen = ({ navigation }) => {
 
     const formatPrice = (price) => `$${price.toLocaleString("es-MX", { minimumFractionDigits: 2 })}`;
 
+    const filteredProducts = products.filter(product => {
+        const query = searchQuery.toLowerCase();
+        const brandMatch = product.brand?.toLowerCase().includes(query);
+        const nameMatch = product.name?.toLowerCase().includes(query);
+        return brandMatch || nameMatch;
+    });
+
     // 2. Lógica de envío de la venta al Backend
     const handleCheckout = async () => {
         const cartItems = products
@@ -132,13 +141,25 @@ const PurchaseMerchScreen = ({ navigation }) => {
                         </View>
 
                         <View style={styles.sectionTitle}>
-                            <Text style={styles.sectionTitleText}>PRODUCTOS EN STOCK ({products.length})</Text>
+                            <Text style={styles.sectionTitleText}>PRODUCTOS EN STOCK ({filteredProducts.length})</Text>
                         </View>
 
-                        {products.length === 0 ? (
+                        <View style={styles.searchContainer}>
+                            <Feather name="search" size={18} color="#8B90A0" />
+                            <TextInput
+                                placeholder="Buscar por marca o nombre..."
+                                placeholderTextColor="#8B90A0"
+                                style={styles.searchInput}
+                                caretColor="#FFD43B"
+                                value={searchQuery}
+                                onChangeText={setSearchQuery}
+                            />
+                        </View>
+
+                        {filteredProducts.length === 0 ? (
                             <Text style={{ color: '#8B90A0', textAlign: 'center', marginTop: 20 }}>No hay productos con stock disponible.</Text>
                         ) : (
-                            products.map((item) => (
+                            filteredProducts.map((item) => (
                                 <View key={item.id} style={styles.cartItem}>
                                     <View style={styles.itemImageContainer}>
                                         <MaterialCommunityIcons name="wrench" size={35} color="#FFD43B" />
@@ -237,6 +258,20 @@ const styles = StyleSheet.create({
         color: "#8B90A0",
         fontSize: 14,
         fontWeight: "600",
+    },
+    searchContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        backgroundColor: "#14161C",
+        borderRadius: 15,
+        paddingHorizontal: 14,
+        paddingVertical: 10,
+        marginBottom: 20,
+    },
+    searchInput: {
+        flex: 1,
+        marginLeft: 10,
+        color: "#fff",
     },
     emptyCart: {
         alignItems: "center",
