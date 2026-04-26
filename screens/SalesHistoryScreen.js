@@ -1,48 +1,77 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
     View,
     Text,
     StyleSheet,
     ScrollView,
     TouchableOpacity,
+    ActivityIndicator,
 } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
 import BottomNavReceptionist from "../components/BottomNavReceptionist";
+import SalesService from "../services/SalesService";
+import { getAuth } from "firebase/auth";
+import { app } from "../firebaseConfig";
 
-const mockSales = [
-    {
-        id: 1,
-        fecha: "22/04/2026",
-        productos: [
-            { nombre: "Filtro de aceite", marca: "Bosch", cantidad: 2, precioUnitario: 250 },
-            { nombre: "Bujía", marca: "NGK", cantidad: 4, precioUnitario: 80 },
-        ],
-    },
-    {
-        id: 2,
-        fecha: "21/04/2026",
-        productos: [
-            { nombre: "Pastillas de freno", marca: "Bendix", cantidad: 1, precioUnitario: 1200 },
-        ],
-    },
-    {
-        id: 3,
-        fecha: "20/04/2026",
-        productos: [
-            { nombre: "Aceite Sintético", marca: "Mobil 1", cantidad: 4, precioUnitario: 350 },
-            { nombre: "Filtro de aire", marca: "K&N", cantidad: 1, precioUnitario: 420 },
-        ],
-    },
-];
+const auth = getAuth(app);
 
 const SalesHistoryScreen = ({ navigation }) => {
-    const formatPrice = (price) => `$${price.toLocaleString("es-MX", { minimumFractionDigits: 2 })}`;
+    const [sales, setSales] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
 
-    const calculateTotal = (productos) => {
-        return productos.reduce((sum, p) => sum + (p.cantidad * p.precioUnitario), 0);
+    const fetchSales = async () => {
+        try {
+            setIsLoading(true);
+            const salesData = await SalesService.getAllSales();
+            setSales(salesData);
+        } catch (error) {
+            console.error("Error al cargar ventas:", error.message);
+        } finally {
+            setIsLoading(false);
+        }
     };
+
+    useEffect(() => {
+        const unsubscribeAuth = auth.onAuthStateChanged((user) => {
+            if (user) {
+                fetchSales();
+            }
+        });
+
+        const unsubscribeFocus = navigation.addListener('focus', () => {
+            fetchSales();
+        });
+
+        return () => {
+            unsubscribeAuth();
+            unsubscribeFocus();
+        };
+    }, [navigation]);
+
+    const formatPrice = (price) => `$${Number(price).toLocaleString("es-MX", { minimumFractionDigits: 2 })}`;
+
+    if (isLoading && sales.length === 0) {
+        return (
+            <SafeAreaProvider>
+                <StatusBar style="light" />
+                <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
+                    <View style={styles.header}>
+                        <TouchableOpacity onPress={() => navigation.goBack()}>
+                            <Feather name="arrow-left" size={24} color="white" />
+                        </TouchableOpacity>
+                        <Text style={styles.headerTitle}>Historial de ventas</Text>
+                    </View>
+                    <View style={styles.loadingContainer}>
+                        <ActivityIndicator size="large" color="#FFD43B" />
+                        <Text style={styles.loadingText}>Cargando ventas...</Text>
+                    </View>
+                    <BottomNavReceptionist active="CartScreen" />
+                </SafeAreaView>
+            </SafeAreaProvider>
+        );
+    }
 
     return (
         <SafeAreaProvider>
@@ -57,11 +86,11 @@ const SalesHistoryScreen = ({ navigation }) => {
                     </View>
 
                     <View style={styles.sectionTitle}>
-                        <Text style={styles.sectionTitleText}>REGISTRO DE VENTAS ({mockSales.length})</Text>
+                        <Text style={styles.sectionTitleText}>REGISTRO DE VENTAS ({sales.length})</Text>
                     </View>
 
-                    {mockSales.map((sale) => {
-                        const totalVenta = calculateTotal(sale.productos);
+                    {sales.map((sale) => {
+                        const totalVenta = Number(sale.total);
                         return (
                             <View key={sale.id} style={styles.saleCard}>
                                 <View style={styles.saleHeader}>
@@ -69,18 +98,25 @@ const SalesHistoryScreen = ({ navigation }) => {
                                     <Text style={styles.saleTotal}>{formatPrice(totalVenta)}</Text>
                                 </View>
                                 
+                                <View style={styles.vendedorRow}>
+                                    <Text style={styles.vendedorLabel}>Vendedor: </Text>
+                                    <Text style={styles.vendedorNombre}>
+                                        {sale.usuario_nombre} {sale.usuario_apellido}
+                                    </Text>
+                                </View>
+                                
                                 <View style={styles.divider} />
                                 
                                 {sale.productos.map((producto, index) => (
                                     <View key={index} style={styles.productRow}>
                                         <View style={styles.productInfo}>
-                                            <Text style={styles.productBrand}>{producto.marca}</Text>
-                                            <Text style={styles.productName}>{producto.nombre}</Text>
+                                            <Text style={styles.productBrand}>{producto.producto_marca}</Text>
+                                            <Text style={styles.productName}>{producto.producto_nombre}</Text>
                                         </View>
                                         <View style={styles.productDetails}>
                                             <Text style={styles.productQuantity}>x{producto.cantidad}</Text>
                                             <Text style={styles.productUnitPrice}>
-                                                {formatPrice(producto.precioUnitario)} c/u
+                                                {formatPrice(producto.precio_unitario)} c/u
                                             </Text>
                                         </View>
                                     </View>
@@ -185,5 +221,28 @@ const styles = StyleSheet.create({
     productUnitPrice: {
         color: "#6B7280",
         fontSize: 12,
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    loadingText: {
+        color: "#888",
+        marginTop: 15,
+    },
+    vendedorRow: {
+        flexDirection: "row",
+        alignItems: "center",
+        marginTop: 8,
+    },
+    vendedorLabel: {
+        color: "#6B7280",
+        fontSize: 12,
+    },
+    vendedorNombre: {
+        color: "#9CA3AF",
+        fontSize: 12,
+        fontWeight: "600",
     },
 });
