@@ -154,6 +154,11 @@ const PurchaseMerchScreen = ({ navigation }) => {
                                 value={searchQuery}
                                 onChangeText={setSearchQuery}
                             />
+                            {searchQuery.length > 0 && (
+                                <TouchableOpacity onPress={() => setSearchQuery("")}>
+                                    <Feather name="x" size={18} color="#8B90A0" />
+                                </TouchableOpacity>
+                            )}
                         </View>
 
                         {filteredProducts.length === 0 ? (
@@ -271,6 +276,7 @@ const styles = StyleSheet.create({
     searchInput: {
         flex: 1,
         marginLeft: 10,
+        marginRight: 10,
         color: "#fff",
     },
     emptyCart: {

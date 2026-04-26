@@ -251,6 +251,7 @@ const CreateOrderScreen = ({ navigation }) => {
     const insets = useSafeAreaInsets();
     const [showLogoutModal, setShowLogoutModal] = useState(false);
     const [showNoClientModal, setShowNoClientModal] = useState(false);
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [userName, setUserName] = useState("Usuario");
     
     // ESTADO PARA DATOS DEL BACKEND
@@ -352,8 +353,16 @@ const CreateOrderScreen = ({ navigation }) => {
             
             await AdminService.createMasterOrder(payload);
             
-            alert("¡Orden creada exitosamente!");
-            navigation.goBack(); // Regresa al Home
+            setShowSuccessModal(true);
+            // Limpiar el formulario para crear una nueva orden
+            setSelectedClient(null);
+            setSelectedVehicle(null);
+            setSelectedMechanic(null);
+            setMileage("");
+            setScheduledDate("");
+            setStartTime("");
+            setNotes("");
+            setSelectedServices([]);
             
         } catch (error) {
             console.error("Error al crear la orden:", error);
@@ -771,6 +780,27 @@ const CreateOrderScreen = ({ navigation }) => {
                                 onPress={() => setShowNoClientModal(false)}
                             >
                                 <Text style={styles.modalAcceptText}>Aceptar</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </Modal>
+
+                <Modal
+                    visible={showSuccessModal}
+                    transparent={true}
+                    animationType="fade"
+                    onRequestClose={() => setShowSuccessModal(false)}
+                >
+                    <View style={styles.modalOverlay}>
+                        <View style={styles.modalContentLogout}>
+                            <MaterialCommunityIcons name="check-circle" size={70} color="#22C55E" />
+                            <Text style={styles.modalTitle}>Orden creada</Text>
+                            <Text style={styles.modalText}>La orden de servicio se ha registrado exitosamente.</Text>
+                            <TouchableOpacity 
+                                style={styles.successButton}
+                                onPress={() => setShowSuccessModal(false)}
+                            >
+                                <Text style={styles.successButtonText}>Aceptar</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -1221,6 +1251,17 @@ const styles = StyleSheet.create({
         borderRadius: 12,
     },
     modalAcceptText: {
+        color: "#fff",
+        fontSize: 14,
+        fontWeight: "600",
+    },
+    successButton: {
+        backgroundColor: "#22C55E",
+        paddingVertical: 12,
+        paddingHorizontal: 24,
+        borderRadius: 12,
+    },
+    successButtonText: {
         color: "#fff",
         fontSize: 14,
         fontWeight: "600",
