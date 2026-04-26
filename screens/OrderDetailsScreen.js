@@ -223,7 +223,7 @@ const OrderDetailsScreen = ({ navigation, route }) => {
                                 { color: "#969494ff" },
                             ]}
                         >
-                            {notes || "Sin notas adicionales."}
+                            {notes && notes.trim().length > 0 ? notes : "No hay notas del cliente"}
                         </Text>
                     </View>
 

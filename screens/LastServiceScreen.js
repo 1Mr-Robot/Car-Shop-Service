@@ -32,10 +32,11 @@ const LastServiceScreen = ({ navigation, route }) => {
         endTime,
         productsList,
     } = route.params || {};
-
+console.log("NOTES EN LASTSERVICE:", notes);
+console.log("ROUTE PARAMS:", route.params);
     const insets = useSafeAreaInsets();
 
-    // 2. Fallbacks de seguridad por si algún campo viene nulo desde la DB
+    // Fallbacks de seguridad
     const displayStartDate = startDate || "---";
     const displayStartTime = startTime || "---";
     const displayEndDate = endDate || "---";
@@ -55,6 +56,7 @@ const LastServiceScreen = ({ navigation, route }) => {
                         paddingBottom: insets.bottom + 20,
                     }}
                 >
+                    {/* HEADER */}
                     <View
                         style={{
                             flexDirection: "row",
@@ -87,6 +89,7 @@ const LastServiceScreen = ({ navigation, route }) => {
                         </Text>
                     </View>
 
+                    {/* VEHICLE CARD */}
                     <VehicleCard
                         status="completed"
                         vehicleYear={vehicle ? vehicle.split(" ")[0] : ""}
@@ -101,6 +104,7 @@ const LastServiceScreen = ({ navigation, route }) => {
                         vin={vehicleVIN || "No registrado"}
                     />
 
+                    {/* SERVICIOS */}
                     <View style={styles.card}>
                         <Text style={styles.cardTitle}>Servicios</Text>
                         {servicesList &&
@@ -113,65 +117,108 @@ const LastServiceScreen = ({ navigation, route }) => {
                             ))}
                     </View>
 
+                    {/* DATOS DEL SERVICIO */}
                     <View style={styles.card}>
                         <Text style={styles.cardTitle}>Datos del Servicio</Text>
+
                         <View style={styles.dataRow}>
                             <Text style={styles.dataLabel}>
                                 Fecha de Inicio
                             </Text>
-                            <Text style={styles.dataValue}>{displayStartDate}</Text>
+                            <Text style={styles.dataValue}>
+                                {displayStartDate}
+                            </Text>
                         </View>
+
                         <View style={styles.dataRow}>
                             <Text style={styles.dataLabel}>Hora de Inicio</Text>
-                            <Text style={styles.dataValue}>{displayStartTime}</Text>
+                            <Text style={styles.dataValue}>
+                                {displayStartTime}
+                            </Text>
                         </View>
+
                         <View style={styles.dataRow}>
                             <Text style={styles.dataLabel}>
                                 Fecha de Finalización
                             </Text>
-                            <Text style={styles.dataValue}>{displayEndDate}</Text>
+                            <Text style={styles.dataValue}>
+                                {displayEndDate}
+                            </Text>
                         </View>
+
                         <View style={styles.dataRow}>
                             <Text style={styles.dataLabel}>
                                 Hora de Finalización
                             </Text>
-                            <Text style={styles.dataValue}>{displayEndTime}</Text>
+                            <Text style={styles.dataValue}>
+                                {displayEndTime}
+                            </Text>
                         </View>
                     </View>
 
-                    {notes && notes.length > 0 && (
-                        <View style={[styles.card, { borderWidth: 1 }]}>
-                            <View style={styles.notesHeader}>
-                                <Feather
-                                    name="file-text"
-                                    size={14}
-                                    color="#FFD43B"
-                                />
-                                <Text style={styles.notesSectionTitle}>
-                                    Notas del cliente
-                                </Text>
-                            </View>
-                            <Text style={styles.notesText}>{notes}</Text>
+                    {/* NOTAS DEL CLIENTE (SIEMPRE APARECE) */}
+                    <View style={[styles.card, { borderWidth: 1 }]}>
+                        <View style={styles.notesHeader}>
+                            <Feather
+                                name="file-text"
+                                size={14}
+                                color="#FFD43B"
+                            />
+                            <Text style={styles.notesSectionTitle}>
+                                Notas del cliente
+                            </Text>
                         </View>
-                    )}
+
+                        <Text style={styles.notesText}>
+                            {notes && notes.trim().length > 0
+                                ? notes
+                                : "No hay notas del cliente"}
+                        </Text>
+                    </View>
+
+                    {/* PRODUCTOS */}
                     {safeProductsList.length > 0 ? (
                         <>
-                            <Text style={styles.sectionTitle}>PRODUCTOS UTILIZADOS</Text>
+                            <Text style={styles.sectionTitle}>
+                                PRODUCTOS UTILIZADOS
+                            </Text>
+
                             {safeProductsList.map((product) => (
-                                <View key={product.id} style={styles.productCard}>
+                                <View
+                                    key={product.id}
+                                    style={styles.productCard}
+                                >
                                     <View style={styles.productInfo}>
-                                        <Text style={styles.productBrand}>{product.brand}</Text>
-                                        <Text style={styles.productName}>{product.name}</Text>
+                                        <Text style={styles.productBrand}>
+                                            {product.brand}
+                                        </Text>
+                                        <Text style={styles.productName}>
+                                            {product.name}
+                                        </Text>
                                     </View>
+
                                     <View style={styles.productQuantity}>
-                                        <Text style={styles.quantityLabel}>Cant.</Text>
-                                        <Text style={styles.quantityValue}>{product.quantity}</Text>
+                                        <Text style={styles.quantityLabel}>
+                                            Cant.
+                                        </Text>
+                                        <Text style={styles.quantityValue}>
+                                            {product.quantity}
+                                        </Text>
                                     </View>
                                 </View>
                             ))}
                         </>
                     ) : (
-                        <Text style={[styles.sectionTitle, { color: '#555', textAlign: 'center', marginTop: 10 }]}>
+                        <Text
+                            style={[
+                                styles.sectionTitle,
+                                {
+                                    color: "#555",
+                                    textAlign: "center",
+                                    marginTop: 10,
+                                },
+                            ]}
+                        >
                             No se utilizaron productos en esta orden
                         </Text>
                     )}
@@ -276,12 +323,5 @@ const styles = StyleSheet.create({
         color: "#fff",
         fontSize: 16,
         fontWeight: "700",
-    },
-    noProductsText: {
-        color: "#888",
-        fontSize: 15,
-        fontStyle: "italic",
-        textAlign: "center",
-        paddingVertical: 20,
     },
 });

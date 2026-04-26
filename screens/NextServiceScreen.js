@@ -188,21 +188,19 @@ const NextServiceScreen = ({ navigation, route }) => {
                         </View>
                     </View>
 
-                    {notes && notes.length > 0 && (
-                        <View style={[styles.card, { borderWidth: 1 }]}>
-                            <View style={styles.notesHeader}>
-                                <Feather
-                                    name="file-text"
-                                    size={14}
-                                    color="#FFD43B"
-                                />
-                                <Text style={styles.notesSectionTitle}>
-                                    Notas del cliente
-                                </Text>
-                            </View>
-                            <Text style={styles.notesText}>{notes}</Text>
+                    <View style={[styles.card, { borderWidth: 1 }]}>
+                        <View style={styles.notesHeader}>
+                            <Feather
+                                name="file-text"
+                                size={14}
+                                color="#FFD43B"
+                            />
+                            <Text style={styles.notesSectionTitle}>
+                                Notas del cliente
+                            </Text>
                         </View>
-                    )}
+                        <Text style={styles.notesText}>{notes && notes.trim().length > 0 ? notes : "No hay notas del cliente"}</Text>
+                    </View>
 
                     {/* FIX 2: Botón Comenzar con Lógica y Loader */}
                     <TouchableOpacity 

@@ -112,13 +112,13 @@ const OrderCard = ({ id, type, vehicleYear, vehicleBrand, vehicleModel, vehicleP
                             />
                         ))}
 
-                        {(type === 'active' || type === 'upcoming') && notes && (
+                        {isExpanded && (
                             <View style={styles.notesSection}>
                                 <View style={styles.notesHeader}>
                                     <Ionicons name="document-text-outline" size={14} color="#FFD43B" />
                                     <Text style={styles.notesLabel}>Notas del cliente</Text>
                                 </View>
-                                <Text style={styles.notesText}>{notes}</Text>
+                                <Text style={styles.notesText}>{notes && notes.trim().length > 0 ? notes : "No hay notas del cliente"}</Text>
                             </View>
                         )}
 

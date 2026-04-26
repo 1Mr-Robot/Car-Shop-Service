@@ -118,69 +118,72 @@ const PurchaseMerchScreen = ({ navigation }) => {
     return (
         <SafeAreaProvider>
             <StatusBar style="light" />
-            <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
-                <ScrollView showsVerticalScrollIndicator={false}>
-                    <View style={styles.header}>
-                        <TouchableOpacity onPress={() => navigation.goBack()}>
-                            <Feather name="arrow-left" size={24} color="white" />
-                        </TouchableOpacity>
-                        <Text style={styles.headerTitle}>Nueva venta</Text>
-                        <TouchableOpacity onPress={() => navigation.navigate("SalesHistory")}>
-                            <Feather name="clock" size={24} color="#FFD43B" />
-                        </TouchableOpacity>
-                    </View>
-
-                    <View style={styles.sectionTitle}>
-                        <Text style={styles.sectionTitleText}>PRODUCTOS EN STOCK ({products.length})</Text>
-                    </View>
-
-                    {products.length === 0 ? (
-                        <Text style={{ color: '#8B90A0', textAlign: 'center', marginTop: 20 }}>No hay productos con stock disponible.</Text>
-                    ) : (
-                        products.map((item) => (
-                            <View key={item.id} style={styles.cartItem}>
-                                <View style={styles.itemImageContainer}>
-                                    <MaterialCommunityIcons name="wrench" size={35} color="#FFD43B" />
-                                </View>
-                                <View style={styles.itemDetails}>
-                                    <Text style={styles.itemBrand}>{item.brand}</Text>
-                                    <Text style={styles.itemName}>{item.name}</Text>
-                                    <Text style={styles.itemSku}>{item.sku}</Text>
-                                    <Text style={styles.itemPrice}>{formatPrice(item.price)} c/u</Text>
-                                </View>
-                                <View style={styles.itemActions}>
-                                    <View style={styles.quantityControl}>
-                                        <TouchableOpacity style={styles.qtyButton} onPress={() => updateQuantity(item.id, -1)}>
-                                            <Feather name="minus" size={18} color="white" />
-                                        </TouchableOpacity>
-                                        <Text style={styles.qtyText}>{item.quantity}</Text>
-                                        <TouchableOpacity style={styles.qtyButton} onPress={() => updateQuantity(item.id, 1)}>
-                                            <Feather name="plus" size={18} color="white" />
-                                        </TouchableOpacity>
-                                    </View>
-                                    <Text style={styles.itemTotal}>{formatPrice(item.price * item.quantity)}</Text>
-                                </View>
-                            </View>
-                        ))
-                    )}
-
-                    {/* Resumen */}
-                    <View style={styles.summaryCard}>
-                        <Text style={styles.summaryTitle}>RESUMEN DE VENTA</Text>
-                        <View style={styles.summaryRow}>
-                            <Text style={styles.summaryLabel}>Total a pagar</Text>
-                            <Text style={styles.totalValue}>{formatPrice(total)}</Text>
+            <SafeAreaView style={{ flex: 1, backgroundColor: "#0F1115" }} edges={["top", "bottom"]}>
+                <View style={{ flex: 1, paddingHorizontal: 20, paddingTop: 20 }}>
+                    <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
+                        <View style={styles.header}>
+                            <TouchableOpacity onPress={() => navigation.goBack()}>
+                                <Feather name="arrow-left" size={24} color="white" />
+                            </TouchableOpacity>
+                            <Text style={styles.headerTitle}>Nueva venta</Text>
+                            <TouchableOpacity onPress={() => navigation.navigate("SalesHistory")}>
+                                <Feather name="clock" size={24} color="#FFD43B" />
+                            </TouchableOpacity>
                         </View>
-                        <TouchableOpacity
-                            style={[styles.checkoutButton, isSubmitting && { opacity: 0.7 }]}
-                            onPress={handleCheckout}
-                            disabled={isSubmitting}
-                        >
-                            {isSubmitting ? <ActivityIndicator color="black" /> : <Text style={styles.checkoutButtonText}>Completar Venta</Text>}
-                        </TouchableOpacity>
+
+                        <View style={styles.sectionTitle}>
+                            <Text style={styles.sectionTitleText}>PRODUCTOS EN STOCK ({products.length})</Text>
+                        </View>
+
+                        {products.length === 0 ? (
+                            <Text style={{ color: '#8B90A0', textAlign: 'center', marginTop: 20 }}>No hay productos con stock disponible.</Text>
+                        ) : (
+                            products.map((item) => (
+                                <View key={item.id} style={styles.cartItem}>
+                                    <View style={styles.itemImageContainer}>
+                                        <MaterialCommunityIcons name="wrench" size={35} color="#FFD43B" />
+                                    </View>
+                                    <View style={styles.itemDetails}>
+                                        <Text style={styles.itemBrand}>{item.brand}</Text>
+                                        <Text style={styles.itemName}>{item.name}</Text>
+                                        <Text style={styles.itemSku}>{item.sku}</Text>
+                                        <Text style={styles.itemPrice}>{formatPrice(item.price)} c/u</Text>
+                                    </View>
+                                    <View style={styles.itemActions}>
+                                        <View style={styles.quantityControl}>
+                                            <TouchableOpacity style={styles.qtyButton} onPress={() => updateQuantity(item.id, -1)}>
+                                                <Feather name="minus" size={18} color="white" />
+                                            </TouchableOpacity>
+                                            <Text style={styles.qtyText}>{item.quantity}</Text>
+                                            <TouchableOpacity style={styles.qtyButton} onPress={() => updateQuantity(item.id, 1)}>
+                                                <Feather name="plus" size={18} color="white" />
+                                            </TouchableOpacity>
+                                        </View>
+                                        <Text style={styles.itemTotal}>{formatPrice(item.price * item.quantity)}</Text>
+                                    </View>
+                                </View>
+                            ))
+                        )}
+                    </ScrollView>
+
+                    <View style={styles.fixedBottom}>
+                        <View style={styles.topDivider} />
+                        <View style={styles.summaryCard}>
+                            <Text style={styles.summaryTitle}>RESUMEN DE VENTA</Text>
+                            <View style={styles.summaryRow}>
+                                <Text style={styles.summaryLabel}>Total a pagar</Text>
+                                <Text style={styles.totalValue}>{formatPrice(total)}</Text>
+                            </View>
+                            <TouchableOpacity
+                                style={[styles.checkoutButton, isSubmitting && { opacity: 0.7 }]}
+                                onPress={handleCheckout}
+                                disabled={isSubmitting}
+                            >
+                                {isSubmitting ? <ActivityIndicator color="black" /> : <Text style={styles.checkoutButtonText}>Completar Venta</Text>}
+                            </TouchableOpacity>
+                        </View>
                     </View>
-                    <View style={{ height: 120 }} />
-                </ScrollView>
+                </View>
                 <BottomNavReceptionist active="CartScreen" />
 
                 {/* Modal de Éxito */}
@@ -337,22 +340,22 @@ const styles = StyleSheet.create({
         fontWeight: "700",
     },
     summaryCard: {
-        backgroundColor: "#1A1D24",
-        borderRadius: 20,
-        padding: 24,
-        marginTop: 10,
-        marginBottom: 0,
+        backgroundColor: "transparent",
+        borderRadius: 0,
+        padding: 0,
+        marginHorizontal: 0,
     },
     summaryTitle: {
         color: "#FFD43B",
-        fontSize: 14,
+        fontSize: 12,
         fontWeight: "600",
-        marginBottom: 20,
+        marginBottom: 16,
+        textTransform: "uppercase",
     },
     summaryRow: {
         flexDirection: "row",
         justifyContent: "space-between",
-        marginBottom: 14,
+        marginBottom: 16,
     },
     summaryLabel: {
         color: "#9CA3AF",
@@ -374,7 +377,7 @@ const styles = StyleSheet.create({
     },
     totalValue: {
         color: "#FFD43B",
-        fontSize: 24,
+        fontSize: 22,
         fontWeight: "700",
     },
     checkoutButton: {
@@ -382,9 +385,10 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "center",
-        paddingVertical: 18,
-        borderRadius: 16,
-        marginTop: 24,
+        paddingVertical: 16,
+        borderRadius: 14,
+        marginTop: 16,
+        alignSelf: "stretch",
     },
     checkoutButtonText: {
         color: "black",
@@ -400,6 +404,19 @@ const styles = StyleSheet.create({
         color: "#FF4D4D",
         fontSize: 14,
         fontWeight: "600",
+    },
+    fixedBottom: {
+        paddingHorizontal: 20,
+        paddingTop: 0,
+        paddingBottom: 80,
+        backgroundColor: "#0F1115",
+        marginHorizontal: -20,
+        paddingHorizontal: 20,
+    },
+    topDivider: {
+        height: 1,
+        backgroundColor: "#1F232B",
+        marginBottom: 20,
     },
     modalOverlay: {
         flex: 1,

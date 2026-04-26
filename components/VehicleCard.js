@@ -122,6 +122,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 12,
         paddingVertical: 6,
         borderRadius: 20,
+        marginLeft: 3,
     },
     badgeActive: {
         backgroundColor: "rgba(255,212,59,0.15)",

@@ -256,6 +256,7 @@ const HomeScreen = ({ navigation }) => {
                                 vehicleVIN={order.vehicleVIN}
                                 ownerName={order.ownerName}
                                 services={order.services}
+                                 notes={order.notes}
                                 time={order.endDate ? `${order.endDate}, ${order.endTime}` : order.time}
                                 mileage={order.vehicleMileage}
                                 navigation={navigation}
