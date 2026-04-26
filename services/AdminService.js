@@ -11,6 +11,11 @@ class AdminService {
         return response.data || [];
     }
 
+    static async getCurrentUser() {
+        const response = await ApiClient.get('/usuarios/yo');
+        return response.data || null;
+    }
+
     static async createMasterOrder(orderData) {
         return await ApiClient.post('/ordenes', orderData);
     }

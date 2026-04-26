@@ -251,6 +251,7 @@ const CreateOrderScreen = ({ navigation }) => {
     const insets = useSafeAreaInsets();
     const [showLogoutModal, setShowLogoutModal] = useState(false);
     const [showNoClientModal, setShowNoClientModal] = useState(false);
+    const [userName, setUserName] = useState("Usuario");
     
     // ESTADO PARA DATOS DEL BACKEND
     const [clients, setClients] = useState([]);
@@ -290,10 +291,14 @@ const CreateOrderScreen = ({ navigation }) => {
                 const clientsData = await AdminService.getClientsWithVehicles();
                 const mechanicsData = await AdminService.getMechanics();
                 const servicesData = await CatalogService.getServices({ limit: 100 });
+                const currentUser = await AdminService.getCurrentUser();
                 
                 setClients(clientsData);
                 setMechanics(mechanicsData);
                 setServices(servicesData);
+                if (currentUser) {
+                    setUserName(`${currentUser.nombre} ${currentUser.apellido_paterno}`);
+                }
             } catch (error) {
                 console.error("Error cargando catálogos:", error);
                 alert("Hubo un error al conectar con la base de datos del taller.");
@@ -423,7 +428,7 @@ const CreateOrderScreen = ({ navigation }) => {
                         </View>
                         <View>
                             <Text style={styles.greeting}>BUENOS DÍAS,</Text>
-                            <Text style={styles.name}>Valentín Elizalde</Text>
+                            <Text style={styles.name}>{userName}</Text>
                         </View>
                     </View>
                     <TouchableOpacity 
