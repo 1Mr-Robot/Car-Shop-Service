@@ -105,7 +105,7 @@ const CreateProductScreen = ({ navigation }) => {
     return (
         <SafeAreaProvider>
             <StatusBar style="light" />
-            <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
+            <SafeAreaView style={[styles.container, { paddingBottom: 160 }]} edges={["top", "bottom"]}>
                 <View style={styles.header}>
                     <TouchableOpacity 
                         style={styles.backButton} 
@@ -124,7 +124,7 @@ const CreateProductScreen = ({ navigation }) => {
                 >
                     <ScrollView 
                         showsVerticalScrollIndicator={false}
-                        contentContainerStyle={{ paddingBottom: 180 }}
+                        contentContainerStyle={{ paddingBottom: 0 }}
                         keyboardShouldPersistTaps="handled"
                     >
                         <Text style={styles.sectionTitle}>Datos del Producto</Text>

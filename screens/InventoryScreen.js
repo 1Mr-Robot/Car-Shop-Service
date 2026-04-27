@@ -7,6 +7,8 @@ import {
     TextInput,
     Modal,
     FlatList,
+    KeyboardAvoidingView,
+    Platform,
     Pressable,
     ActivityIndicator,
 } from "react-native";
@@ -149,57 +151,63 @@ const InventoryScreen = ({ navigation }) => {
                 />
 
                 <Modal visible={showProductModal} transparent animationType="slide">
-                    <View style={styles.modalOverlay}>
-                        <View style={styles.modalContent}>
-                            <View style={styles.modalHeader}>
-                                <Text style={styles.modalTitle}>Actualizar Stock</Text>
-                                <Pressable onPress={() => setShowProductModal(false)}>
-                                    <Feather name="x" size={24} color="#fff" />
-                                </Pressable>
-                            </View>
-                            {selectedProduct && (
-                                <View style={styles.modalBody}>
-                                    <Text style={styles.modalProductName}>{selectedProduct.nombre}</Text>
-                                    <Text style={styles.modalProductDetails}>
-                                        {selectedProduct.marca} | SKU: {selectedProduct.sku}
-                                    </Text>
-                                    <Text style={styles.modalProductDetails}>
-                                        Precio de compra: ${selectedProduct.precio_compra}
-                                    </Text>
-                                    <Text style={styles.modalProductDetails}>
-                                        Precio de venta: ${selectedProduct.precio_venta}
-                                    </Text>
-                                    <Text style={[styles.modalProductDetails, { marginBottom: 20 }]}>
-                                        Stock actual: {selectedProduct.cantidad_stock}
-                                    </Text>
-
-                                    <Text style={styles.label}>Nueva cantidad en stock <Text style={styles.required}>*</Text></Text>
-                                    <View style={styles.inputContainer}>
-                                        <TextInput
-                                            style={styles.input}
-                                            value={newStock}
-                                            onChangeText={setNewStock}
-                                            placeholder="Ingresa la cantidad"
-                                            placeholderTextColor="#555"
-                                            keyboardType="numeric"
-                                        />
+                        <View style={styles.modalOverlay}>
+                            <KeyboardAvoidingView
+                                behavior={Platform.OS === "ios" ? "padding" : "height"}
+                                style={{ flex: 1, marginVertical: "auto", justifyContent: "center" }}
+                                keyboardVerticalOffset={10}
+                            >
+                                <View style={styles.modalContent}>
+                                    <View style={styles.modalHeader}>
+                                        <Text style={styles.modalTitle}>Actualizar Stock</Text>
+                                        <Pressable onPress={() => setShowProductModal(false)}>
+                                            <Feather name="x" size={24} color="#fff" />
+                                        </Pressable>
                                     </View>
+                                    {selectedProduct && (
+                                        <View style={styles.modalBody}>
+                                            <Text style={styles.modalProductName}>{selectedProduct.nombre}</Text>
+                                            <Text style={styles.modalProductDetails}>
+                                                {selectedProduct.marca} | SKU: {selectedProduct.sku}
+                                            </Text>
+                                            <Text style={styles.modalProductDetails}>
+                                                Precio de compra: ${selectedProduct.precio_compra}
+                                            </Text>
+                                            <Text style={styles.modalProductDetails}>
+                                                Precio de venta: ${selectedProduct.precio_venta}
+                                            </Text>
+                                            <Text style={[styles.modalProductDetails, { marginBottom: 20 }]}>
+                                                Stock actual: {selectedProduct.cantidad_stock}
+                                            </Text>
 
-                                    <TouchableOpacity 
-                                        style={[styles.submitButton, isUpdating && styles.submitButtonDisabled]}
-                                        onPress={handleUpdateStock}
-                                        disabled={isUpdating}
-                                    >
-                                        {isUpdating ? (
-                                            <ActivityIndicator color="#000" />
-                                        ) : (
-                                            <Text style={styles.submitButtonText}>Actualizar Stock</Text>
-                                        )}
-                                    </TouchableOpacity>
+                                            <Text style={styles.label}>Nueva cantidad en stock <Text style={styles.required}>*</Text></Text>
+                                            <View style={styles.inputContainer}>
+                                                <TextInput
+                                                    style={styles.input}
+                                                    value={newStock}
+                                                    onChangeText={setNewStock}
+                                                    placeholder="Ingresa la cantidad"
+                                                    placeholderTextColor="#555"
+                                                    keyboardType="numeric"
+                                                />
+                                            </View>
+
+                                            <TouchableOpacity 
+                                                style={[styles.submitButton, isUpdating && styles.submitButtonDisabled]}
+                                                onPress={handleUpdateStock}
+                                                disabled={isUpdating}
+                                            >
+                                                {isUpdating ? (
+                                                    <ActivityIndicator color="#000" />
+                                                ) : (
+                                                    <Text style={styles.submitButtonText}>Actualizar Stock</Text>
+                                                )}
+                                            </TouchableOpacity>
+                                        </View>
+                                    )}
                                 </View>
-                            )}
+                            </KeyboardAvoidingView>
                         </View>
-                    </View>
                 </Modal>
 
                 <Modal
@@ -346,10 +354,8 @@ const styles = StyleSheet.create({
         backgroundColor: "#1A1D23",
         borderRadius: 24,
         paddingBottom: 20,
-        maxHeight: "60%",
         width: "90%",
         alignSelf: "center",
-        marginVertical: "auto",
     },
     modalHeader: {
         flexDirection: "row",
