@@ -10,6 +10,8 @@ import {
     FlatList,
     Pressable,
     ActivityIndicator,
+    KeyboardAvoidingView,
+    Platform,
 } from "react-native";
 import {
     SafeAreaProvider,
@@ -429,7 +431,7 @@ const CreateOrderScreen = ({ navigation }) => {
     return (
         <SafeAreaProvider>
             <StatusBar style="light" />
-            <SafeAreaView style={[styles.container, { paddingBottom: insets.bottom }]} edges={["top", "bottom"]}>
+            <SafeAreaView style={[styles.container, { paddingBottom: 160 }]} edges={["top", "bottom"]}>
                 <View style={styles.header}>
                     <View style={styles.profileRow}>
                         <View style={styles.avatar}>
@@ -450,134 +452,124 @@ const CreateOrderScreen = ({ navigation }) => {
 
                 <Text style={styles.headerTitle}>Nueva Orden de Servicio</Text>
 
-                <ScrollView 
-                    showsVerticalScrollIndicator={false}
-                    contentContainerStyle={{ paddingBottom: 150 }}
+                <KeyboardAvoidingView
+                    behavior={Platform.OS === "ios" ? "padding" : "height"}
+                    style={{ flex: 1 }}
+                    keyboardVerticalOffset={10}
                 >
-                    <Text style={styles.sectionTitle}>Información del Cliente</Text>
-                    
-                    {renderSelectButton("Dueño", selectedClient?.name, () => setShowClientModal(true))}
-                    
-                    {renderSelectButton("Auto", selectedVehicle ? 
-                        `${selectedVehicle.year} ${selectedVehicle.brand} ${selectedVehicle.model}` : null, 
-                        () => selectedClient ? setShowVehicleModal(true) : setShowNoClientModal(true),
-                        true
-                    )}
-
-                    <View style={styles.fieldContainer}>
-                        <Text style={styles.label}>Kilometraje <Text style={styles.required}>*</Text></Text>
-                        <View style={styles.inputContainer}>
-                            <TextInput
-                                style={styles.input}
-                                value={mileage}
-                                onChangeText={setMileage}
-                                placeholder="Ej: 45,000 km"
-                                placeholderTextColor="#555"
-                                keyboardType="numeric"
-                            />
-                        </View>
-                    </View>
-
-                    <Text style={[styles.sectionTitle, { marginTop: 24 }]}>Programación</Text>
-
-                    <View style={styles.row}>
-                        <View style={[styles.fieldContainer, { flex: 1 }]}>
-                            <Text style={styles.label}>Fecha programada <Text style={styles.required}>*</Text></Text>
-                            <TouchableOpacity 
-                                style={styles.selectButton} 
-                                onPress={() => {
-                                    setTempDate(scheduledDate ? new Date(scheduledDate) : new Date());
-                                    setShowDatePicker(true);
-                                }}
-                            >
-                                <Text style={[styles.selectText, !scheduledDate && styles.placeholderText]}>
-                                    {scheduledDate ? formatDateDisplay(scheduledDate) : "DD/MM/AAAA"}
-                                </Text>
-                                <Feather name="calendar" size={20} color="#888" />
-                            </TouchableOpacity>
-                        </View>
-                        <View style={{ width: 12 }} />
-                        <View style={[styles.fieldContainer, { flex: 1 }]}>
-                            <Text style={styles.label}>Hora de inicio <Text style={styles.required}>*</Text></Text>
-                            <TouchableOpacity 
-                                style={styles.selectButton} 
-                                onPress={() => setShowTimePicker(true)}
-                            >
-                                <Text style={[styles.selectText, !startTime && styles.placeholderText]}>
-                                    {startTime ? formatTimeDisplay(startTime) : "HH:MM"}
-                                </Text>
-                                <Feather name="clock" size={20} color="#888" />
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-
-                    <Text style={[styles.sectionTitle, { marginTop: 24 }]}>Servicios</Text>
-                    
-                    <TouchableOpacity 
-                        style={styles.servicesButton}
-                        onPress={() => setShowServicesModal(true)}
+                    <ScrollView 
+                        showsVerticalScrollIndicator={false}
+                        contentContainerStyle={{ paddingBottom: 0 }}
+                        keyboardShouldPersistTaps="handled"
                     >
-                        <View style={styles.servicesContent}>
-                            <Text style={[styles.selectText, selectedServices.length === 0 && styles.placeholderText]}>
-                                {selectedServices.length > 0 
-                                    ? `${selectedServices.length} servicio(s) seleccionado(s)`
-                                    : "Seleccionar servicios..."}
-                            </Text>
-                            <Feather name="chevron-down" size={20} color="#888" />
+                        <Text style={styles.sectionTitle}>Información del Cliente</Text>
+                        
+                        {renderSelectButton("Dueño", selectedClient?.name, () => setShowClientModal(true))}
+                        
+                        {renderSelectButton("Auto", selectedVehicle ? 
+                            `${selectedVehicle.year} ${selectedVehicle.brand} ${selectedVehicle.model}` : null, 
+                            () => selectedClient ? setShowVehicleModal(true) : setShowNoClientModal(true),
+                            true
+                        )}
+
+                        <View style={styles.fieldContainer}>
+                            <Text style={styles.label}>Kilometraje <Text style={styles.required}>*</Text></Text>
+                            <View style={styles.inputContainer}>
+                                <TextInput
+                                    style={styles.input}
+                                    value={mileage}
+                                    onChangeText={setMileage}
+                                    placeholder="Ej: 45,000 km"
+                                    placeholderTextColor="#555"
+                                    keyboardType="numeric"
+                                />
+                            </View>
                         </View>
-                    </TouchableOpacity>
 
-                    {selectedServices.length > 0 && (
-                        <View style={styles.selectedServicesContainer}>
-                            {selectedServices.map(serviceId => {
-                                const service = services.find(s => s.id === serviceId);
-                                return (
-                                    <View key={serviceId} style={styles.serviceChip}>
-                                        <Text style={styles.serviceChipText}>{service?.name}</Text>
-                                        <Pressable onPress={() => toggleService(serviceId)}>
-                                            <Feather name="x" size={16} color="#FF4D4D" />
-                                        </Pressable>
-                                    </View>
-                                );
-                            })}
+                        <Text style={[styles.sectionTitle, { marginTop: 24 }]}>Programación</Text>
+
+                        <View style={styles.row}>
+                            <View style={[styles.fieldContainer, { flex: 1 }]}>
+                                <Text style={styles.label}>Fecha programada <Text style={styles.required}>*</Text></Text>
+                                <TouchableOpacity 
+                                    style={styles.selectButton} 
+                                    onPress={() => {
+                                        setTempDate(scheduledDate ? new Date(scheduledDate) : new Date());
+                                        setShowDatePicker(true);
+                                    }}
+                                >
+                                    <Text style={[styles.selectText, !scheduledDate && styles.placeholderText]}>
+                                        {scheduledDate ? formatDateDisplay(scheduledDate) : "DD/MM/AAAA"}
+                                    </Text>
+                                    <Feather name="calendar" size={20} color="#888" />
+                                </TouchableOpacity>
+                            </View>
+                            <View style={{ width: 12 }} />
+                            <View style={[styles.fieldContainer, { flex: 1 }]}>
+                                <Text style={styles.label}>Hora de inicio <Text style={styles.required}>*</Text></Text>
+                                <TouchableOpacity 
+                                    style={styles.selectButton} 
+                                    onPress={() => setShowTimePicker(true)}
+                                >
+                                    <Text style={[styles.selectText, !startTime && styles.placeholderText]}>
+                                        {startTime ? formatTimeDisplay(startTime) : "HH:MM"}
+                                    </Text>
+                                    <Feather name="clock" size={20} color="#888" />
+                                </TouchableOpacity>
+                            </View>
                         </View>
-                    )}
 
-                    <Text style={[styles.sectionTitle, { marginTop: 24 }]}>Asignación</Text>
-                    
-                    {renderSelectButton("Mecánico asignado", selectedMechanic?.name, () => setShowMechanicModal(true))}
-
-                    <View style={styles.fieldContainer}>
-                        <Text style={styles.label}>Notas del cliente</Text>
-                        <View style={[styles.inputContainer, { height: 100 }]}>
-                            <TextInput
-                                style={[styles.input, { height: "100%", textAlignVertical: "top" }]}
-                                value={notes}
-                                onChangeText={setNotes}
-                                placeholder="Notas adicionales del cliente..."
-                                placeholderTextColor="#555"
-                                multiline
-                            />
-                        </View>
-                    </View>
-                </ScrollView>
-
-                <View style={styles.bottom}>
-                    <View style={[styles.footer, { bottom: insets.bottom || 0 }]}>
+                        <Text style={[styles.sectionTitle, { marginTop: 24 }]}>Servicios</Text>
+                        
                         <TouchableOpacity 
-                            style={[styles.submitButton, (!isFormValid() || isSubmitting) && styles.submitButtonDisabled]}
-                            onPress={handleSubmit}
-                            disabled={!isFormValid() || isSubmitting}
+                            style={styles.servicesButton}
+                            onPress={() => setShowServicesModal(true)}
                         >
-                            {isSubmitting ? (
-                                <ActivityIndicator color="#000" />
-                            ) : (
-                                <Text style={styles.submitButtonText}>Crear Orden</Text>
-                            )}
+                            <View style={styles.servicesContent}>
+                                <Text style={[styles.selectText, selectedServices.length === 0 && styles.placeholderText]}>
+                                    {selectedServices.length > 0 
+                                        ? `${selectedServices.length} servicio(s) seleccionado(s)`
+                                        : "Seleccionar servicios..."}
+                                </Text>
+                                <Feather name="chevron-down" size={20} color="#888" />
+                            </View>
                         </TouchableOpacity>
-                    </View>
-                    <BottomNavReceptionist active="HomeReceptionist" />
-                </View>
+
+                        {selectedServices.length > 0 && (
+                            <View style={styles.selectedServicesContainer}>
+                                {selectedServices.map(serviceId => {
+                                    const service = services.find(s => s.id === serviceId);
+                                    return (
+                                        <View key={serviceId} style={styles.serviceChip}>
+                                            <Text style={styles.serviceChipText}>{service?.name}</Text>
+                                            <Pressable onPress={() => toggleService(serviceId)}>
+                                                <Feather name="x" size={16} color="#FF4D4D" />
+                                            </Pressable>
+                                        </View>
+                                    );
+                                })}
+                            </View>
+                        )}
+
+                        <Text style={[styles.sectionTitle, { marginTop: 24 }]}>Asignación</Text>
+                        
+                        {renderSelectButton("Mecánico asignado", selectedMechanic?.name, () => setShowMechanicModal(true))}
+
+                        <View style={styles.fieldContainer}>
+                            <Text style={styles.label}>Notas del cliente</Text>
+                            <View style={[styles.inputContainer, { height: 100 }]}>
+                                <TextInput
+                                    style={[styles.input, { height: "100%", textAlignVertical: "top" }]}
+                                    value={notes}
+                                    onChangeText={setNotes}
+                                    placeholder="Notas adicionales del cliente..."
+                                    placeholderTextColor="#555"
+                                    multiline
+                                />
+                            </View>
+                        </View>
+                    </ScrollView>
+                </KeyboardAvoidingView>
 
                 <DatePickerModal
                     visible={showDatePicker}
@@ -809,6 +801,23 @@ const CreateOrderScreen = ({ navigation }) => {
                     </View>
                 </Modal>
             </SafeAreaView>
+
+            <View style={styles.bottom}>
+                <View style={[styles.footer, { bottom: insets.bottom || 0 }]}>
+                    <TouchableOpacity 
+                        style={[styles.submitButton, (!isFormValid() || isSubmitting) && styles.submitButtonDisabled]}
+                        onPress={handleSubmit}
+                        disabled={!isFormValid() || isSubmitting}
+                    >
+                        {isSubmitting ? (
+                            <ActivityIndicator color="#000" />
+                        ) : (
+                            <Text style={styles.submitButtonText}>Crear Orden</Text>
+                        )}
+                    </TouchableOpacity>
+                </View>
+                <BottomNavReceptionist active="HomeReceptionist" />
+            </View>
         </SafeAreaProvider>
     );
 };
@@ -923,12 +932,14 @@ const styles = StyleSheet.create({
         left: 0,
         right: 0,
         bottom: 0,
+        height: 160,
     },
     footer: {
         padding: 18,
         backgroundColor: "#0F1115",
         borderTopWidth: 1,
         borderTopColor: "#1A1D23",
+        height: 90,
     },
     submitButton: {
         backgroundColor: "#FFD43B",
