@@ -14,6 +14,23 @@ class AdminService {
         return await ApiClient.post('/vehiculos', vehicleData);
     }
 
+    static async getProductos() {
+        const response = await ApiClient.get('/productos');
+        return response.data || [];
+    }
+
+    static async createProducto(productoData) {
+        return await ApiClient.post('/productos', productoData);
+    }
+
+    static async updateProducto(id, productoData) {
+        return await ApiClient.put(`/productos/${id}`, productoData);
+    }
+
+    static async updateStock(id, cantidad_stock) {
+        return await ApiClient.put(`/productos/${id}/stock`, { cantidad_stock });
+    }
+
     static async getMechanics() {
         const response = await ApiClient.get('/usuarios/mecanicos');
         return response.data || [];

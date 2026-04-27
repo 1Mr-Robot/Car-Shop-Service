@@ -16,6 +16,8 @@ import CreateClientScreen from "./screens/CreateClientScreen";
 import CreateVehicleScreen from "./screens/CreateVehicleScreen";
 import CartScreen from "./screens/CartScreen";
 import SalesHistoryScreen from "./screens/SalesHistoryScreen";
+import InventoryScreen from "./screens/InventoryScreen";
+import CreateProductScreen from "./screens/CreateProductScreen";
 import { app } from "./firebaseConfig";
 
 const Stack = createNativeStackNavigator();
@@ -110,6 +112,16 @@ export default function App() {
                 <Stack.Screen
                     name="SalesHistory"
                     component={SalesHistoryScreen}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                    name="InventoryScreen"
+                    component={InventoryScreen}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                    name="CreateProduct"
+                    component={CreateProductScreen}
                     options={{ headerShown: false }}
                 />
             </Stack.Navigator>

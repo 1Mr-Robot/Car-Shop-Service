@@ -1,5 +1,5 @@
 import { Pressable, View, StyleSheet } from "react-native";
-import { Ionicons, Feather } from "@expo/vector-icons";
+import { Ionicons, Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from '@react-navigation/native';
 
@@ -25,6 +25,22 @@ export default function BottomNavReceptionist({ active }) {
                     name="shopping-cart"
                     size={24}
                     color={active === "CartScreen" ? activeColor : inactiveColor}
+                />
+            </Pressable>
+
+            <Pressable onPress={() => navigation.navigate("InventoryScreen")}>
+                <Feather
+                    name="package"
+                    size={24}
+                    color={active === "InventoryScreen" ? activeColor : inactiveColor}
+                />
+            </Pressable>
+
+            <Pressable onPress={() => navigation.navigate("SalesHistory")}>
+                <MaterialCommunityIcons
+                    name="history"
+                    size={24}
+                    color={active === "SalesHistory" ? activeColor : inactiveColor}
                 />
             </Pressable>
         </View>
