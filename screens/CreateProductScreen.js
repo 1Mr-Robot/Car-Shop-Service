@@ -6,6 +6,7 @@ import {
     ScrollView,
     TouchableOpacity,
     TextInput,
+    Modal,
     ActivityIndicator,
     KeyboardAvoidingView,
     Platform,
@@ -24,6 +25,7 @@ import AdminService from "../services/AdminService";
 const CreateProductScreen = ({ navigation }) => {
     const insets = useSafeAreaInsets();
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
 
     const [formData, setFormData] = useState({
         sku: "",
@@ -73,9 +75,7 @@ const CreateProductScreen = ({ navigation }) => {
             };
 
             await AdminService.createProducto(payload);
-            Alert.alert("Éxito", "Producto creado correctamente.", [
-                { text: "Aceptar", onPress: () => navigation.goBack() }
-            ]);
+            setShowSuccessModal(true);
         } catch (error) {
             console.error("Error creando producto:", error);
             Alert.alert("Error", "No se pudo crear el producto.");
@@ -143,6 +143,35 @@ const CreateProductScreen = ({ navigation }) => {
                         {renderInput("Precio de Venta", "precio_venta", true, "decimal")}
                     </ScrollView>
                 </KeyboardAvoidingView>
+
+                <Modal
+                    visible={showSuccessModal}
+                    transparent={true}
+                    animationType="fade"
+                    onRequestClose={() => {
+                        setShowSuccessModal(false);
+                        navigation.goBack();
+                    }}
+                >
+                    <View style={styles.successModalOverlay}>
+                        <View style={styles.successModalContent}>
+                            <Feather name="check-circle" size={70} color="#22C55E" />
+                            <Text style={styles.successModalTitle}>Producto creado</Text>
+                            <Text style={styles.successModalText}>
+                                El producto se ha creado correctamente.
+                            </Text>
+                            <TouchableOpacity 
+                                style={styles.successButton}
+                                onPress={() => {
+                                    setShowSuccessModal(false);
+                                    navigation.goBack();
+                                }}
+                            >
+                                <Text style={styles.successButtonText}>Aceptar</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </Modal>
             </SafeAreaView>
 
             <View style={styles.bottom}>
@@ -246,5 +275,42 @@ const styles = StyleSheet.create({
         color: "#000",
         fontSize: 16,
         fontWeight: "700",
+    },
+    successModalOverlay: {
+        flex: 1,
+        backgroundColor: "rgba(0, 0, 0, 0.8)",
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    successModalContent: {
+        backgroundColor: "#1A1D23",
+        borderRadius: 24,
+        padding: 30,
+        alignItems: "center",
+        marginHorizontal: 20,
+    },
+    successModalTitle: {
+        color: "#fff",
+        fontSize: 20,
+        fontWeight: "600",
+        marginTop: 16,
+        marginBottom: 8,
+    },
+    successModalText: {
+        color: "#888",
+        fontSize: 14,
+        textAlign: "center",
+        marginBottom: 24,
+    },
+    successButton: {
+        backgroundColor: "#22C55E",
+        paddingVertical: 12,
+        paddingHorizontal: 24,
+        borderRadius: 12,
+    },
+    successButtonText: {
+        color: "#fff",
+        fontSize: 14,
+        fontWeight: "600",
     },
 });

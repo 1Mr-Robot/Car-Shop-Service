@@ -3,14 +3,12 @@ import {
     View,
     Text,
     StyleSheet,
-    ScrollView,
     TouchableOpacity,
     TextInput,
     Modal,
     FlatList,
     Pressable,
     ActivityIndicator,
-    Alert,
 } from "react-native";
 import {
     SafeAreaProvider,
@@ -28,6 +26,7 @@ const InventoryScreen = ({ navigation }) => {
     const [isLoadingData, setIsLoadingData] = useState(true);
     const [isUpdating, setIsUpdating] = useState(false);
     const [showProductModal, setShowProductModal] = useState(false);
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [newStock, setNewStock] = useState("");
     const [userName, setUserName] = useState("Usuario");
@@ -77,7 +76,7 @@ const InventoryScreen = ({ navigation }) => {
             await AdminService.updateStock(selectedProduct.id, stock);
             await loadData();
             setShowProductModal(false);
-            Alert.alert("Éxito", "Stock actualizado correctamente.");
+            setShowSuccessModal(true);
         } catch (error) {
             console.error("Error actualizando stock:", error);
             Alert.alert("Error", "No se pudo actualizar el stock.");
@@ -203,6 +202,28 @@ const InventoryScreen = ({ navigation }) => {
                     </View>
                 </Modal>
 
+                <Modal
+                    visible={showSuccessModal}
+                    transparent={true}
+                    animationType="fade"
+                    onRequestClose={() => setShowSuccessModal(false)}
+                >
+                    <View style={styles.successModalOverlay}>
+                        <View style={styles.successModalContent}>
+                            <Feather name="check-circle" size={70} color="#22C55E" />
+                            <Text style={styles.successModalTitle}>Stock actualizado</Text>
+                            <Text style={styles.successModalText}>
+                                El stock del producto se ha actualizado correctamente.
+                            </Text>
+                            <TouchableOpacity 
+                                style={styles.successButton}
+                                onPress={() => setShowSuccessModal(false)}
+                            >
+                                <Text style={styles.successButtonText}>Aceptar</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </Modal>
             </SafeAreaView>
 
             <View style={styles.bottom}>
@@ -327,6 +348,8 @@ const styles = StyleSheet.create({
         paddingBottom: 20,
         maxHeight: "60%",
         width: "90%",
+        alignSelf: "center",
+        marginVertical: "auto",
     },
     modalHeader: {
         flexDirection: "row",
@@ -386,7 +409,8 @@ const styles = StyleSheet.create({
         paddingVertical: 16,
         borderRadius: 12,
         alignItems: "center",
-        marginHorizontal: 20,
+        marginHorizontal: 0,
+        marginTop: 20,
     },
     submitButtonDisabled: {
         opacity: 0.5,
@@ -423,5 +447,42 @@ const styles = StyleSheet.create({
         color: "#000",
         fontSize: 16,
         fontWeight: "700",
+    },
+    successModalOverlay: {
+        flex: 1,
+        backgroundColor: "rgba(0, 0, 0, 0.8)",
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    successModalContent: {
+        backgroundColor: "#1A1D23",
+        borderRadius: 24,
+        padding: 30,
+        alignItems: "center",
+        marginHorizontal: 20,
+    },
+    successModalTitle: {
+        color: "#fff",
+        fontSize: 20,
+        fontWeight: "600",
+        marginTop: 16,
+        marginBottom: 8,
+    },
+    successModalText: {
+        color: "#888",
+        fontSize: 14,
+        textAlign: "center",
+        marginBottom: 24,
+    },
+    successButton: {
+        backgroundColor: "#22C55E",
+        paddingVertical: 12,
+        paddingHorizontal: 24,
+        borderRadius: 12,
+    },
+    successButtonText: {
+        color: "#fff",
+        fontSize: 14,
+        fontWeight: "600",
     },
 });

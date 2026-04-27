@@ -114,7 +114,7 @@ const CreateVehicleScreen = ({ navigation, route }) => {
     return (
         <SafeAreaProvider>
             <StatusBar style="light" />
-            <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
+            <SafeAreaView style={[styles.container, { paddingBottom: 160 }]} edges={["top", "bottom"]}>
                 <View style={styles.header}>
                     <TouchableOpacity 
                         style={styles.backButton} 
@@ -133,7 +133,7 @@ const CreateVehicleScreen = ({ navigation, route }) => {
                 >
                     <ScrollView 
                         showsVerticalScrollIndicator={false}
-                        contentContainerStyle={{ paddingBottom: 180 }}
+                        contentContainerStyle={{ paddingBottom: 0 }}
                         keyboardShouldPersistTaps="handled"
                     >
                         <Text style={styles.sectionTitle}>Datos del Vehículo</Text>
@@ -366,6 +366,8 @@ const styles = StyleSheet.create({
         paddingBottom: 30,
         maxHeight: "60%",
         width: "90%",
+        alignSelf: "center",
+        marginVertical: "auto",
     },
     pickerHeader: {
         flexDirection: "row",

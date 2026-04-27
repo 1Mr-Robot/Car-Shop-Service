@@ -127,7 +127,7 @@ const SalesHistoryScreen = ({ navigation }) => {
                     <View style={{ height: 120 }} />
                 </ScrollView>
                 <View style={styles.bottom}>
-                    <BottomNavReceptionist active="CartScreen" />
+                    <BottomNavReceptionist active="SalesHistory" />
                 </View>
             </SafeAreaView>
         </SafeAreaProvider>
