@@ -25,6 +25,10 @@ const PurchaseMerchScreen = ({ navigation }) => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showCheckoutModal, setShowCheckoutModal] = useState(false);
     const [showEmptyCartModal, setShowEmptyCartModal] = useState(false);
+    const [showStockErrorModal, setShowStockErrorModal] = useState(false);
+    const [stockErrorProduct, setStockErrorProduct] = useState(null);
+    const [showSaleErrorModal, setShowSaleErrorModal] = useState(false);
+    const [saleErrorMessage, setSaleErrorMessage] = useState("");
     const [searchQuery, setSearchQuery] = useState("");
     const insets = useSafeAreaInsets();
 
@@ -66,7 +70,8 @@ const PurchaseMerchScreen = ({ navigation }) => {
                     const newQty = item.quantity + delta;
                     // No permitir vender más de lo que hay en stock real
                     if (newQty > item.stock) {
-                        Alert.alert("Límite de Stock", `Solo quedan ${item.stock} unidades de este producto.`);
+                        setStockErrorProduct({ name: item.name, stock: item.stock });
+                        setShowStockErrorModal(true);
                         return item;
                     }
                     return { ...item, quantity: newQty >= 0 ? newQty : 0 };
@@ -110,7 +115,8 @@ const PurchaseMerchScreen = ({ navigation }) => {
         } catch (error) {
             console.error("Error en la venta:", error);
             const msg = error.message || "No se pudo completar la venta.";
-            Alert.alert("Venta Fallida", msg);
+            setSaleErrorMessage(msg);
+            setShowSaleErrorModal(true);
         } finally {
             setIsSubmitting(false);
         }
@@ -224,6 +230,42 @@ const PurchaseMerchScreen = ({ navigation }) => {
                             <TouchableOpacity
                                 style={styles.modalAcceptButton}
                                 onPress={() => { setShowCheckoutModal(false); resetAll(); }}
+                            >
+                                <Text style={styles.modalAcceptText}>Aceptar</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </Modal>
+
+                {/* Modal de Error de Stock */}
+                <Modal visible={showStockErrorModal} transparent animationType="fade">
+                    <View style={styles.modalOverlay}>
+                        <View style={styles.modalContent}>
+                            <MaterialCommunityIcons name="alert-circle" size={70} color="#FF4D4D" />
+                            <Text style={styles.modalTitle}>Límite de Stock</Text>
+                            <Text style={styles.modalText}>
+                                Solo quedan {stockErrorProduct?.stock} unidades de {stockErrorProduct?.name}.
+                            </Text>
+                            <TouchableOpacity
+                                style={styles.modalAcceptButton}
+                                onPress={() => setShowStockErrorModal(false)}
+                            >
+                                <Text style={styles.modalAcceptText}>Aceptar</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </Modal>
+
+                {/* Modal de Venta Fallida */}
+                <Modal visible={showSaleErrorModal} transparent animationType="fade">
+                    <View style={styles.modalOverlay}>
+                        <View style={styles.modalContent}>
+                            <MaterialCommunityIcons name="close-circle" size={70} color="#FF4D4D" />
+                            <Text style={styles.modalTitle}>Venta Fallida</Text>
+                            <Text style={styles.modalText}>{saleErrorMessage}</Text>
+                            <TouchableOpacity
+                                style={styles.modalAcceptButton}
+                                onPress={() => setShowSaleErrorModal(false)}
                             >
                                 <Text style={styles.modalAcceptText}>Aceptar</Text>
                             </TouchableOpacity>
