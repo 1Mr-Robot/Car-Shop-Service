@@ -206,7 +206,7 @@ const OrderDetailsScreen = ({ navigation, route }) => {
                         />
                     </View>
 
-                    <View style={[styles.card, { borderWidth: 1 }]}>
+                    <View style={styles.card}>
                         <View style={styles.notesHeader}>
                             <Ionicons
                                 name="document-text-outline"

@@ -157,7 +157,7 @@ console.log("ROUTE PARAMS:", route.params);
                     </View>
 
                     {/* NOTAS DEL CLIENTE (SIEMPRE APARECE) */}
-                    <View style={[styles.card, { borderWidth: 1 }]}>
+                    <View style={styles.card}>
                         <View style={styles.notesHeader}>
                             <Feather
                                 name="file-text"

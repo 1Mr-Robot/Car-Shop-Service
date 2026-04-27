@@ -188,7 +188,7 @@ const NextServiceScreen = ({ navigation, route }) => {
                         </View>
                     </View>
 
-                    <View style={[styles.card, { borderWidth: 1 }]}>
+                    <View style={styles.card}>
                         <View style={styles.notesHeader}>
                             <Feather
                                 name="file-text"
