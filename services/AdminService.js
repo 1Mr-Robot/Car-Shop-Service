@@ -6,6 +6,10 @@ class AdminService {
         return response.data || [];
     }
 
+    static async createClient(clientData) {
+        return await ApiClient.post('/clientes', clientData);
+    }
+
     static async getMechanics() {
         const response = await ApiClient.get('/usuarios/mecanicos');
         return response.data || [];

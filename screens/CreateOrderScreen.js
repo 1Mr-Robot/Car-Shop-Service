@@ -285,6 +285,23 @@ const CreateOrderScreen = ({ navigation }) => {
     // Vehículos dinámicos basados en el cliente seleccionado
     const clientVehicles = selectedClient ? selectedClient.vehicles : [];
 
+    // Recargar clientes al volver de crear cliente
+    useEffect(() => {
+        const unsubscribe = navigation.addListener("focus", () => {
+            loadClients();
+        });
+        return unsubscribe;
+    }, [navigation]);
+
+    const loadClients = async () => {
+        try {
+            const clientsData = await AdminService.getClientsWithVehicles();
+            setClients(clientsData);
+        } catch (error) {
+            console.error("Error recargando clientes:", error);
+        }
+    };
+
     // CARGA DE DATOS RESTful
     useEffect(() => {
         const loadInitialData = async () => {
@@ -613,7 +630,17 @@ const CreateOrderScreen = ({ navigation }) => {
                                     </TouchableOpacity>
                                 )}
                             />
-                            </View>
+                            <TouchableOpacity 
+                                style={styles.addNewButton}
+                                onPress={() => {
+                                    setShowClientModal(false);
+                                    navigation.navigate("CreateClient");
+                                }}
+                            >
+                                <Feather name="plus" size={20} color="#FFD43B" />
+                                <Text style={styles.addNewButtonText}>Crear nuevo cliente</Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
                 </Modal>
 
