@@ -201,15 +201,6 @@ const NextServiceScreen = ({ navigation, route }) => {
                         </View>
                         <Text style={styles.notesText}>{notes && notes.trim().length > 0 ? notes : "No hay notas del cliente"}</Text>
                     </View>
-
-                    {/* FIX 2: Botón Comenzar con Lógica y Loader */}
-                    <TouchableOpacity 
-                        style={styles.primaryButton}
-                        onPress={handleStartOrder}
-                    >
-                        <Text style={styles.primaryButtonText}>Comenzar</Text>
-                        <Feather name="arrow-right" size={20} color="black" />
-                    </TouchableOpacity>
                 </ScrollView>
                 {/* MODAL DE BLOQUEO DE ORDEN ACTIVA */}
                 <Modal
@@ -247,6 +238,16 @@ const NextServiceScreen = ({ navigation, route }) => {
                     </View>
                 </Modal>
             </View>
+
+            <View style={styles.bottom}>
+                <TouchableOpacity 
+                    style={[styles.primaryButton, { bottom: insets.bottom || 0 }]}
+                    onPress={handleStartOrder}
+                >
+                    <Text style={styles.primaryButtonText}>Comenzar</Text>
+                    <Feather name="arrow-right" size={20} color="black" />
+                </TouchableOpacity>
+            </View>
         </SafeAreaProvider>
     );
 };
@@ -258,6 +259,7 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: "#0F1115",
         paddingHorizontal: 18,
+        paddingBottom: 35,
     },
     card: {
         backgroundColor: "#1A1D24",
@@ -300,6 +302,13 @@ const styles = StyleSheet.create({
         color: "#888",
         fontSize: 15,
         lineHeight: 22,
+    },
+    bottom: {
+        position: "absolute",
+        left: 0,
+        right: 0,
+        bottom: 0,
+        padding: 18,
     },
     primaryButton: {
         backgroundColor: "#FFD43B",

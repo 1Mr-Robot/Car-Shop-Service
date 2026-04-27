@@ -151,6 +151,7 @@ const OrderDetailsScreen = ({ navigation, route }) => {
                     contentContainerStyle={{
                         paddingBottom: insets.bottom + 20,
                     }}
+                    showsVerticalScrollIndicator={false}
                 >
                     <View
                         style={styles.navHeader}
@@ -328,59 +329,60 @@ const OrderDetailsScreen = ({ navigation, route }) => {
                     </Modal>
 
                 </ScrollView>
+                <View
+                    style={[
+                        { bottom: insets.bottom || 0 },
+                        { backgroundColor: "#0F1115" }
+                    ]}
+                >
                     <View
                         style={{
-                            marginBottom: 25
+                            borderBottomColor: '#a8a8a86b',
+                            borderBottomWidth: 1,
                         }}
                     >
-                        <View
-                            style={{
-                                borderBottomColor: '#a8a8a86b',
-                                borderBottomWidth: 1,
-                            }}
-                        >
-                        </View>
+                    </View>
 
-                        <View
-                            style={{
-                                flexDirection: "row",
-                                gap: 15,
-                            }}
+                    <View
+                        style={{
+                            flexDirection: "row",
+                            gap: 15,
+                        }}
+                    >
+                        <TouchableOpacity
+                            style={[styles.productButton, styles.half]}
+                            onPress={() =>
+                                navigation.navigate("AddProduct", {
+                                    orderId: orderId,
+                                })
+                            }
                         >
-                            <TouchableOpacity
-                                style={[styles.productButton, styles.half]}
-                                onPress={() =>
-                                    navigation.navigate("AddProduct", {
-                                        orderId: orderId,
-                                    })
-                                }
-                            >
-                                <Text style={styles.secondaryButtonText}>
-                                    Agregar Producto
-                                </Text>
-                            </TouchableOpacity>
-
-                            <TouchableOpacity
-                                style={[styles.serviceButton, styles.half]}
-                                onPress={() =>
-                                    navigation.navigate("AddService", {
-                                        orderId: orderId,
-                                    })
-                                }
-                            >
-                                <Text style={styles.secondaryButtonText}>
-                                    Agregar Servicio
-                                </Text>
-                            </TouchableOpacity>
-                        </View>
-                        <TouchableOpacity 
-                            style={[styles.primaryButton, isFinishingMaster && { opacity: 0.7 }]} 
-                            onPress={handleFinishMasterOrder}
-                            disabled={isFinishingMaster}
-                        >
-                            {isFinishingMaster ? <ActivityIndicator color="black" /> : <Text style={styles.primaryButtonText}>Finalizar</Text>}
+                            <Text style={styles.secondaryButtonText}>
+                                Agregar Producto
+                            </Text>
                         </TouchableOpacity>
-                    </View>                  
+
+                        <TouchableOpacity
+                            style={[styles.serviceButton, styles.half]}
+                            onPress={() =>
+                                navigation.navigate("AddService", {
+                                    orderId: orderId,
+                                })
+                            }
+                        >
+                            <Text style={styles.secondaryButtonText}>
+                                Agregar Servicio
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
+                    <TouchableOpacity 
+                        style={[styles.primaryButton, isFinishingMaster && { opacity: 0.7 }]} 
+                        onPress={handleFinishMasterOrder}
+                        disabled={isFinishingMaster}
+                    >
+                        {isFinishingMaster ? <ActivityIndicator color="black" /> : <Text style={styles.primaryButtonText}>Finalizar</Text>}
+                    </TouchableOpacity>
+                </View>
             </View>
         </SafeAreaProvider>
     );
