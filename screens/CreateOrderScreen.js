@@ -452,7 +452,7 @@ const CreateOrderScreen = ({ navigation }) => {
 
                 <ScrollView 
                     showsVerticalScrollIndicator={false}
-                    contentContainerStyle={{ paddingBottom: 100 }}
+                    contentContainerStyle={{ paddingBottom: 150 }}
                 >
                     <Text style={styles.sectionTitle}>Información del Cliente</Text>
                     

@@ -129,7 +129,7 @@ const PurchaseMerchScreen = ({ navigation }) => {
         <SafeAreaProvider>
             <StatusBar style="light" />
             <SafeAreaView style={{ flex: 1, backgroundColor: "#0F1115" }} edges={["top", "bottom"]}>
-                <View style={{ flex: 1, paddingHorizontal: 20, paddingTop: 20 }}>
+                <View style={{ flex: 1, paddingHorizontal: 20, paddingTop: 20, paddingBottom: 260 }}>
                     <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
                         <View style={styles.header}>
                             <TouchableOpacity onPress={() => navigation.goBack()}>
@@ -443,6 +443,7 @@ const styles = StyleSheet.create({
         left: 0,
         right: 0,
         bottom: 0,
+        paddingTop: 0,
     },
     clearButton: {
         alignItems: "center",
@@ -465,6 +466,8 @@ const styles = StyleSheet.create({
         height: 1,
         backgroundColor: "#1F232B",
         marginBottom: 20,
+        marginHorizontal: -20,
+        marginTop: 0,
     },
     modalOverlay: {
         flex: 1,
