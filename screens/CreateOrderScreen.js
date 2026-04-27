@@ -279,16 +279,17 @@ const CreateOrderScreen = ({ navigation }) => {
     const [showServicesModal, setShowServicesModal] = useState(false);
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [showTimePicker, setShowTimePicker] = useState(false);
+    const [isReloading, setIsReloading] = useState(false);
 
     const [tempDate, setTempDate] = useState(new Date());
 
     // Vehículos dinámicos basados en el cliente seleccionado
     const clientVehicles = selectedClient ? selectedClient.vehicles : [];
 
-    // Recargar clientes al volver de crear cliente
+    // Recargar clientes al volver de crear cliente o vehículo
     useEffect(() => {
-        const unsubscribe = navigation.addListener("focus", () => {
-            loadClients();
+        const unsubscribe = navigation.addListener("focus", async () => {
+            await loadClients();
         });
         return unsubscribe;
     }, [navigation]);
@@ -297,6 +298,13 @@ const CreateOrderScreen = ({ navigation }) => {
         try {
             const clientsData = await AdminService.getClientsWithVehicles();
             setClients(clientsData);
+            if (selectedClient) {
+                const clientIdStr = String(selectedClient.id);
+                const updatedClient = clientsData.find(c => String(c.id) === clientIdStr);
+                if (updatedClient) {
+                    setSelectedClient(updatedClient);
+                }
+            }
         } catch (error) {
             console.error("Error recargando clientes:", error);
         }
@@ -420,6 +428,28 @@ const CreateOrderScreen = ({ navigation }) => {
         setShowTimePicker(false);
     };
 
+    const handleVehiclePress = async () => {
+        if (!selectedClient) {
+            setShowNoClientModal(true);
+            return;
+        }
+        setShowVehicleModal(true);
+        setIsReloading(true);
+        try {
+            const clientsData = await AdminService.getClientsWithVehicles();
+            setClients(clientsData);
+            const clientIdStr = String(selectedClient.id);
+            const updatedClient = clientsData.find(c => String(c.id) === clientIdStr);
+            if (updatedClient) {
+                setSelectedClient(updatedClient);
+            }
+        } catch (error) {
+            console.error("Error recargando datos:", error);
+        } finally {
+            setIsReloading(false);
+        }
+    };
+
     const renderSelectButton = (label, value, onPress, isRequired = true) => (
         <View style={styles.fieldContainer}>
             <Text style={styles.label}>
@@ -485,7 +515,7 @@ const CreateOrderScreen = ({ navigation }) => {
                         
                         {renderSelectButton("Auto", selectedVehicle ? 
                             `${selectedVehicle.year} ${selectedVehicle.brand} ${selectedVehicle.model}` : null, 
-                            () => selectedClient ? setShowVehicleModal(true) : setShowNoClientModal(true),
+                            handleVehiclePress,
                             true
                         )}
 
@@ -653,26 +683,54 @@ const CreateOrderScreen = ({ navigation }) => {
                                     <Feather name="x" size={24} color="#fff" />
                                 </Pressable>
                             </View>
-                            <FlatList
-                                data={clientVehicles}
-                                keyExtractor={item => item.id.toString()}
-                                renderItem={({ item }) => (
-                                    <TouchableOpacity 
-                                        style={styles.modalItem}
-                                        onPress={() => {
-                                            setSelectedVehicle(item);
-                                            setShowVehicleModal(false);
-                                        }}
-                                    >
-                                        <View style={styles.modalItemContent}>
-                                            <Text style={styles.modalItemText}>
-                                                {item.year} {item.brand} {item.model}
-                                            </Text>
-                                            <Text style={styles.modalItemSubtext}>{item.plate}</Text>
-                                        </View>
-                                    </TouchableOpacity>
-                                )}
-                            />
+                            {isReloading ? (
+                                <View style={styles.loadingContainer}>
+                                    <ActivityIndicator size="large" color="#FFD43B" />
+                                    <Text style={styles.loadingText}>Actualizando...</Text>
+                                </View>
+                            ) : clientVehicles.length === 0 ? (
+                                <View style={styles.emptyContainer}>
+                                    <Text style={styles.emptyText}>
+                                        Este cliente no tiene ningún vehículo registrado.
+                                    </Text>
+                                </View>
+                            ) : (
+                                <FlatList
+                                    data={clientVehicles}
+                                    keyExtractor={item => item.id.toString()}
+                                    renderItem={({ item }) => (
+                                        <TouchableOpacity 
+                                            style={styles.modalItem}
+                                            onPress={() => {
+                                                setSelectedVehicle(item);
+                                                setShowVehicleModal(false);
+                                            }}
+                                        >
+                                            <View style={styles.modalItemContent}>
+                                                <Text style={styles.modalItemText}>
+                                                    {item.year} {item.brand} {item.model}
+                                                </Text>
+                                                <Text style={styles.modalItemSubtext}>{item.plate}</Text>
+                                            </View>
+                                        </TouchableOpacity>
+                                    )}
+                                />
+                            )}
+                            {!isReloading && (
+                                <TouchableOpacity 
+                                    style={styles.addNewButton}
+                                    onPress={() => {
+                                        setShowVehicleModal(false);
+                                        navigation.navigate("CreateVehicle", {
+                                            clientId: selectedClient.id,
+                                            clientName: selectedClient.name,
+                                        });
+                                    }}
+                                >
+                                    <Feather name="plus" size={20} color="#FFD43B" />
+                                    <Text style={styles.addNewButtonText}>Crear nuevo vehículo</Text>
+                                </TouchableOpacity>
+                            )}
                         </View>
                     </View>
                 </Modal>
@@ -1064,6 +1122,24 @@ const styles = StyleSheet.create({
         color: "#FFD43B",
         fontSize: 16,
         fontWeight: "600",
+    },
+    emptyContainer: {
+        padding: 30,
+        alignItems: "center",
+    },
+    emptyText: {
+        color: "#888",
+        fontSize: 14,
+        textAlign: "center",
+    },
+    loadingContainer: {
+        padding: 50,
+        alignItems: "center",
+    },
+    loadingText: {
+        color: "#FFD43B",
+        fontSize: 14,
+        marginTop: 12,
     },
     pickerModalContent: {
         backgroundColor: "#1A1D23",
