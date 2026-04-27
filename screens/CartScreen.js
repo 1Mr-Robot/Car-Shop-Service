@@ -10,7 +10,7 @@ import {
     Alert,
     TextInput
 } from "react-native";
-import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaProvider, SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
 import BottomNavReceptionist from "../components/BottomNavReceptionist";
@@ -26,6 +26,7 @@ const PurchaseMerchScreen = ({ navigation }) => {
     const [showCheckoutModal, setShowCheckoutModal] = useState(false);
     const [showEmptyCartModal, setShowEmptyCartModal] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
+    const insets = useSafeAreaInsets();
 
     // 1. Carga de productos reales del catálogo
     useEffect(() => {
@@ -191,8 +192,9 @@ const PurchaseMerchScreen = ({ navigation }) => {
                             ))
                         )}
                     </ScrollView>
-
-                    <View style={styles.fixedBottom}>
+                </View>
+                <View style={styles.bottom}>
+                    <View style={[styles.fixedBottom, { bottom: insets.bottom || 0 }]}>
                         <View style={styles.topDivider} />
                         <View style={styles.summaryCard}>
                             <Text style={styles.summaryTitle}>RESUMEN DE VENTA</Text>
@@ -209,8 +211,8 @@ const PurchaseMerchScreen = ({ navigation }) => {
                             </TouchableOpacity>
                         </View>
                     </View>
+                    <BottomNavReceptionist active="CartScreen" />
                 </View>
-                <BottomNavReceptionist active="CartScreen" />
 
                 {/* Modal de Éxito */}
                 <Modal visible={showCheckoutModal} transparent animationType="fade">
@@ -436,6 +438,12 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: "700",
     },
+    bottom: {
+        position: "absolute",
+        left: 0,
+        right: 0,
+        bottom: 0,
+    },
     clearButton: {
         alignItems: "center",
         paddingVertical: 14,
@@ -449,9 +457,8 @@ const styles = StyleSheet.create({
     fixedBottom: {
         paddingHorizontal: 20,
         paddingTop: 0,
-        paddingBottom: 80,
+        paddingBottom: 20,
         backgroundColor: "#0F1115",
-        marginHorizontal: -20,
         paddingHorizontal: 20,
     },
     topDivider: {

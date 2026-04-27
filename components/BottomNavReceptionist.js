@@ -33,10 +33,6 @@ export default function BottomNavReceptionist({ active }) {
 
 const styles = StyleSheet.create({
     bottomBar: {
-        position: "absolute",
-        bottom: 0,
-        left: 0,
-        right: 0,
         backgroundColor: "#15181E",
         height: 70,
         flexDirection: "row",

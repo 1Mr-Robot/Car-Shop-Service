@@ -562,18 +562,21 @@ const CreateOrderScreen = ({ navigation }) => {
                     </View>
                 </ScrollView>
 
-                <View style={styles.footer}>
-                    <TouchableOpacity 
-                        style={[styles.submitButton, (!isFormValid() || isSubmitting) && styles.submitButtonDisabled]}
-                        onPress={handleSubmit}
-                        disabled={!isFormValid() || isSubmitting}
-                    >
-                        {isSubmitting ? (
-                            <ActivityIndicator color="#000" />
-                        ) : (
-                            <Text style={styles.submitButtonText}>Crear Orden</Text>
-                        )}
-                    </TouchableOpacity>
+                <View style={styles.bottom}>
+                    <View style={[styles.footer, { bottom: insets.bottom || 0 }]}>
+                        <TouchableOpacity 
+                            style={[styles.submitButton, (!isFormValid() || isSubmitting) && styles.submitButtonDisabled]}
+                            onPress={handleSubmit}
+                            disabled={!isFormValid() || isSubmitting}
+                        >
+                            {isSubmitting ? (
+                                <ActivityIndicator color="#000" />
+                            ) : (
+                                <Text style={styles.submitButtonText}>Crear Orden</Text>
+                            )}
+                        </TouchableOpacity>
+                    </View>
+                    <BottomNavReceptionist active="HomeReceptionist" />
                 </View>
 
                 <DatePickerModal
@@ -805,8 +808,6 @@ const CreateOrderScreen = ({ navigation }) => {
                         </View>
                     </View>
                 </Modal>
-
-                <BottomNavReceptionist active="HomeReceptionist" />
             </SafeAreaView>
         </SafeAreaProvider>
     );
@@ -917,11 +918,13 @@ const styles = StyleSheet.create({
         color: "#FFD43B",
         fontSize: 14,
     },
-    footer: {
+    bottom: {
         position: "absolute",
-        bottom: 110,
         left: 0,
         right: 0,
+        bottom: 0,
+    },
+    footer: {
         padding: 18,
         backgroundColor: "#0F1115",
         borderTopWidth: 1,

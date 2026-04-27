@@ -67,7 +67,6 @@ const SalesHistoryScreen = ({ navigation }) => {
                         <ActivityIndicator size="large" color="#FFD43B" />
                         <Text style={styles.loadingText}>Cargando ventas...</Text>
                     </View>
-                    <BottomNavReceptionist active="CartScreen" />
                 </SafeAreaView>
             </SafeAreaProvider>
         );
@@ -127,7 +126,9 @@ const SalesHistoryScreen = ({ navigation }) => {
 
                     <View style={{ height: 120 }} />
                 </ScrollView>
-                <BottomNavReceptionist active="CartScreen" />
+                <View style={styles.bottom}>
+                    <BottomNavReceptionist active="CartScreen" />
+                </View>
             </SafeAreaView>
         </SafeAreaProvider>
     );
@@ -244,5 +245,11 @@ const styles = StyleSheet.create({
         color: "#9CA3AF",
         fontSize: 12,
         fontWeight: "600",
+    },
+    bottom: {
+        position: "absolute",
+        left: 0,
+        right: 0,
+        bottom: 0,
     },
 });
