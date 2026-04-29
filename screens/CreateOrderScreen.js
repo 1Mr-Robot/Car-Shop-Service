@@ -272,6 +272,7 @@ const CreateOrderScreen = ({ navigation }) => {
     const [startTime, setStartTime] = useState("");
     const [notes, setNotes] = useState("");
     const [selectedServices, setSelectedServices] = useState([]);
+    const [estimatedPrice, setEstimatedPrice] = useState("");
 
     const [showClientModal, setShowClientModal] = useState(false);
     const [showVehicleModal, setShowVehicleModal] = useState(false);
@@ -348,7 +349,7 @@ const CreateOrderScreen = ({ navigation }) => {
     const isFormValid = () => {
         return selectedClient && selectedVehicle && selectedMechanic && 
                mileage.trim() && scheduledDate.trim() && startTime.trim() &&
-               selectedServices.length > 0;
+               selectedServices.length > 0 && estimatedPrice.trim();
     };
 
     // ENVÍO DE ORDEN AL BACKEND
@@ -375,7 +376,8 @@ const CreateOrderScreen = ({ navigation }) => {
                 kilometraje: mileage,
                 fecha_inicio: fechaLocalExacta,
                 notas_cliente: notes,
-                servicios: selectedServices
+                servicios: selectedServices,
+                total_orden: parseFloat(estimatedPrice)
             };
             
             await AdminService.createMasterOrder(payload);
@@ -390,6 +392,7 @@ const CreateOrderScreen = ({ navigation }) => {
             setStartTime("");
             setNotes("");
             setSelectedServices([]);
+            setEstimatedPrice("");
             
         } catch (error) {
             console.error("Error al crear la orden:", error);
@@ -527,6 +530,20 @@ const CreateOrderScreen = ({ navigation }) => {
                                     value={mileage}
                                     onChangeText={setMileage}
                                     placeholder="Ej: 45,000 km"
+                                    placeholderTextColor="#555"
+                                    keyboardType="numeric"
+                                />
+                            </View>
+                        </View>
+
+                        <View style={styles.fieldContainer}>
+                            <Text style={styles.label}>Precio estimado <Text style={styles.required}>*</Text></Text>
+                            <View style={styles.inputContainer}>
+                                <TextInput
+                                    style={styles.input}
+                                    value={estimatedPrice}
+                                    onChangeText={setEstimatedPrice}
+                                    placeholder="Ej: 1,500.00"
                                     placeholderTextColor="#555"
                                     keyboardType="numeric"
                                 />
