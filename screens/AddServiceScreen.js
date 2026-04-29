@@ -25,21 +25,25 @@ import OrderService from "../services/OrderService";
 
 const formatPrice = (price) => `$${price.toLocaleString("es-MX", { minimumFractionDigits: 2 })}`;
 
-const SelectableService = ({ id, name, description, price, isSelected, onToggle }) => (
+const SelectableService = ({ id, name, description, price, isSelected, isAlreadyAdded, onToggle }) => (
     <Pressable 
-        style={styles.selectableItem}
+        style={[styles.selectableItem, isAlreadyAdded && styles.selectableItemDisabled]}
         onPress={() => onToggle(id)}
     >
         <View style={{ flex: 1, paddingRight: 10 }}>
-            <Text style={styles.serviceTitle}>{name}</Text>
-            {description ? <Text style={styles.subText}>{description}</Text> : null}
-            <Text style={styles.priceText}>{formatPrice(price)}</Text>
+            <Text style={[styles.serviceTitle, isAlreadyAdded && styles.serviceTitleDisabled]}>{name}</Text>
+            {description ? <Text style={[styles.subText, isAlreadyAdded && styles.subTextDisabled]}>{description}</Text> : null}
+            <Text style={[styles.priceText, isAlreadyAdded && styles.priceTextDisabled]}>{formatPrice(price)}</Text>
         </View>
-        <Checkbox
-            value={isSelected}
-            onValueChange={() => onToggle(id)}
-            color={isSelected ? '#FFD43B' : undefined}
-        />
+        {isAlreadyAdded ? (
+            <MaterialCommunityIcons name="check-circle" size={24} color="#4ADE80" />
+        ) : (
+            <Checkbox
+                value={isSelected}
+                onValueChange={() => onToggle(id)}
+                color={isSelected ? '#FFD43B' : undefined}
+            />
+        )}
     </Pressable>
 );
 
@@ -52,14 +56,17 @@ export default function AddServiceScreen({ navigation, route }){
     const [selectedServiceIds, setSelectedServiceIds] = useState([]);
     const [isLoadingInit, setIsLoadingInit] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [existingServiceIds, setExistingServiceIds] = useState([]);
+    const [showDuplicateModal, setShowDuplicateModal] = useState(false);
+    const [duplicateServiceName, setDuplicateServiceName] = useState("");
 
     useEffect(() => {
-        const fetchCatalog = async () => {
+        const fetchData = async () => {
             try {
-                const data = await CatalogService.getServices({ limit: 50 });
+                // Cargar servicios del catálogo
+                const catalogData = await CatalogService.getServices({ limit: 50 });
                 
-                // FIX: Normalizamos los datos (descripcion de BD a description de UI)
-                const formattedServices = data.map(s => ({
+                const formattedServices = catalogData.map(s => ({
                     id: s.id,
                     name: s.name,
                     description: s.descripcion, 
@@ -67,17 +74,32 @@ export default function AddServiceScreen({ navigation, route }){
                 }));
                 
                 setServices(formattedServices);
+
+                // Cargar servicios ya existentes en la orden
+                const orderServicesData = await OrderService.getOrderServices(orderId);
+                const existingIds = orderServicesData.data
+                    .filter(os => os.id_servicio !== null)
+                    .map(os => os.id_servicio);
+                setExistingServiceIds(existingIds);
             } catch (error) {
-                console.error("Error al cargar servicios:", error);
-                Alert.alert("Error", "No se pudo cargar el catálogo de servicios.");
+                console.error("Error al cargar datos:", error);
+                Alert.alert("Error", "No se pudo cargar los datos necesarios.");
             } finally {
                 setIsLoadingInit(false);
             }
         };
-        fetchCatalog();
-    }, []);
+        fetchData();
+    }, [orderId]);
 
     const toggleSelection = (serviceId) => {
+        const service = services.find(s => s.id === serviceId);
+        
+        if (existingServiceIds.includes(serviceId)) {
+            setDuplicateServiceName(service?.name || "este servicio");
+            setShowDuplicateModal(true);
+            return;
+        }
+        
         setSelectedServiceIds((prev) => 
             prev.includes(serviceId) ? prev.filter(id => id !== serviceId) : [...prev, serviceId]
         );
@@ -98,7 +120,12 @@ export default function AddServiceScreen({ navigation, route }){
             navigation.navigate("Home"); 
         } catch (error) {
             setIsSubmitting(false);
-            Alert.alert("Error", "No se pudieron agregar los servicios.");
+            const errorMessage = error.response?.data?.error || "No se pudieron agregar los servicios.";
+            if (error.response?.data?.duplicates) {
+                Alert.alert("Servicios Duplicados", errorMessage);
+            } else {
+                Alert.alert("Error", errorMessage);
+            }
         }
     };
 
@@ -141,6 +168,7 @@ export default function AddServiceScreen({ navigation, route }){
                                     description={item.description}
                                     price={item.price}
                                     isSelected={selectedServiceIds.includes(item.id)}
+                                    isAlreadyAdded={existingServiceIds.includes(item.id)}
                                     onToggle={toggleSelection}
                                 />
                                 {index < services.length - 1 && <View style={styles.hrLight} />}
@@ -184,7 +212,23 @@ export default function AddServiceScreen({ navigation, route }){
                         </View>
                     </View>
                 </Modal>
- 
+
+                {/* MODAL: SERVICIO DUPLICADO */}
+                <Modal visible={showDuplicateModal} transparent={true} animationType="fade" onRequestClose={() => setShowDuplicateModal(false)}>
+                    <View style={styles.modalOverlayDark}>
+                        <View style={styles.modalContentSmall}>
+                            <MaterialCommunityIcons name="alert-circle" size={50} color="#FFD43B" style={{ marginBottom: 10 }} />
+                            <Text style={[styles.modalTitle, { textAlign: 'center', fontSize: 18, color: "white" }]}>Servicio Duplicado</Text>
+                            <Text style={styles.modalText}>El servicio "{duplicateServiceName}" ya está agregado a esta orden.</Text>
+                            <TouchableOpacity
+                                style={styles.checkoutButton}
+                                onPress={() => setShowDuplicateModal(false)}
+                            >
+                                <Text style={[styles.checkoutButtonText, { paddingHorizontal: 20 }]}>Aceptar</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </Modal>
             </SafeAreaView>
         </SafeAreaProvider>
     );
@@ -255,6 +299,18 @@ const styles = StyleSheet.create({
         size: 14,
         marginTop: 6,
         fontWeight: "600"
+    },
+    selectableItemDisabled: {
+        opacity: 0.6,
+    },
+    serviceTitleDisabled: {
+        color: "#9CA3AF",
+    },
+    subTextDisabled: {
+        color: "#6B7280",
+    },
+    priceTextDisabled: {
+        color: "#6B7280",
     },
     summaryCard: {
         backgroundColor: "#1A1D24",

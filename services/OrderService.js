@@ -91,6 +91,10 @@ class OrderService {
         });
     }
 
+    static async getOrderServices(orderId) {
+        return await ApiClient.get(`/ordenes/${orderId}/servicios`);
+    }
+
     /**
      * Agrega uno o más productos a la orden.
      * Utilizado en AddProductScreen.js
