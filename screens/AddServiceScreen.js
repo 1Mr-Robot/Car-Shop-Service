@@ -6,10 +6,8 @@ import {
     ScrollView,
     TouchableOpacity,
     Pressable,
-    FlatList,
     Modal,
-    ActivityIndicator,
-    TextInput, 
+    ActivityIndicator, 
     Alert
 } from "react-native";
 import {
@@ -17,7 +15,7 @@ import {
     SafeAreaView,
     useSafeAreaInsets
 } from "react-native-safe-area-context";
-import { MaterialCommunityIcons, Feather } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
 import { Checkbox } from 'expo-checkbox';
 
@@ -54,11 +52,6 @@ export default function AddServiceScreen({ navigation, route }){
     const [selectedServiceIds, setSelectedServiceIds] = useState([]);
     const [isLoadingInit, setIsLoadingInit] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
-
-    // Estados Servicio Personalizado
-    const [showCustomModal, setShowCustomModal] = useState(false);
-    const [customDesc, setCustomDesc] = useState("");
-    const [customPrice, setCustomPrice] = useState("");
 
     useEffect(() => {
         const fetchCatalog = async () => {
@@ -109,25 +102,6 @@ export default function AddServiceScreen({ navigation, route }){
         }
     };
 
-    // POST: Servicio Personalizado
-    const handleAddCustomService = async () => {
-        if (!customDesc.trim() || !customPrice.trim()) {
-            Alert.alert("Campos incompletos", "Define la descripción y el precio estimado.");
-            return;
-        }
-
-        setIsSubmitting(true);
-        try {
-            await OrderService.addCustomService(orderId, customDesc, customPrice);
-            setIsSubmitting(false);
-            setShowCustomModal(false);
-            navigation.navigate("Home");
-        } catch (error) {
-            setIsSubmitting(false);
-            Alert.alert("Error", "No se pudo crear el servicio personalizado.");
-        }
-    };
-
     if (isLoadingInit) {
         return (
             <SafeAreaProvider>
@@ -153,17 +127,10 @@ export default function AddServiceScreen({ navigation, route }){
                 <View style={styles.hr} />
 
                 <ScrollView showsVerticalScrollIndicator={false}>
-                    <View style={{ marginTop: 20, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                    <View style={{ marginTop: 20, marginBottom: 6 }}>
                         <Text style={styles.sectionTitleText}>CATÁLOGO DE SERVICIOS</Text>                  
-                        <TouchableOpacity 
-                            style={styles.customServiceBtn} 
-                            onPress={() => setShowCustomModal(true)}
-                        >
-                            <Feather name="plus" size={14} color="#000" />
-                            <Text style={styles.customServiceBtnText}>Personalizado</Text>
-                        </TouchableOpacity>
                     </View>
-                    <Text style={styles.subText}>Selecciona del catálogo base o crea uno al vuelo.</Text>
+                    <Text style={styles.subText}>Selecciona los servicios del catálogo.</Text>
 
                     <View style={styles.listContainer}>
                         {services.map((item, index) => (
@@ -207,48 +174,7 @@ export default function AddServiceScreen({ navigation, route }){
                     </TouchableOpacity>
                 </View>
 
-                {/* MODAL 1: CREAR SERVICIO PERSONALIZADO */}
-                <Modal visible={showCustomModal} transparent={true} animationType="slide" onRequestClose={() => setShowCustomModal(false)}>
-                    <View style={styles.modalOverlay}>
-                        <View style={styles.modalContent}>
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '100%', marginBottom: 15 }}>
-                                <Text style={styles.modalTitle}>Servicio Extra / Imprevisto</Text>
-                                <TouchableOpacity onPress={() => setShowCustomModal(false)}>
-                                    <Feather name="x" size={24} color="#888" />
-                                </TouchableOpacity>
-                            </View>
-                            
-                            <Text style={styles.inputLabel}>Descripción del Trabajo</Text>
-                            <TextInput 
-                                style={styles.inputField}
-                                placeholder="Ej. Soldadura de mofle especial..."
-                                placeholderTextColor="#666"
-                                value={customDesc}
-                                onChangeText={setCustomDesc}
-                                multiline
-                            />
-
-                            <Text style={styles.inputLabel}>Precio / Costo Estimado ($)</Text>
-                            <TextInput 
-                                style={styles.inputField}
-                                placeholder="0.00"
-                                placeholderTextColor="#666"
-                                value={customPrice}
-                                onChangeText={setCustomPrice}
-                                keyboardType="numeric"
-                            />
-
-                            <TouchableOpacity 
-                                style={[styles.checkoutButton, { marginTop: 25 }]} 
-                                onPress={handleAddCustomService}
-                            >
-                                <Text style={styles.checkoutButtonText}>Guardar y Añadir a la Orden</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                </Modal>
-
-                {/* MODAL 2: CARGANDO (MUTACIÓN) */}
+                {/* MODAL: CARGANDO (MUTACIÓN) */}
                 <Modal visible={isSubmitting} transparent={true} animationType="fade">
                     <View style={styles.modalOverlayDark}>
                         <View style={styles.modalContentSmall}>
@@ -326,23 +252,9 @@ const styles = StyleSheet.create({
     },
     priceText: {
         color: "#9CA3AF",
-        fontSize: 14,
+        size: 14,
         marginTop: 6,
         fontWeight: "600"
-    },
-    customServiceBtn: { 
-        backgroundColor: "#FFD43B", 
-        flexDirection: 'row', 
-        alignItems: 'center', 
-        paddingHorizontal: 14, 
-        paddingVertical: 8, 
-        borderRadius: 20, 
-        gap: 6 
-    },
-    customServiceBtnText: { 
-        color: "#000", 
-        fontWeight: "bold", 
-        fontSize: 12 
     },
     summaryCard: {
         backgroundColor: "#1A1D24",
@@ -391,39 +303,6 @@ const styles = StyleSheet.create({
         color: "black",
         fontSize: 18,
         fontWeight: "700",
-    },
-    modalOverlay: { 
-        flex: 1, 
-        backgroundColor: "rgba(0,0,0,0.7)", 
-        justifyContent: "flex-end" 
-    },
-    modalContent: { 
-        backgroundColor: "#1A1D24", 
-        borderTopLeftRadius: 30, 
-        borderTopRightRadius: 30, 
-        padding: 25, 
-        paddingBottom: 50 
-    },
-    modalTitle: { 
-        color: "#fff", 
-        fontSize: 20, 
-        fontWeight: "bold" 
-    },
-    inputLabel: { 
-        color: "#FFD43B", 
-        fontSize: 13, 
-        fontWeight: "600", 
-        marginBottom: 8, 
-        marginTop: 15 
-    },
-    inputField: { 
-        backgroundColor: "#0F1115", 
-        color: "#fff", 
-        borderRadius: 12, 
-        padding: 15, 
-        fontSize: 16, 
-        borderWidth: 1, 
-        borderColor: "#2A2F36" 
     },
     modalOverlayDark: { 
         flex: 1, 
