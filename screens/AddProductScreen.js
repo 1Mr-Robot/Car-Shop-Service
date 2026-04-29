@@ -8,7 +8,8 @@ import {
     Pressable,
     Modal, 
     ActivityIndicator, 
-    Alert
+    Alert,
+    TextInput
 } from "react-native";
 import {
     SafeAreaProvider,
@@ -28,6 +29,7 @@ const AddProductScreen = ({ navigation, route }) => {
     const [products, setProducts] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [searchQuery, setSearchQuery] = useState("");
 
     // 1. Carga de productos reales del catálogo
     useEffect(() => {
@@ -81,6 +83,13 @@ const AddProductScreen = ({ navigation, route }) => {
     const formatPrice = (price) => `$${price.toLocaleString("es-MX", { minimumFractionDigits: 2 })}`;
     const itemsSelectedCount = products.filter(p => p.quantity > 0).length;
 
+    const filteredProducts = products.filter(product => {
+        const query = searchQuery.toLowerCase();
+        const brandMatch = product.brand?.toLowerCase().includes(query);
+        const nameMatch = product.name?.toLowerCase().includes(query);
+        return brandMatch || nameMatch;
+    });
+
     // 4. Lógica de Mutación (POST a la Orden)
     const handleAddProductsToOrder = async () => {
         const payload = products
@@ -128,13 +137,30 @@ const AddProductScreen = ({ navigation, route }) => {
 
                 <ScrollView showsVerticalScrollIndicator={false}>
                     <View style={styles.sectionTitle}>
-                        <Text style={styles.sectionTitleText}>PRODUCTOS EN STOCK ({products.length})</Text>
+                        <Text style={styles.sectionTitleText}>PRODUCTOS EN STOCK ({filteredProducts.length})</Text>
                     </View>
 
-                    {products.length === 0 ? (
+                    <View style={styles.searchContainer}>
+                        <Feather name="search" size={18} color="#8B90A0" />
+                        <TextInput
+                            placeholder="Buscar por marca o nombre..."
+                            placeholderTextColor="#8B90A0"
+                            style={styles.searchInput}
+                            caretColor="#FFD43B"
+                            value={searchQuery}
+                            onChangeText={setSearchQuery}
+                        />
+                        {searchQuery.length > 0 && (
+                            <TouchableOpacity onPress={() => setSearchQuery("")}>
+                                <Feather name="x" size={18} color="#8B90A0" />
+                            </TouchableOpacity>
+                        )}
+                    </View>
+
+                    {filteredProducts.length === 0 ? (
                         <Text style={{ color: '#8B90A0', textAlign: 'center', marginTop: 40 }}>No hay productos con stock disponible en el taller.</Text>
                     ) : (
-                        products.map((item) => (
+                        filteredProducts.map((item) => (
                             <View key={item.id} style={styles.cartItem}>
                                 <View style={styles.itemImageContainer}>
                                     <MaterialCommunityIcons name="wrench" size={35} color="#FFD43B" />
@@ -230,6 +256,21 @@ const styles = StyleSheet.create({
         backgroundColor: "#2A2F36",
         width: "100%",
         marginBottom: 20
+    },
+    searchContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        backgroundColor: "#14161C",
+        borderRadius: 15,
+        paddingHorizontal: 14,
+        paddingVertical: 10,
+        marginBottom: 20,
+    },
+    searchInput: {
+        flex: 1,
+        marginLeft: 10,
+        marginRight: 10,
+        color: "#fff",
     },
     sectionTitle: {
         marginBottom: 16,
