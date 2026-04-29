@@ -30,13 +30,24 @@ const AddProductScreen = ({ navigation, route }) => {
     const [isLoading, setIsLoading] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
+    const [existingProductsMap, setExistingProductsMap] = useState({});
 
-    // 1. Carga de productos reales del catálogo
+    // 1. Carga de productos reales del catálogo y productos existentes en la orden
     useEffect(() => {
         const fetchInventory = async () => {
             try {
                 setIsLoading(true);
+                
+                // Cargar productos del catálogo
                 const data = await CatalogService.getProducts({ conStock: true, limit: 50 });
+                
+                // Cargar productos existentes en la orden
+                const orderProductsData = await OrderService.getOrderProducts(orderId);
+                const existingMap = {};
+                orderProductsData.data.forEach(op => {
+                    existingMap[op.id_producto] = op.cantidad;
+                });
+                setExistingProductsMap(existingMap);
                 
                 // Mapeamos los datos de la DB al formato de la UI interactiva
                 const formattedProducts = data.map(p => ({
@@ -46,7 +57,7 @@ const AddProductScreen = ({ navigation, route }) => {
                     sku: p.sku,
                     price: parseFloat(p.precio_venta),
                     stock: p.cantidad_stock,
-                    quantity: 0
+                    quantity: existingMap[p.id] || 0
                 }));
                 
                 setProducts(formattedProducts);
@@ -59,7 +70,7 @@ const AddProductScreen = ({ navigation, route }) => {
         };
 
         fetchInventory();
-    }, []);
+    }, [orderId]);
 
     // 2. Controladores de Cantidad con Validación de Stock
     const updateQuantity = (id, delta) => {
@@ -79,9 +90,18 @@ const AddProductScreen = ({ navigation, route }) => {
     };
 
     // 3. Cálculos Financieros
-    const totalToAdd = products.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const totalToAdd = products.reduce((sum, item) => {
+        const existingQty = existingProductsMap[item.id] || 0;
+        const newQty = Math.max(0, item.quantity - existingQty);
+        return sum + item.price * newQty;
+    }, 0);
     const formatPrice = (price) => `$${price.toLocaleString("es-MX", { minimumFractionDigits: 2 })}`;
-    const itemsSelectedCount = products.filter(p => p.quantity > 0).length;
+    
+    const itemsToAddCount = products.reduce((sum, item) => {
+        const existingQty = existingProductsMap[item.id] || 0;
+        const newQty = Math.max(0, item.quantity - existingQty);
+        return sum + newQty;
+    }, 0);
 
     const filteredProducts = products.filter(product => {
         const query = searchQuery.toLowerCase();
@@ -93,8 +113,16 @@ const AddProductScreen = ({ navigation, route }) => {
     // 4. Lógica de Mutación (POST a la Orden)
     const handleAddProductsToOrder = async () => {
         const payload = products
-            .filter(p => p.quantity > 0)
-            .map(p => ({ id_producto: p.id, cantidad: p.quantity }));
+            .filter(p => {
+                const existingQty = existingProductsMap[p.id] || 0;
+                const newQty = p.quantity - existingQty;
+                return newQty > 0;
+            })
+            .map(p => {
+                const existingQty = existingProductsMap[p.id] || 0;
+                const newQty = p.quantity - existingQty;
+                return { id_producto: p.id, cantidad: newQty };
+            });
 
         if (payload.length === 0) return;
 
@@ -104,7 +132,6 @@ const AddProductScreen = ({ navigation, route }) => {
             await OrderService.addProductsToOrder(orderId, payload);
             
             setIsSubmitting(false);
-            // TRUCO DE SINCRONIZACIÓN: Redirigir al Home dispara el fetch y actualiza todo el árbol
             navigation.navigate("Home");
         } catch (error) {
             setIsSubmitting(false);
@@ -201,9 +228,9 @@ const AddProductScreen = ({ navigation, route }) => {
                         </View>                       
                     </View>
                         <TouchableOpacity
-                            style={[styles.checkoutButton, (isSubmitting || itemsSelectedCount === 0) && { opacity: 0.5 }]}
+                            style={[styles.checkoutButton, (isSubmitting || itemsToAddCount === 0) && { opacity: 0.5 }]}
                             onPress={handleAddProductsToOrder}
-                            disabled={isSubmitting || itemsSelectedCount === 0}
+                            disabled={isSubmitting || itemsToAddCount === 0}
                         >
                             {isSubmitting ? (
                                 <ActivityIndicator color="black" />

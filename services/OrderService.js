@@ -106,6 +106,10 @@ class OrderService {
         });
     }
 
+    static async getOrderProducts(orderId) {
+        return await ApiClient.get(`/ordenes/${orderId}/productos`);
+    }
+
     /**
      * Agrega un servicio personalizado (al vuelo) definiendo descripción y precio.
      */
