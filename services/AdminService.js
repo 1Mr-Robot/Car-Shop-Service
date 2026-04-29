@@ -14,8 +14,8 @@ class AdminService {
         return await ApiClient.post('/vehiculos', vehicleData);
     }
 
-    static async getProductos() {
-        const response = await ApiClient.get('/productos');
+    static async getProductos(limit = 100) {
+        const response = await ApiClient.get(`/productos?limit=${limit}`);
         return response.data || [];
     }
 

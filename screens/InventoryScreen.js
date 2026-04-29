@@ -32,6 +32,7 @@ const InventoryScreen = ({ navigation }) => {
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [newStock, setNewStock] = useState("");
     const [userName, setUserName] = useState("Usuario");
+    const [searchQuery, setSearchQuery] = useState("");
 
     useEffect(() => {
         loadData();
@@ -44,7 +45,7 @@ const InventoryScreen = ({ navigation }) => {
     const loadData = async () => {
         try {
             setIsLoadingData(true);
-            const productsData = await AdminService.getProductos();
+            const productsData = await AdminService.getProductos(100);
             const currentUser = await AdminService.getCurrentUser();
             setProducts(productsData);
             if (currentUser) {
@@ -57,6 +58,13 @@ const InventoryScreen = ({ navigation }) => {
             setIsLoadingData(false);
         }
     };
+
+    const filteredProducts = products.filter(product => {
+        const query = searchQuery.toLowerCase();
+        const brandMatch = product.marca?.toLowerCase().includes(query);
+        const nameMatch = product.nombre?.toLowerCase().includes(query);
+        return brandMatch || nameMatch;
+    });
 
     const handleSelectProduct = (product) => {
         setSelectedProduct(product);
@@ -127,19 +135,36 @@ const InventoryScreen = ({ navigation }) => {
 
                 <View style={styles.statsContainer}>
                     <View style={styles.statCard}>
-                        <Text style={styles.statNumber}>{products.length}</Text>
+                        <Text style={styles.statNumber}>{filteredProducts.length}</Text>
                         <Text style={styles.statLabel}>Productos</Text>
                     </View>
                     <View style={styles.statCard}>
                         <Text style={styles.statNumber}>
-                            {products.reduce((sum, p) => sum + (p.cantidad_stock || 0), 0)}
+                            {filteredProducts.reduce((sum, p) => sum + (p.cantidad_stock || 0), 0)}
                         </Text>
                         <Text style={styles.statLabel}>Total Piezas</Text>
                     </View>
                 </View>
 
+                <View style={styles.searchContainer}>
+                    <Feather name="search" size={18} color="#8B90A0" />
+                    <TextInput
+                        placeholder="Buscar por marca o nombre..."
+                        placeholderTextColor="#8B90A0"
+                        style={styles.searchInput}
+                        caretColor="#FFD43B"
+                        value={searchQuery}
+                        onChangeText={setSearchQuery}
+                    />
+                    {searchQuery.length > 0 && (
+                        <TouchableOpacity onPress={() => setSearchQuery("")}>
+                            <Feather name="x" size={18} color="#8B90A0" />
+                        </TouchableOpacity>
+                    )}
+                </View>
+
                 <FlatList
-                    data={products}
+                    data={filteredProducts}
                     keyExtractor={item => item.id.toString()}
                     renderItem={renderProductItem}
                     contentContainerStyle={styles.listContent}
@@ -289,6 +314,22 @@ const styles = StyleSheet.create({
     statLabel: {
         color: "#888",
         fontSize: 12,
+    },
+    searchContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        backgroundColor: "#14161C",
+        borderRadius: 15,
+        paddingHorizontal: 14,
+        paddingVertical: 10,
+        marginHorizontal: 18,
+        marginBottom: 16,
+    },
+    searchInput: {
+        flex: 1,
+        marginLeft: 10,
+        marginRight: 10,
+        color: "#fff",
     },
     listContent: {
         paddingHorizontal: 18,

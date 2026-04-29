@@ -207,7 +207,7 @@ export default function AddServiceScreen({ navigation, route }){
                     <View style={styles.modalOverlayDark}>
                         <View style={styles.modalContentSmall}>
                             <ActivityIndicator size="large" color="#FFD43B" style={{ marginBottom: 20 }} />
-                            <Text style={[styles.modalTitle, { textAlign: 'center' }]}>Actualizando Orden...</Text>
+                            <Text style={[styles.modalTitle, { textAlign: 'center', color: "white" }]}>Actualizando Orden...</Text>
                             <Text style={styles.modalText}>Registrando servicios en el taller.</Text>
                         </View>
                     </View>
