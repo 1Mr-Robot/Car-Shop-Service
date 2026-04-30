@@ -1,18 +1,25 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
     View,
     Text,
     StyleSheet,
     ScrollView,
     Pressable,
+    ActivityIndicator,
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
-import BottomNav from "../components/BottomNav";
-import OrderCard from "../components/OrderCard";
 import { useNavigation } from "@react-navigation/native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import BottomNav from "../components/BottomNav";
+import OrderCard from "../components/OrderCard";
+import OrderService from "../services/OrderService";
+
+import { getAuth } from "firebase/auth";
+import { app } from "../firebaseConfig";
+
+const auth = getAuth(app);
 
 const months = [
     "Enero","Febrero","Marzo","Abril","Mayo","Junio",
@@ -21,35 +28,12 @@ const months = [
 
 const weekDays = ["L","M","M","J","V","S","D"];
 
-const mockOrders = {
-    "2026-03-06": [
-        {
-            id: 1,
-            vehicle: "Ford F-150",
-            service: "Diagnóstico de motor",
-            plate: "PL-9988",
-            time: "02:30 PM",
-            status: "PENDIENTE"
-        }
-    ],
-    "2026-03-07": [
-        {
-            id: 2,
-            vehicle: "Toyota RAV4",
-            service: "Servicio de mantenimiento",
-            plate: "TX-5544",
-            time: "09:00 AM",
-            status: "PROGRAMADO"
-        },
-        {
-            id: 3,
-            vehicle: "BMW X5",
-            service: "Cambio de aceite",
-            plate: "BM-2233",
-            time: "11:00 AM",
-            status: "PROGRAMADO"
-        }
-    ]
+const convertToDateKey = (dateStr) => {
+    if (!dateStr) return null;
+    const parts = dateStr.split('/');
+    if (parts.length !== 3) return null;
+    const [day, month, year] = parts;
+    return `${year}-${month.padStart(2,'0')}-${day.padStart(2,'0')}`;
 };
 
 export default function AgendaScreen() {
@@ -60,23 +44,90 @@ export default function AgendaScreen() {
     const [selectedDay, setSelectedDay] = useState(new Date().getDate());
     const [filterType, setFilterType] = useState("day");
     const [expandedId, setExpandedId] = useState(null);
+    
+    const [ordersByDate, setOrdersByDate] = useState({});
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(null);
+
     const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
     const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
     const startOffset = firstDayOfMonth === 0 ? 6 : firstDayOfMonth - 1;
     const formattedDate = `${currentYear}-${String(currentMonth + 1).padStart(2,"0")}-${String(selectedDay).padStart(2,"0")}`;
-    const allDates = Object.keys(mockOrders);
+    const allDates = Object.keys(ordersByDate);
+
+    const fetchOrders = async (uid) => {
+        if (!uid) return;
+        try {
+            setIsLoading(true);
+            setError(null);
+            const allOrders = await OrderService.getAllOrders(uid, 100);
+            
+            const grouped = {};
+            allOrders.forEach(order => {
+                const dateKey = convertToDateKey(order.startDate);
+                if (dateKey) {
+                    if (!grouped[dateKey]) {
+                        grouped[dateKey] = [];
+                    }
+                    const hasPending = order.services?.some(s => s.status === 'Pendiente');
+                    const hasInProgress = order.services?.some(s => s.status === 'En Progreso');
+                    const hasFinalized = order.services?.every(s => s.status === 'Finalizado');
+                    
+                    let status = 'Pendiente';
+                    if (hasInProgress) status = 'En Progreso';
+                    else if (hasFinalized && order.endDate) status = 'Finalizado';
+                    else if (order.services?.length > 0) status = 'Pendiente';
+                    
+                    grouped[dateKey].push({
+                        ...order,
+                        status,
+                        time: order.time || order.startTime,
+                    });
+                }
+            });
+            
+            setOrdersByDate(grouped);
+        } catch (err) {
+            console.error("Error al cargar órdenes:", err);
+            setError("No se pudieron cargar las órdenes.");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        const unsubscribeAuth = auth.onAuthStateChanged((user) => {
+            if (user) {
+                fetchOrders(user.uid);
+            } else {
+                setIsLoading(false);
+            }
+        });
+
+        const unsubscribeFocus = navigation.addListener('focus', () => {
+            const currentUser = auth.currentUser;
+            if (currentUser) {
+                fetchOrders(currentUser.uid);
+            }
+        });
+
+        return () => {
+            unsubscribeAuth();
+            unsubscribeFocus();
+        };
+    }, [navigation]);
 
     let filteredOrders = [];
 
     if (filterType === "day") {
-        filteredOrders = mockOrders[formattedDate] || [];
+        filteredOrders = ordersByDate[formattedDate] || [];
     }
 
     if (filterType === "month") {
         const monthPrefix = `${currentYear}-${String(currentMonth + 1).padStart(2,"0")}`;
         filteredOrders = allDates
         .filter(date => date.startsWith(monthPrefix))
-        .flatMap(date => mockOrders[date]);
+        .flatMap(date => ordersByDate[date] || []);
     }
 
     if (filterType === "week") {
@@ -91,7 +142,7 @@ export default function AgendaScreen() {
             const d = new Date(date);
             return d >= startOfWeek && d <= endOfWeek;
         })
-        .flatMap(date => mockOrders[date]);
+        .flatMap(date => ordersByDate[date] || []);
     }
 
     const goNextMonth = () => {
@@ -113,6 +164,27 @@ export default function AgendaScreen() {
         }
         setSelectedDay(1);
     };
+
+    if (isLoading && Object.keys(ordersByDate).length === 0) {
+        return (
+            <SafeAreaView style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+                <ActivityIndicator size="large" color="#FFD43B" />
+                <Text style={{ color: "#888", marginTop: 15 }}>Cargando calendario...</Text>
+            </SafeAreaView>
+        );
+    }
+
+    if (error) {
+        return (
+            <SafeAreaView style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+                <Feather name="alert-triangle" size={40} color="#FF4D4D" />
+                <Text style={{ color: "#fff", marginTop: 15, textAlign: 'center', paddingHorizontal: 20 }}>{error}</Text>
+                <Pressable onPress={() => fetchOrders(auth?.currentUser?.uid)} style={styles.retryButton}>
+                    <Text style={styles.retryButtonText}>Reintentar</Text>
+                </Pressable>
+            </SafeAreaView>
+        );
+    }
 
     return (
         <>
@@ -213,30 +285,33 @@ export default function AgendaScreen() {
                         filteredOrders.map((order) => (
                             <OrderCard
                                 key={order.id}
+                                id={order.id}
                                 type={
-                                order.status === "PENDIENTE"
-                                    ? "active"
-                                    : order.status === "PROGRAMADO"
-                                    ? "upcoming"
-                                    : "completed"
+                                    order.status === "En Progreso"
+                                        ? "active"
+                                        : order.status === "Finalizado"
+                                        ? "completed"
+                                        : "upcoming"
                                 }
-                                vehicleYear="2026"
-                                vehicleBrand={order.vehicle.split(" ")[0]}
-                                vehicleModel={order.vehicle.split(" ").slice(1).join(" ")}
-                                vehiclePlate={order.plate}
-                                services={[
-                                    {
-                                        id: 1,
-                                        title: order.service,
-                                        status: "pending"
-                                    }
-                                ]}
-                                notes="Sin notas"
+                                vehicleYear={order.vehicleYear}
+                                vehicleBrand={order.vehicleBrand}
+                                vehicleModel={order.vehicleModel}
+                                vehiclePlate={order.vehiclePlate}
+                                vehicleColor={order.vehicleColor}
+                                vehicleVIN={order.vehicleVIN}
+                                ownerName={order.ownerName}
+                                services={order.services || []}
+                                notes={order.notes}
                                 time={order.time}
-                                mileage="15000"
+                                mileage={order.vehicleMileage}
                                 navigation={navigation}
                                 expandedId={expandedId}
                                 setExpandedId={setExpandedId}
+                                startDate={order.startDate}
+                                startTime={order.startTime}
+                                endDate={order.endDate}
+                                endTime={order.endTime}
+                                products={order.products}
                             />
                         ))
                     )}
@@ -337,49 +412,16 @@ const styles = StyleSheet.create({
         color: "#888",
         fontSize: 14,
     },
-    orderCard: {
-        flexDirection: "row",
-        backgroundColor: "#1A1D24",
-        padding: 16,
-        borderRadius: 16,
-        marginBottom: 15,
-        alignItems: "center",
-    },
-    vehicle: {
-        color: "#fff",
-        fontSize: 15,
-        fontWeight: "600",
-    },
-    service: {
-        color: "#8B90A0",
-        fontSize: 12,
-        marginTop: 4,
-    },
-    timeText: {
-        color: "#8B90A0",
-        fontSize: 12,
-        marginTop: 4,
-    },
-    statusBadge: {
-        paddingHorizontal: 12,
-        paddingVertical: 6,
-        borderRadius: 20,
-    },
-    pendingBadge: {
+    retryButton: {
+        marginTop: 20,
+        paddingVertical: 12,
+        paddingHorizontal: 24,
         backgroundColor: "#FFD43B",
+        borderRadius: 12,
     },
-    programmedBadge: {
-        borderWidth: 1,
-        borderColor: "#FFD43B",
-    },
-    statusText: {
-        fontSize: 12,
-        fontWeight: "600",
-    },
-    pendingText: {
+    retryButtonText: {
         color: "#000",
-    },
-    programmedText: {
-        color: "#FFD43B",
+        fontWeight: "600",
+        fontSize: 14,
     },
 });

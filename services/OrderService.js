@@ -22,6 +22,15 @@ class OrderService {
         return await ApiClient.get(`/ordenes?${params.toString()}`);
     }
 
+    // Método para obtener todas las órdenes (sin filtro de estatus) para el calendario
+    static async getAllOrders(mecanicoId, limit = 100) {
+        const response = await this.getOrders({
+            mecanicoId,
+            limit
+        });
+        return response.data || [];
+    }
+
     // Wrappers específicos para la UI (HomeScreen y OrdersScreen)
     static async getActiveOrder(mecanicoId) {
         const response = await this.getOrders({
