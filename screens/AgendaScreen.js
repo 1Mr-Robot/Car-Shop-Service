@@ -36,6 +36,38 @@ const convertToDateKey = (dateStr) => {
     return `${year}-${month.padStart(2,'0')}-${day.padStart(2,'0')}`;
 };
 
+const convertTo24Hour = (timeStr) => {
+    if (!timeStr) return "23:59";
+    const match = timeStr.match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i);
+    if (!match) return timeStr;
+    let hours = parseInt(match[1]);
+    const minutes = match[2];
+    const period = match[3].toUpperCase();
+    if (period === 'PM' && hours !== 12) hours += 12;
+    if (period === 'AM' && hours === 12) hours = 0;
+    return `${hours.toString().padStart(2,'0')}:${minutes}`;
+};
+
+const getStatusPriority = (status) => {
+    if (status === 'Finalizado') return 1;
+    if (status === 'En Progreso') return 2;
+    return 3;
+};
+
+const sortOrders = (orders) => {
+    return [...orders].sort((a, b) => {
+        if (a.startDate !== b.startDate) {
+            return a.startDate.localeCompare(b.startDate);
+        }
+        const timeA = convertTo24Hour(a.startTime);
+        const timeB = convertTo24Hour(b.startTime);
+        if (timeA !== timeB) {
+            return timeA.localeCompare(timeB);
+        }
+        return getStatusPriority(a.status) - getStatusPriority(b.status);
+    });
+};
+
 export default function AgendaScreen() {
     const navigation = useNavigation();
     const insets = useSafeAreaInsets();
@@ -282,7 +314,7 @@ export default function AgendaScreen() {
                             No hay órdenes para este filtro.
                         </Text>
                     ) : (
-                        filteredOrders.map((order) => (
+                        sortOrders(filteredOrders).map((order) => (
                             <OrderCard
                                 key={order.id}
                                 id={order.id}
