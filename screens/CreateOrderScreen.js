@@ -503,9 +503,9 @@ const CreateOrderScreen = ({ navigation }) => {
                 <Text style={styles.headerTitle}>Nueva Orden de Servicio</Text>
 
                 <KeyboardAvoidingView
-                    behavior={Platform.OS === "ios" ? "padding" : "height"}
+                    behavior="padding"
                     style={{ flex: 1 }}
-                    keyboardVerticalOffset={10}
+                    keyboardVerticalOffset={Platform.OS === "ios" ? 10 : 0}
                 >
                     <ScrollView 
                         showsVerticalScrollIndicator={false}
