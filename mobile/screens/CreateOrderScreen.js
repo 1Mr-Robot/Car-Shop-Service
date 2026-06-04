@@ -250,6 +250,8 @@ const TimePickerModal = ({ visible, onClose, onSelect, initialTime }) => {
 // COMPONENTE PRINCIPAL
 // ==========================================
 const CreateOrderScreen = ({ navigation }) => {
+    document.title = 'Nueva orden | Car Shop Service';
+
     const insets = useSafeAreaInsets();
     const [showLogoutModal, setShowLogoutModal] = useState(false);
     const [showNoClientModal, setShowNoClientModal] = useState(false);

@@ -16,6 +16,8 @@ import Service from "../components/Service";
 import VehicleCard from "../components/VehicleCard";
 
 const LastServiceScreen = ({ navigation, route }) => {
+    document.title = 'Órden Completada | Car Shop Service';
+
     const {
         orderId,
         vehicle,
@@ -32,8 +34,6 @@ const LastServiceScreen = ({ navigation, route }) => {
         endTime,
         productsList,
     } = route.params || {};
-console.log("NOTES EN LASTSERVICE:", notes);
-console.log("ROUTE PARAMS:", route.params);
     const insets = useSafeAreaInsets();
 
     // Fallbacks de seguridad

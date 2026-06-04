@@ -34,6 +34,8 @@ const getGreeting = () => {
 };
 
 const HomeScreen = ({ navigation }) => {
+    document.title = 'Inicio | Car Shop Service';
+
     const [expandedId, setExpandedId] = useState(null);
     const [showLogoutModal, setShowLogoutModal] = useState(false);
     const insets = useSafeAreaInsets();

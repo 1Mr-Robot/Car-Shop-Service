@@ -20,6 +20,8 @@ import CatalogService from "../services/CatalogService";
 import AdminService from "../services/AdminService";
 
 const PurchaseMerchScreen = ({ navigation }) => {
+    document.title = 'Nueva venta | Car Shop Service';
+
     const [products, setProducts] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);

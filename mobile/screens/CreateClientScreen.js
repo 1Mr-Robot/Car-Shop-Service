@@ -23,6 +23,8 @@ import { StatusBar } from "expo-status-bar";
 import AdminService from "../services/AdminService";
 
 const CreateClientScreen = ({ navigation }) => {
+    document.title = 'Nuevo cliente | Car Shop Service';
+
     const insets = useSafeAreaInsets();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showSuccessModal, setShowSuccessModal] = useState(false);

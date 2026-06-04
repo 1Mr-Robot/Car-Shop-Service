@@ -22,6 +22,8 @@ import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { app } from "../firebaseConfig"; 
 
 export default function LoginScreen({ navigation }) {
+    document.title = 'Inicio de sesión | Car Shop Service';
+
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);

@@ -23,6 +23,8 @@ import { StatusBar } from "expo-status-bar";
 import AdminService from "../services/AdminService";
 
 const CreateProductScreen = ({ navigation }) => {
+    document.title = 'Nuevo producto | Car Shop Service';
+
     const insets = useSafeAreaInsets();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showSuccessModal, setShowSuccessModal] = useState(false);

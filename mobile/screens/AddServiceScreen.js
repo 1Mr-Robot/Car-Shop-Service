@@ -48,6 +48,8 @@ const SelectableService = ({ id, name, description, price, isSelected, isAlready
 );
 
 export default function AddServiceScreen({ navigation, route }){
+    document.title = 'Agregar Servicios | Car Shop Service';
+
     const insets = useSafeAreaInsets();
     const { orderId } = route.params || {}; 
 

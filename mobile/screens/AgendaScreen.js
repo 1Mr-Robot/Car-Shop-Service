@@ -69,6 +69,8 @@ const sortOrders = (orders) => {
 };
 
 export default function AgendaScreen() {
+    document.title = 'Agenda | Car Shop Service';
+
     const navigation = useNavigation();
     const insets = useSafeAreaInsets();
     const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());

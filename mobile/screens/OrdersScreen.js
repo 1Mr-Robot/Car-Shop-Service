@@ -76,6 +76,8 @@ const groupOrdersByDay = (orders) => {
 };
 
 export default function OrdersScreen({ navigation }) {
+    document.title = 'Órdenes | Car Shop Service';
+
     const [expandedId, setExpandedId] = useState(null);
     const insets = useSafeAreaInsets();
     

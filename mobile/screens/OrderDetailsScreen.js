@@ -51,6 +51,8 @@ const Item = ({ id, title, status, onToggle }) => {
 };
 
 const OrderDetailsScreen = ({ navigation, route }) => {
+    document.title = 'Órden actual | Car Shop Service';
+
     // 1. Extraemos los datos dinámicos, incluyendo la nueva variable 'servicesList'
     const {
         orderId,

@@ -23,6 +23,8 @@ import { StatusBar } from "expo-status-bar";
 import AdminService from "../services/AdminService";
 
 const InventoryScreen = ({ navigation }) => {
+    document.title = 'Inventario | Car Shop Service';
+
     const insets = useSafeAreaInsets();
     const [products, setProducts] = useState([]);
     const [isLoadingData, setIsLoadingData] = useState(true);

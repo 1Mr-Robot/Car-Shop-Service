@@ -27,6 +27,8 @@ import { app } from "../firebaseConfig";
 const auth = getAuth(app);
 
 const NextServiceScreen = ({ navigation, route }) => {
+    document.title = 'Próxima Orden | Car Shop Service';
+
     // 1. Recibo de parametros de OrderCard
     const {
         orderId,

@@ -18,6 +18,8 @@ import { app } from "../firebaseConfig";
 const auth = getAuth(app);
 
 const SalesHistoryScreen = ({ navigation }) => {
+    document.title = 'Historial de Ventas | Car Shop Service';
+
     const [sales, setSales] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
 
