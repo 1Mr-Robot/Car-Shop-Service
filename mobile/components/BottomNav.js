@@ -12,37 +12,39 @@ export default function BottomNav({ active }) {
 
     return (
         <View style={[styles.bottomBar, { bottom: insets.bottom || 0 }]}>
-            <Pressable onPress={() => navigation.navigate("Home")}>
-                <Ionicons
-                    name="grid-outline"
-                    size={24}
-                    color={active === "Home" ? activeColor : inactiveColor}
-                />
-            </Pressable>
+            <View style={styles.container}>
+                <Pressable onPress={() => navigation.navigate("Home")}>
+                    <Ionicons
+                        name="grid-outline"
+                        size={24}
+                        color={active === "Home" ? activeColor : inactiveColor}
+                    />
+                </Pressable>
 
-            <Pressable onPress={() => navigation.navigate("Orders")}>
-                <Ionicons
-                    name="clipboard-outline"
-                    size={24}
-                    color={active === "Orders" ? activeColor : inactiveColor}
-                />
-            </Pressable>
+                <Pressable onPress={() => navigation.navigate("Orders")}>
+                    <Ionicons
+                        name="clipboard-outline"
+                        size={24}
+                        color={active === "Orders" ? activeColor : inactiveColor}
+                    />
+                </Pressable>
 
-            <Pressable onPress={() => navigation.navigate("Agenda")}>
-                <Feather
-                    name="calendar"
-                    size={24}
-                    color={active === "Agenda" ? activeColor : inactiveColor}
-                />
-            </Pressable>
+                <Pressable onPress={() => navigation.navigate("Agenda")}>
+                    <Feather
+                        name="calendar"
+                        size={24}
+                        color={active === "Agenda" ? activeColor : inactiveColor}
+                    />
+                </Pressable>
 
-            <Pressable onPress={() => navigation.navigate("PastRepairs")}>
-                <Feather
-                    name="archive"
-                    size={24}
-                    color={active === "PastRepairs" ? activeColor : inactiveColor}
-                />
-            </Pressable>
+                <Pressable onPress={() => navigation.navigate("PastRepairs")}>
+                    <Feather
+                        name="archive"
+                        size={24}
+                        color={active === "PastRepairs" ? activeColor : inactiveColor}
+                    />
+                </Pressable>
+            </View>
         </View>
     );
 }
@@ -55,9 +57,15 @@ const styles = StyleSheet.create({
         right: 0,
         backgroundColor: "#15181E",
         height: 70,
+    },
+    container: {
+        width: "100%",
+        height: "100%",
+        maxWidth: 600,
+        alignSelf: "center",
         flexDirection: "row",
         justifyContent: "space-evenly",
         alignItems: "center",
         paddingHorizontal: 10,
-    },
+    }
 });

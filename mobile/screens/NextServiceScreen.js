@@ -109,6 +109,7 @@ const NextServiceScreen = ({ navigation, route }) => {
                     contentContainerStyle={{
                         paddingBottom: insets.bottom + 20
                     }}
+                    style={{ width: "100%", maxWidth: 600, alignSelf: "center" }}
                 >
                     {/* FIX 1: Header restaurado a su estructura visual en línea (idéntico a LastServiceScreen) */}
                     <View
@@ -241,7 +242,7 @@ const NextServiceScreen = ({ navigation, route }) => {
 
             <View style={styles.bottom}>
                 <TouchableOpacity 
-                    style={[styles.primaryButton, { bottom: insets.bottom || 0 }]}
+                    style={[styles.primaryButton, { bottom: insets.bottom || 0, width: "100%", maxWidth: 600, alignSelf: "center" }]}
                     onPress={handleStartOrder}
                 >
                     <Text style={styles.primaryButtonText}>Comenzar</Text>
@@ -305,10 +306,11 @@ const styles = StyleSheet.create({
     },
     bottom: {
         position: "absolute",
-        left: 0,
-        right: 0,
         bottom: 0,
         padding: 18,
+        width: "100%",
+        alignSelf: "center",
+        alignItems: "center",
     },
     primaryButton: {
         backgroundColor: "#FFD43B",
@@ -336,7 +338,9 @@ const styles = StyleSheet.create({
         borderRadius: 20, 
         padding: 24, 
         width: "85%", 
-        alignItems: "center" 
+        alignItems: "center",
+        maxWidth: 550,
+        alignSelf: "center"
     },
     modalTitle: { 
         color: "#fff", 

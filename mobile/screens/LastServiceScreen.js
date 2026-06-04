@@ -55,6 +55,7 @@ console.log("ROUTE PARAMS:", route.params);
                     contentContainerStyle={{
                         paddingBottom: insets.bottom + 20,
                     }}
+                    style={{ width: "100%", maxWidth: 600, alignSelf: "center" }}
                 >
                     {/* HEADER */}
                     <View

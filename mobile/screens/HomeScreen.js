@@ -139,7 +139,7 @@ const HomeScreen = ({ navigation }) => {
                 style={[styles.container, { paddingBottom: insets.bottom }]}
                 edges={["top", "bottom"]}
             >
-                <ScrollView showsVerticalScrollIndicator={false}>
+                <ScrollView showsVerticalScrollIndicator={false} style={{ width: "100%", maxWidth: 600, alignSelf: "center" }}>
                     <View style={styles.header}>
                         <View style={styles.profileRow}>
                             <View style={styles.avatar}>
@@ -595,6 +595,8 @@ const styles = StyleSheet.create({
         padding: 24,
         width: "85%",
         alignItems: "center",
+        maxWidth: 400,
+        alignSelf: "center"
     },
     modalTitle: {
         color: "#fff",

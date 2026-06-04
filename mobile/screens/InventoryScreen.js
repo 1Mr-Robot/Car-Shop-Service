@@ -168,6 +168,7 @@ const InventoryScreen = ({ navigation }) => {
                     keyExtractor={item => item.id.toString()}
                     renderItem={renderProductItem}
                     contentContainerStyle={styles.listContent}
+                    showsVerticalScrollIndicator={false}
                     ListEmptyComponent={
                         <View style={styles.emptyContainer}>
                             <Text style={styles.emptyText}>No hay productos en el inventario.</Text>
@@ -287,6 +288,9 @@ const styles = StyleSheet.create({
         paddingVertical: 16,
         borderBottomWidth: 1,
         borderBottomColor: "#1A1D23",
+        width: "100%",
+        maxWidth: 600,
+        alignSelf: "center"
     },
     headerTitle: {
         color: "#fff",
@@ -298,6 +302,9 @@ const styles = StyleSheet.create({
         paddingHorizontal: 18,
         paddingVertical: 16,
         gap: 12,
+        width: "100%",
+        maxWidth: 600,
+        alignSelf: "center"
     },
     statCard: {
         flex: 1,
@@ -324,6 +331,9 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
         marginHorizontal: 18,
         marginBottom: 16,
+        width: "100%",
+        maxWidth: 600,
+        alignSelf: "center"
     },
     searchInput: {
         flex: 1,
@@ -334,6 +344,9 @@ const styles = StyleSheet.create({
     listContent: {
         paddingHorizontal: 18,
         paddingBottom: 20,
+        width: "100%",
+        maxWidth: 600,
+        alignSelf: "center"
     },
     productItem: {
         backgroundColor: "#1A1D23",
@@ -397,6 +410,8 @@ const styles = StyleSheet.create({
         paddingBottom: 20,
         width: "90%",
         alignSelf: "center",
+        maxWidth: 550,
+        alignSelf: "center"
     },
     modalHeader: {
         flexDirection: "row",
@@ -480,6 +495,9 @@ const styles = StyleSheet.create({
         borderTopWidth: 1,
         borderTopColor: "#1A1D23",
         height: 90,
+        width: "100%",
+        maxWidth: 600,
+        alignSelf: "center"
     },
     addProductButton: {
         backgroundColor: "#FFD43B",

@@ -135,7 +135,7 @@ const PurchaseMerchScreen = ({ navigation }) => {
         <SafeAreaProvider>
             <StatusBar style="light" />
             <SafeAreaView style={{ flex: 1, backgroundColor: "#0F1115" }} edges={["top", "bottom"]}>
-                <View style={{ flex: 1, paddingHorizontal: 20, paddingTop: 20, paddingBottom: 260 }}>
+                <View style={{ flex: 1, paddingHorizontal: 20, paddingTop: 20, paddingBottom: 260, width: "100%", maxWidth: 600, alignSelf: "center" }}>
                     <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
                         <View style={styles.header}>
                             <TouchableOpacity onPress={() => navigation.goBack()}>
@@ -200,7 +200,7 @@ const PurchaseMerchScreen = ({ navigation }) => {
                     </ScrollView>
                 </View>
                 <View style={styles.bottom}>
-                    <View style={[styles.fixedBottom, { bottom: insets.bottom || 0 }]}>
+                    <View style={[styles.fixedBottom, { bottom: insets.bottom + 70 || 0 }]}>
                         <View style={styles.topDivider} />
                         <View style={styles.summaryCard}>
                             <Text style={styles.summaryTitle}>RESUMEN DE VENTA</Text>
@@ -503,6 +503,9 @@ const styles = StyleSheet.create({
         paddingBottom: 20,
         backgroundColor: "#0F1115",
         paddingHorizontal: 20,
+        width: "100%",
+        maxWidth: 600,
+        alignSelf: "center"
     },
     topDivider: {
         height: 1,
@@ -523,6 +526,8 @@ const styles = StyleSheet.create({
         padding: 32,
         width: "85%",
         alignItems: "center",
+        maxWidth: 400,
+        alignSelf: "center"
     },
     modalTitle: {
         color: "white",

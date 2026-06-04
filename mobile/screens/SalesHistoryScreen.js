@@ -76,7 +76,7 @@ const SalesHistoryScreen = ({ navigation }) => {
         <SafeAreaProvider>
             <StatusBar style="light" />
             <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
-                <ScrollView showsVerticalScrollIndicator={false}>
+                <ScrollView showsVerticalScrollIndicator={false} style={{ width: "100%", maxWidth: 600, alignSelf: "center" }}>
                     <View style={styles.header}>
                         <TouchableOpacity onPress={() => navigation.goBack()}>
                             <Feather name="arrow-left" size={24} color="white" />
@@ -148,6 +148,9 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         marginBottom: 24,
+        width: "100%",
+        maxWidth: 600,
+        alignSelf: "center"
     },
     headerTitle: {
         color: "white",

@@ -153,7 +153,7 @@ export default function AddServiceScreen({ navigation, route }){
                 </View>
                 <View style={styles.hr} />
 
-                <ScrollView showsVerticalScrollIndicator={false}>
+                <ScrollView showsVerticalScrollIndicator={false} style={{ width: "100%", maxWidth: 600, alignSelf: "center" }}>
                     <View style={{ marginTop: 20, marginBottom: 6 }}>
                         <Text style={styles.sectionTitleText}>CATÁLOGO DE SERVICIOS</Text>                  
                     </View>
@@ -179,7 +179,7 @@ export default function AddServiceScreen({ navigation, route }){
                     {/* RESUMEN DE VENTA / ORDEN (Consistencia con AddProductScreen) */}
 
                 </ScrollView>
-                <View>
+                <View style={{ width: "100%", maxWidth: 600, alignSelf: "center", paddingBottom: 10}}>
                     <Text style={styles.summaryTitle}>Resumen de agregado</Text>
                     <View style={styles.summaryRow}>
                         <Text style={styles.summaryLabel}>Servicios Seleccionados</Text>
@@ -244,7 +244,10 @@ const styles = StyleSheet.create({
         flexDirection: 'row', 
         alignItems: 'center', 
         paddingHorizontal: 0, 
-        paddingVertical: 10 
+        paddingVertical: 10,
+        width: "100%",
+        maxWidth: 600,
+        alignSelf: "center"
     },
     navTitle: { 
         color: "#ffff", 
@@ -258,6 +261,8 @@ const styles = StyleSheet.create({
         height: 1,
         backgroundColor: "#2A2F36",
         width: "100%",
+        maxWidth: 600,
+        alignSelf: "center"
     },
     hrLight: {
         height: 1,
@@ -371,7 +376,9 @@ const styles = StyleSheet.create({
         borderRadius: 20, 
         padding: 30, 
         width: "85%", 
-        alignItems: "center" 
+        alignItems: "center",
+        maxWidth: 400,
+        alignSelf: "center"
     },
     modalText: { 
         color: "#888", 

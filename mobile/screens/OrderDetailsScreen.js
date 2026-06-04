@@ -152,6 +152,7 @@ const OrderDetailsScreen = ({ navigation, route }) => {
                         paddingBottom: insets.bottom + 20,
                     }}
                     showsVerticalScrollIndicator={false}
+                    style={{ width: "100%", maxWidth: 600, alignSelf: "center" }}
                 >
                     <View
                         style={styles.navHeader}
@@ -304,7 +305,7 @@ const OrderDetailsScreen = ({ navigation, route }) => {
                                             Estás a punto de marcar como finalizado:{"\n"}
                                             <Text style={{ fontWeight: "bold", color: "#fff" }}>{serviceToFinish?.title}</Text>
                                         </Text>
-                                        <View style={{ flexDirection: "row", gap: 10, marginTop: 10 }}>
+                                        <View style={{ flexDirection: "row", gap: 10, marginTop: 10, width: "100%" }}>
                                             <TouchableOpacity style={[styles.modalAcceptButton, { flex: 1, backgroundColor: "#333" }]} onPress={() => setServiceToFinish(null)}>
                                                 <Text style={[styles.modalAcceptText, { color: "#fff" }]}>Regresar</Text>
                                             </TouchableOpacity>
@@ -331,8 +332,8 @@ const OrderDetailsScreen = ({ navigation, route }) => {
                 </ScrollView>
                 <View
                     style={[
-                        { bottom: insets.bottom || 0 },
-                        { backgroundColor: "#0F1115" }
+                        { bottom: insets.bottom + 10 || 0 },
+                        { backgroundColor: "#0F1115", width: "100%", maxWidth: 600, alignSelf: "center" },
                     ]}
                 >
                     <View
@@ -496,6 +497,9 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         padding: 24,
         width: "85%",
+        alignItems: "center",
+        maxWidth: 550,
+        alignSelf: "center"
     },
     modalTitle: {
         color: "#fff",
@@ -524,6 +528,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 24,
         borderRadius: 12,
         alignItems: "center",
+        justifyContent: "center",
         marginTop: 16,
     },
     modalAcceptText: {

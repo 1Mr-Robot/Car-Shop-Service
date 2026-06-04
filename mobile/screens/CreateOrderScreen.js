@@ -79,7 +79,7 @@ const DatePickerModal = ({ visible, onClose, onSelect, initialDate }) => {
     return (
         <Modal visible={visible} transparent animationType="slide">
             <View style={styles.modalOverlay}>
-                <View style={[styles.pickerModalContent, { maxHeight: "60%" }]}>
+                <View style={[styles.pickerModalContent, { paddingBottom: 50 }]}>
                     <View style={styles.pickerHeader}>
                         <Text style={styles.pickerTitle}>Seleccionar Fecha</Text>
                         <Pressable onPress={onClose}>
@@ -504,7 +504,7 @@ const CreateOrderScreen = ({ navigation }) => {
 
                 <KeyboardAvoidingView
                     behavior="padding"
-                    style={{ flex: 1 }}
+                    style={{ flex: 1, width: "100%", maxWidth: 600, alignSelf: "center" }}
                     keyboardVerticalOffset={Platform.OS === "ios" ? 10 : 0}
                 >
                     <ScrollView 
@@ -939,11 +939,17 @@ const styles = StyleSheet.create({
         paddingVertical: 16,
         borderBottomWidth: 1,
         borderBottomColor: "#1A1D23",
+        width: "100%",
+        maxWidth: 600,
+        alignSelf: "center"
     },
     headerTitle: {
         color: "#fff",
         fontSize: 18,
         fontWeight: "600",
+        width: "100%",
+        maxWidth: 600,
+        alignSelf: "center",
     },
     sectionTitle: {
         color: "#FFD43B",
@@ -1042,6 +1048,9 @@ const styles = StyleSheet.create({
         borderTopWidth: 1,
         borderTopColor: "#1A1D23",
         height: 90,
+        width: "100%",
+        maxWidth: 600,
+        alignSelf: "center"
     },
     submitButton: {
         backgroundColor: "#FFD43B",
@@ -1072,6 +1081,8 @@ const styles = StyleSheet.create({
         paddingBottom: 30,
         maxHeight: "60%",
         width: "90%",
+        maxWidth: 550,
+        alignSelf: "center"
     },
     modalContentLogout: {
         backgroundColor: "#1A1D23",
@@ -1080,6 +1091,9 @@ const styles = StyleSheet.create({
         maxHeight: "60%",
         alignItems: "center",
         marginHorizontal: 20,
+        width: "85%",
+        maxWidth: 400,
+        alignSelf: "center"
     },
     modalHeader: {
         flexDirection: "row",
@@ -1163,6 +1177,8 @@ const styles = StyleSheet.create({
         borderRadius: 24,
         paddingBottom: 30,
         width: "90%",
+        maxWidth: 550,
+        alignSelf: "center",
     },
     pickerHeader: {
         flexDirection: "row",

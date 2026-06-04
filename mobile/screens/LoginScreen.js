@@ -114,7 +114,7 @@ export default function LoginScreen({ navigation }) {
             <StatusBar barStyle="light-content" backgroundColor="#1a1a1a" />
             <KeyboardAvoidingView
                 behavior={Platform.OS === "ios" ? "padding" : "height"}
-                style={{ flex: 1 }}
+                style={{ flex: 1, maxWidth: 600, alignSelf: "center" }}
                 keyboardVerticalOffset={0}
             >
                 <ScrollView 

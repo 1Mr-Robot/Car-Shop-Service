@@ -201,7 +201,7 @@ export default function AgendaScreen() {
         return (
             <SafeAreaView style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
                 <ActivityIndicator size="large" color="#FFD43B" />
-                <Text style={{ color: "#888", marginTop: 15 }}>Cargando calendario...</Text>
+                <Text style={{ color: "#888", marginTop: 15 }}>Cargando agenda...</Text>
             </SafeAreaView>
         );
     }
@@ -226,7 +226,7 @@ export default function AgendaScreen() {
                 edges={["top","bottom"]}
             >
                 <ScrollView
-                    style={{ flex: 1 }}
+                    style={{ flex: 1, width: "100%", maxWidth: 600, alignSelf: "center" }}
                     contentContainerStyle={styles.scrollContent}
                     showsVerticalScrollIndicator={false}
                 >

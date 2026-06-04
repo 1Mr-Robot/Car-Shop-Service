@@ -145,7 +145,7 @@ export default function PastRepairsScreen({ navigation }) {
                 style={[styles.container, { paddingBottom: insets.bottom }]}
                 edges={["top", "bottom"]}
             >
-                <ScrollView showsVerticalScrollIndicator={false}>
+                <ScrollView showsVerticalScrollIndicator={false} style={{ width: "100%", maxWidth: 600, alignSelf: "center" }}>
 
                     <Text style={styles.headerTitle}>
                         Historial de Ordenes

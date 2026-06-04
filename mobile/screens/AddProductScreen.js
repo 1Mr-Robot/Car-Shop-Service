@@ -162,7 +162,7 @@ const AddProductScreen = ({ navigation, route }) => {
                 </View>
                 <View style={styles.hr} />
 
-                <ScrollView showsVerticalScrollIndicator={false}>
+                <ScrollView showsVerticalScrollIndicator={false} style={{ width: "100%", maxWidth: 600, alignSelf: "center" }}>
                     <View style={styles.sectionTitle}>
                         <Text style={styles.sectionTitleText}>PRODUCTOS EN STOCK ({filteredProducts.length})</Text>
                     </View>
@@ -219,7 +219,7 @@ const AddProductScreen = ({ navigation, route }) => {
                 </ScrollView>
                 
                 <View style={styles.hr}/>
-                <View style={{flexDirection: "row", gap: 25}}>
+                <View style={{flexDirection: "row", gap: 25, width: "100%", maxWidth: 600, alignSelf: "center", paddingBottom: 10}}>
                     <View style={{flexDirection: 1, marginTop: 1}}>
                         <Text style={styles.summaryTitle}>Resumen de agregado</Text>
                         <View styles={[styles.summaryRow]}>
@@ -268,7 +268,10 @@ const styles = StyleSheet.create({
         flexDirection: 'row', 
         alignItems: 'center', 
         paddingHorizontal: 0, 
-        paddingVertical: 10 
+        paddingVertical: 10,
+        width: "100%",
+        maxWidth: 600,
+        alignSelf: "center"
     },
     navTitle: { 
         color: "#ffff", 
@@ -282,7 +285,9 @@ const styles = StyleSheet.create({
         height: 1,
         backgroundColor: "#2A2F36",
         width: "100%",
-        marginBottom: 20
+        marginBottom: 20,
+        maxWidth: 600,
+        alignSelf: "center"
     },
     searchContainer: {
         flexDirection: "row",
@@ -429,6 +434,8 @@ const styles = StyleSheet.create({
         padding: 30,
         width: "85%",
         alignItems: "center",
+        maxWidth: 400,
+        alignSelf: "center"
     },
     modalTitle: {
         color: "#fff",

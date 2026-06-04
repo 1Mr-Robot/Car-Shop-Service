@@ -119,7 +119,7 @@ const CreateProductScreen = ({ navigation }) => {
 
                 <KeyboardAvoidingView
                     behavior={Platform.OS === "ios" ? "padding" : "height"}
-                    style={{ flex: 1 }}
+                    style={{ flex: 1, width: "100%", maxWidth: 600, alignSelf: "center" }}
                     keyboardVerticalOffset={10}
                 >
                     <ScrollView 
@@ -209,6 +209,9 @@ const styles = StyleSheet.create({
         paddingVertical: 16,
         borderBottomWidth: 1,
         borderBottomColor: "#1A1D23",
+        width: "100%",
+        maxWidth: 600,
+        alignSelf: "center"
     },
     backButton: {
         padding: 4,
@@ -261,6 +264,9 @@ const styles = StyleSheet.create({
         borderTopWidth: 1,
         borderTopColor: "#1A1D23",
         height: 90,
+        width: "100%",
+        maxWidth: 600,
+        alignSelf: "center"
     },
     submitButton: {
         backgroundColor: "#FFD43B",

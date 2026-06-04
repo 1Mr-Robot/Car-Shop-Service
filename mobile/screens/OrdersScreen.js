@@ -136,7 +136,7 @@ export default function OrdersScreen({ navigation }) {
             <SafeAreaProvider>
                 <SafeAreaView style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
                     <ActivityIndicator size="large" color="#FFD43B" />
-                    <Text style={{ color: "#888", marginTop: 15 }}>Cargando agenda...</Text>
+                    <Text style={{ color: "#888", marginTop: 15 }}>Cargando ordenes...</Text>
                 </SafeAreaView>
             </SafeAreaProvider>
         );
@@ -151,7 +151,7 @@ export default function OrdersScreen({ navigation }) {
                 style={[styles.container, { paddingBottom: insets.bottom }]}
                 edges={["top", "bottom"]}
             >
-                <ScrollView showsVerticalScrollIndicator={false} style={{ marginBottom: 20 }}>
+                <ScrollView showsVerticalScrollIndicator={false} style={{ marginBottom: 20, width: "100%", maxWidth: 600, alignSelf: "center" }}>
                     <Text
                         style={{
                             fontSize: 24,
