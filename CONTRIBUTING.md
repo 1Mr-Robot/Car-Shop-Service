@@ -18,30 +18,238 @@ Antes de comenzar, asegurate de tener instaladas las siguientes herramientas:
 ## Estructura del Proyecto
 
 ```
-ProyectoMoviles/
-├── App.js                  # Navegacion principal (Stack Navigator)
-├── app.json                # Configuracion de la app Expo
-├── firebaseConfig.js       # Configuracion de Firebase
-├── index.js                # Punto de entrada Expo
-├── package.json            # Dependencias del frontend
-├── tsconfig.json           # Configuracion de TypeScript
-├── .prettierrc             # Configuracion de formateo
+Car-Shop-Service/
+├── App.js                           # Navegacion principal (Stack Navigator)
+├── app.json                         # Configuracion de la app Expo
+├── index.js                         # Punto de entrada Expo
+├── package.json                     # Dependencias del frontend
+├── package-lock.json                # Lockfile de dependencias frontend
+├── tsconfig.json                    # Configuracion de TypeScript
+├── .env
 ├── .gitignore
-├── assets/                 # Imagenes y recursos estaticos
-├── components/             # Componentes reutilizables
-├── screens/                # Pantallas de la aplicacion
-├── services/               # Capa de acceso a la API
+├── .easignore
+├── CONTRIBUTING.md                  # Guia de contribucion
+├── README.md                        # Documentacion del proyecto
+├── LICENSE                          # Licencia del proyecto
+├── eas.json                         # Configuracion de EAS Build
+├── firebaseConfig.js                # Configuracion de Firebase
+│
+├── assets/                          # Imagenes y recursos estaticos
+│   ├── adaptive-icon.png
+│   ├── favicon.png
+│   ├── icon.png
+│   ├── logo.png
+│   └── splash-icon.png
+│
+├── components/                      # Componentes reutilizables
+│   ├── BottomNav.js                 # Barra de navegacion (mecanico)
+│   ├── BottomNavReceptionist.js     # Barra de navegacion (recepcionista)
+│   ├── OrderCard.js                 # Tarjeta de orden de servicio
+│   ├── Service.js                   # Componente de servicio
+│   └── VehicleCard.js               # Tarjeta de vehiculo
+│
+├── screens/                         # Pantallas de la aplicacion
+│   ├── AddProductScreen.js          # Agregar producto al inventario
+│   ├── AddServiceScreen.js          # Agregar servicio a una orden
+│   ├── AgendaScreen.js              # Agenda de servicios
+│   ├── CartScreen.js                # Carrito de compras
+│   ├── CreateClientScreen.js        # Crear nuevo cliente
+│   ├── CreateOrderScreen.js         # Crear orden de servicio
+│   ├── CreateProductScreen.js       # Crear nuevo producto
+│   ├── CreateVehicleScreen.js       # Registrar nuevo vehiculo
+│   ├── HomeScreen.js                # Pantalla principal
+│   ├── InventoryScreen.js           # Inventario de productos
+│   ├── LastServiceScreen.js         # Ultimo servicio del vehiculo
+│   ├── LoginScreen.js               # Pantalla de inicio de sesion
+│   ├── NextServiceScreen.js         # Proximo servicio programado
+│   ├── OrderDetailsScreen.js        # Detalles de orden de servicio
+│   ├── OrdersScreen.js              # Lista de ordenes (mecanico)
+│   ├── PastRepairsScreen.js         # Historial de reparaciones
+│   └── SalesHistoryScreen.js        # Historial de ventas
+│
+├── services/                        # Capa de acceso a la API
+│   ├── AdminService.js              # Servicios para admins
+│   ├── apiClient.js                 # Cliente HTTP configurado
+│   ├── CatalogService.js            # Servicios de catalogos
+│   ├── OrderService.js              # Servicios de ordenes
+│   └── SalesService.js              # Servicios de ventas
+│
 ├── database/
-│   └── schema.sql          # Schema completo de PostgreSQL
-└── backend/
-    ├── server.js           # Servidor Express
-    ├── db.js               # Pool de conexion a PostgreSQL
-    ├── package.json        # Dependencias del backend
-    ├── .env                # Variables de entorno (NO compartir)
-    ├── routes/             # Definicion de rutas
-    ├── controllers/         # Logica de negocio
-    └── node_modules/
+│   └── schema.sql                   # Schema completo de PostgreSQL
+│
+└── backend/                         # Servidor Express
+    ├── server.js                    # Punto de entrada del servidor
+    ├── db.js                        # Pool de conexion a PostgreSQL
+    ├── package.json                 # Dependencias del backend
+    ├── package-lock.json            # Lockfile de dependencias backend
+    ├── .env                         # Variables de entorno (NO compartir)
+    ├── .env.example                 # Ejemplo de variables de entorno
+    ├── .dockerignore
+    ├── Dockerfile                   # Imagen Docker del backend
+    ├── docker-compose.yml           # Configuracion de contenedores
+    ├── nginx.conf                   # Configuracion de Nginx
+    │
+    ├── config/
+    │   └── firebase.js              # Configuracion de Firebase Admin
+    │
+    ├── controllers/                 # Logica de negocio
+    │   ├── authController.js        # Autenticacion
+    │   ├── catalogController.js     # Catalogos del sistema
+    │   ├── clienteController.js     # Gestion de clientes
+    │   ├── ordenController.js       # Gestion de ordenes
+    │   ├── productoController.js    # Gestion de productos
+    │   ├── usuarioController.js     # Gestion de usuarios
+    │   ├── vehiculoController.js    # Gestion de vehiculos
+    │   └── ventaController.js       # Gestion de ventas
+    │
+    ├── middleware/                   # Middleware de Express
+    │   ├── authMiddleware.js         # Verificacion de token JWT
+    │   └── roleMiddleware.js         # Control de roles (mecanico/recepcionista)
+    │
+    └── routes/                      # Definicion de rutas API
+        ├── authRoutes.js            # Rutas de autenticacion
+        ├── catalogRoutes.js         # Rutas de catalogos
+        ├── clienteRoutes.js         # Rutas de clientes
+        ├── ordenRoutes.js           # Rutas de ordenes
+        ├── productoRoutes.js        # Rutas de productos
+        ├── usuarioRoutes.js         # Rutas de usuarios
+        ├── vehiculoRoutes.js        # Rutas de vehiculos
+        └── ventaRoutes.js           # Rutas de ventas
 ```
+
+> **Nota:** Las carpetas `.expo/`, `dist/`, `node_modules/` y `.git/` han sido excluidas de esta estructura.
+
+---
+
+## Esquema de la Base de Datos
+
+El proyecto utiliza **PostgreSQL** como base de datos. A continuacion se describe cada tabla y sus campos:
+
+### 1. Tablas Independientes (Catalogos)
+
+```
+rol                           # Roles de usuario en el sistema
+├── id                        # Identificador unico del rol (PK)
+└── nombre                    # Nombre del rol (ej: 'Mecanico', 'Recepcionista')
+
+cliente                       # Clientes del taller
+├── id                        # Identificador unico del cliente (PK)
+├── nombre                    # Nombre(s) del cliente
+├── apellido_paterno          # Apellido paterno del cliente
+├── apellido_materno          # Apellido materno del cliente
+├── rfc                       # RFC del cliente (opcional, unico)
+├── celular                   # Numero de telefono celular (unico, requerido)
+├── correo                    # Correo electronico (unico, opcional)
+└── direccion                 # Direccion del cliente (texto libre)
+
+producto                      # Productos y piezas en inventario
+├── id                        # Identificador unico del producto (PK)
+├── sku                       # Codigo SKU del producto (unico, requerido)
+├── codigo_barras             # Codigo de barras (unico, opcional)
+├── nombre                    # Nombre del producto
+├── vehiculos_compatibles     # Texto con vehiculos compatibles (opcional)
+├── descripcion               # Descripcion detallada del producto
+├── marca                     # Marca del producto
+├── activo                    # Si el producto esta disponible (default TRUE)
+├── cantidad_stock            # Cantidad en inventario (default 0)
+├── precio_compra             # Costo de compra al proveedor
+└── precio_venta              # Precio de venta al cliente
+
+servicio                      # Servicios que ofrece el taller
+├── id                        # Identificador unico del servicio (PK)
+├── nombre                    # Nombre del servicio (ej: 'Cambio de aceite')
+├── descripcion               # Descripcion del servicio
+├── precio_mano_obra          # Costo de la mano de obra (default 0.00)
+└── activo                    # Si el servicio esta disponible (default TRUE)
+```
+
+### 2. Tablas Dependientes (Nivel 1)
+
+```
+usuario                       # Usuarios del sistema (mecanicos/recepcionistas)
+├── id                        # Identificador unico del usuario (PK)
+├── firebase_uid             # UID de Firebase Authentication (unico, requerido)
+├── id_rol                    # FK hacia rol (requerido, no eliminable)
+├── nombre                    # Nombre(s) del usuario
+├── apellido_paterno          # Apellido paterno del usuario
+├── apellido_materno          # Apellido materno del usuario
+├── rfc                       # RFC del usuario (unico, opcional)
+├── curp                      # CURP del usuario (unico, opcional)
+├── celular                   # Numero de telefono (unico, requerido)
+└── correo                    # Correo electronico (unico, requerido)
+
+vehiculo                      # Vehiculos registrados por los clientes
+├── id                        # Identificador unico del vehiculo (PK)
+├── id_cliente                # FK hacia cliente (required, CASCADE al eliminar)
+├── marca                     # Marca del vehiculo (ej: 'Toyota')
+├── modelo                    # Modelo del vehiculo (ej: 'Corolla')
+├── anio                      # Anio del vehiculo
+├── color                     # Color del vehiculo
+├── matricula                 # Placas del vehiculo (unico, requerido)
+└── niv                       # Numero de identificacion vehicular (17 digitos, unico)
+```
+
+### 3. Tablas Dependientes (Nivel 2)
+
+```
+orden                        # Ordenes de servicio
+├── id                       # Identificador unico de la orden (PK)
+├── id_vehiculo              # FK hacia vehiculo (requerido, no eliminable)
+├── id_mecanico              # FK hacia usuario (mecanico asignado, no eliminable)
+├── notas_cliente            # Notas o instrucciones del cliente
+├── kilometraje              # Kilometraje actual del vehiculo
+├── fecha_inicio             # Fecha de inicio de la orden (requerido)
+├── fecha_fin                # Fecha de finalizacion (nullable)
+└── total_orden              # Total de la orden (default 0.00)
+
+venta                        # Ventas de productos
+├── id                       # Identificador unico de la venta (PK)
+├── id_usuario               # FK hacia usuario (recepcionista que realizo la venta)
+├── total                    # Total de la venta
+└── fecha                    # Fecha de la venta (default CURRENT_TIMESTAMP)
+```
+
+### 4. Tablas de Detalle (Nivel 3)
+
+```
+orden_servicio               # Servicios asociados a una orden
+├── id                       # Identificador unico (PK)
+├── id_orden                 # FK hacia orden (CASCADE al eliminar)
+├── id_servicio              # FK hacia servicio (no eliminable)
+├── estatus                  # Estado del servicio en la orden
+│   ├── Pendiente           # Servicio asignado pero no iniciado
+│   ├── En Progreso         # Servicio en ejecucion
+│   └── Finalizado          # Servicio completado
+├── descripcion_personalizada # Notas especificas para este servicio
+└── precio_personalizado    # Precio especial (nullable, sobrescribe el de servicio)
+
+orden_producto              # Productos utilizados en una orden
+├── id                       # Identificador unico (PK)
+├── id_orden                 # FK hacia orden (CASCADE al eliminar)
+├── id_producto             # FK hacia producto (no eliminable)
+├── cantidad                # Cantidad de productos usados (> 0)
+├── precio_unitario         # Precio unitario al momento de agregar
+└── subtotal                # cantidad * precio_unitario
+
+detalle_venta               # Productos vendidos en una venta
+├── id_venta                # FK hacia venta (CASCADE al eliminar)
+├── id_producto             # FK hacia producto (no eliminable)
+├── cantidad                # Cantidad de productos vendidos (> 0)
+├── precio_unitario         # Precio unitario al momento de la venta
+├── subtotal                # cantidad * precio_unitario
+└── PRIMARY KEY (id_venta, id_producto)  # Clave compuesta
+```
+
+### Relaciones entre tablas
+
+- **rol** (1) ──────── (N) **usuario**
+- **cliente** (1) ──────── (N) **vehiculo**
+- **usuario** (1) ──────── (N) **orden** (como mecanico)
+- **vehiculo** (1) ──────── (N) **orden**
+- **orden** (1) ──────── (N) **orden_servicio**
+- **orden** (1) ──────── (N) **orden_producto**
+- **usuario** (1) ──────── (N) **venta**
+- **venta** (1) ──────── (N) **detalle_venta**
 
 ---
 
