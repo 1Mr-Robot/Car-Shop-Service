@@ -62,13 +62,13 @@ Car-Shop-Service/
 │  Web bundle  │            │  - sirve /dist (web)     │           │ (carshop-   │
 │  (mobile/)   │ ◄───────── │  - proxy /api → backend  │ ◄──────── │   backend)  │
 └──────┬───────┘            └──────────────────────────┘           └──────┬──────┘
-       │                                                                    │
-       │ Firebase Auth (Email/Password)                                     │ pg
-       ▼                                                                    ▼
-┌──────────────┐                                                    ┌─────────────┐
-│   Firebase   │  ◄── verifyIdToken (Firebase Admin SDK) ──────────►│ PostgreSQL  │
-│     Auth     │                                                    │ (carshop-db)│
-└──────────────┘                                                    └─────────────┘
+       │                                                                  │
+       │ Firebase Auth (Email/Password)                                   │ pg
+       ▼                                                                  ▼
+┌──────────────┐                                                   ┌─────────────┐
+│   Firebase   │  ◄────── verifyIdToken (Firebase Admin SDK) ─────►│ PostgreSQL  │
+│     Auth     │                                                   │ (carshop-db)│
+└──────────────┘                                                   └─────────────┘
 ```
 
 ### Frontend — Aplicación Móvil (`mobile/`)
