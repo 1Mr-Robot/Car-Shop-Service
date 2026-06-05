@@ -5,7 +5,7 @@ import { getAuth } from 'firebase/auth';
 import { app } from '../firebaseConfig'; 
 
 const auth = getAuth(app);
-const BASE_URL = `${process.env.EXPO_PUBLIC_API_URL}/api/v1`; 
+const BASE_URL = process.env.EXPO_PUBLIC_API_URL ? `${process.env.EXPO_PUBLIC_API_URL}/api/v1` : `/api/v1`;
 
 class ApiClient {
     static async _getToken() {

@@ -60,10 +60,11 @@ export default function LoginScreen({ navigation }) {
             const userCredential = await signInWithEmailAndPassword(auth, email.trim(), password);
             const user = userCredential.user;
             
-            console.log("¡Usuario autenticado en Firebase! UID:", user.uid);
+            console.log("¡Usuario autenticado en Firebase!");
             
             // Enviamos el UID al servidor Node.js
-            const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/auth/verify`, {
+            const URL = process.env.EXPO_PUBLIC_API_URL ? `${process.env.EXPO_PUBLIC_API_URL}/api/auth/verify` : `/api/auth/verify`;
+            const response = await fetch(URL, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -80,8 +81,6 @@ export default function LoginScreen({ navigation }) {
                 showModal("Acceso Denegado", data.error || "No estás registrado en el sistema del taller.");
                 return;
             }
-
-            console.log("Datos desde PostgreSQL:", data.user);
 
             // ==================================================================
             // ENRUTAMIENTO BASADO EN RBAC
@@ -543,6 +542,8 @@ const styles = StyleSheet.create({
         padding: 28,
         width: "85%",
         alignItems: "center",
+        maxWidth: 400,
+        alignSelf: "center",
     },
     modalIconContainer: {
         width: 64,
