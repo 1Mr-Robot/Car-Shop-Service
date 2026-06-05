@@ -23,7 +23,9 @@ import CatalogService from "../services/CatalogService";
 import OrderService from "../services/OrderService";
 
 const AddProductScreen = ({ navigation, route }) => {
-    document.title = 'Agregar Productos | Car Shop Service';
+    useEffect(() => {
+            navigation.setOptions({ title: 'Agregar Productos | Car Shop Service' });
+        }, [navigation]);
 
     const { orderId } = route.params || {};
     const insets = useSafeAreaInsets();

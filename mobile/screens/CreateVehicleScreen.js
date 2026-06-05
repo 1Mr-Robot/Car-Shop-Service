@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
     View,
     Text,
@@ -27,7 +27,9 @@ const currentYear = new Date().getFullYear();
 const years = Array.from({ length: 30 }, (_, i) => currentYear - i);
 
 const CreateVehicleScreen = ({ navigation, route }) => {
-    document.title = 'Nuevo vehículo | Car Shop Service';
+    useEffect(() => {
+        navigation.setOptions({ title: 'Nuevo vehículo | Car Shop Service' });
+    }, [navigation]);
 
     const insets = useSafeAreaInsets();
     const [isSubmitting, setIsSubmitting] = useState(false);

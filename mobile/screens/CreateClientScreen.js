@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
     View,
     Text,
@@ -23,7 +23,9 @@ import { StatusBar } from "expo-status-bar";
 import AdminService from "../services/AdminService";
 
 const CreateClientScreen = ({ navigation }) => {
-    document.title = 'Nuevo cliente | Car Shop Service';
+    useEffect(() => {
+        navigation.setOptions({ title: 'Nuevo cliente | Car Shop Service' });
+    }, [navigation]);
 
     const insets = useSafeAreaInsets();
     const [isSubmitting, setIsSubmitting] = useState(false);

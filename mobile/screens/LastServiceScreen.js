@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
     View,
     Text,
@@ -16,7 +16,9 @@ import Service from "../components/Service";
 import VehicleCard from "../components/VehicleCard";
 
 const LastServiceScreen = ({ navigation, route }) => {
-    document.title = 'Órden Completada | Car Shop Service';
+    useEffect(() => {
+        navigation.setOptions({ title: 'Órden Completada | Car Shop Service' });
+    }, [navigation]);
 
     const {
         orderId,

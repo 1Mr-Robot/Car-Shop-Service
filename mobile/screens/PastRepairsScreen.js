@@ -74,7 +74,9 @@ const groupOrdersByDay = (orders) => {
 };
 
 export default function PastRepairsScreen({ navigation }) {
-    document.title = 'Historial de Ordenes | Car Shop Service';
+    useEffect(() => {
+        navigation.setOptions({ title: 'Historial de Ordenes | Car Shop Service' });
+    }, [navigation]);
 
     const [expandedId, setExpandedId] = useState(null);
     const insets = useSafeAreaInsets();

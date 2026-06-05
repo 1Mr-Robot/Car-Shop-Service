@@ -10,7 +10,6 @@ import {
 import { Feather } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
-import { useNavigation } from "@react-navigation/native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import BottomNav from "../components/BottomNav";
 import OrderCard from "../components/OrderCard";
@@ -68,10 +67,11 @@ const sortOrders = (orders) => {
     });
 };
 
-export default function AgendaScreen() {
-    document.title = 'Agenda | Car Shop Service';
-
-    const navigation = useNavigation();
+export default function AgendaScreen({ navigation }) {
+    useEffect(() => {
+        navigation.setOptions({ title: 'Agenda | Car Shop Service' });
+    }, [navigation]);
+    
     const insets = useSafeAreaInsets();
     const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
     const [currentYear, setCurrentYear] = useState(new Date().getFullYear());

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
     View,
     Text,
@@ -22,7 +22,9 @@ import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { app } from "../firebaseConfig"; 
 
 export default function LoginScreen({ navigation }) {
-    document.title = 'Inicio de sesión | Car Shop Service';
+    useEffect(() => {
+        navigation.setOptions({ title: 'Inicio de sesión | Car Shop Service' });
+    }, [navigation]);
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");

@@ -18,7 +18,9 @@ import { app } from "../firebaseConfig";
 const auth = getAuth(app);
 
 const SalesHistoryScreen = ({ navigation }) => {
-    document.title = 'Historial de Ventas | Car Shop Service';
+    useEffect(() => {
+        navigation.setOptions({ title: 'Historial de Ventas | Car Shop Service' });
+    }, [navigation]);
 
     const [sales, setSales] = useState([]);
     const [isLoading, setIsLoading] = useState(true);

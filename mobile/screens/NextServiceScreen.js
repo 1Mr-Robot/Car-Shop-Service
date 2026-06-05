@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
     View,
     Text,
@@ -27,7 +27,9 @@ import { app } from "../firebaseConfig";
 const auth = getAuth(app);
 
 const NextServiceScreen = ({ navigation, route }) => {
-    document.title = 'Próxima Órden | Car Shop Service';
+    useEffect(() => {
+        navigation.setOptions({ title: 'Próxima Órden | Car Shop Service' });
+    }, [navigation]);
 
     // 1. Recibo de parametros de OrderCard
     const {

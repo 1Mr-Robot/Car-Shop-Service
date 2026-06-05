@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
     View,
     Text,
@@ -51,7 +51,9 @@ const Item = ({ id, title, status, onToggle }) => {
 };
 
 const OrderDetailsScreen = ({ navigation, route }) => {
-    document.title = 'Órden actual | Car Shop Service';
+    useEffect(() => {
+        navigation.setOptions({ title: 'Órden actual | Car Shop Service' });
+    }, [navigation]);
 
     // 1. Extraemos los datos dinámicos, incluyendo la nueva variable 'servicesList'
     const {

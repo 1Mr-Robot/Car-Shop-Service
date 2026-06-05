@@ -23,7 +23,9 @@ import { StatusBar } from "expo-status-bar";
 import AdminService from "../services/AdminService";
 
 const InventoryScreen = ({ navigation }) => {
-    document.title = 'Inventario | Car Shop Service';
+    useEffect(() => {
+        navigation.setOptions({ title: 'Inventario | Car Shop Service' });
+    }, [navigation]);
 
     const insets = useSafeAreaInsets();
     const [products, setProducts] = useState([]);
