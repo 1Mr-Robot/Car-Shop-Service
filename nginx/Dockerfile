@@ -30,7 +30,7 @@ ENV EXPO_PUBLIC_FIREBASE_APP_ID=$EXPO_PUBLIC_FIREBASE_APP_ID
 
 RUN pnpm exec expo export --platform web
 
-FROM nginx:alpine
+FROM nginx:latest
 
 COPY nginx/default.conf /etc/nginx/conf.d/default.conf
 COPY --from=builder /app/dist /usr/share/nginx/html
